@@ -17,41 +17,48 @@ st.set_page_config(
 # 🎨 Custom CSS for Modern Look
 st.markdown("""
 <style>
-    /* Main background and text */
+    /* Main background - Clean light blue-gray */
     .main {
-        background-color: #0e1117;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     }
 
     /* Headers */
     h1 {
-        color: #ffffff;
+        color: #1a202c;
         font-weight: 700;
         letter-spacing: -0.5px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     h2, h3 {
-        color: #ffffff;
+        color: #2d3748;
         font-weight: 600;
     }
 
-    /* All paragraph and label text */
+    /* All text elements */
     p, label, span, div {
-        color: #ffffff;
+        color: #1a202c;
     }
 
     /* Metrics */
     [data-testid="stMetricValue"] {
         font-size: 28px;
         font-weight: 700;
+        color: #1a202c;
+    }
+
+    [data-testid="stMetricLabel"] {
+        color: #4a5568;
     }
 
     /* Cards with borders */
     [data-testid="stHorizontalBlock"] {
-        background-color: #1a1d24;
+        background-color: #ffffff;
         padding: 20px;
-        border-radius: 10px;
-        border: 1px solid #2d3139;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
         margin-bottom: 15px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
     /* Buttons */
@@ -63,6 +70,7 @@ st.markdown("""
         padding: 10px 24px;
         font-weight: 600;
         transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
     }
 
     .stButton > button:hover {
@@ -73,16 +81,17 @@ st.markdown("""
     /* Tabs */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
-        background-color: #1a1d24;
+        background-color: #ffffff;
         padding: 8px;
-        border-radius: 10px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
     .stTabs [data-baseweb="tab"] {
         height: 50px;
-        background-color: #262a33;
+        background-color: #f7fafc;
         border-radius: 8px;
-        color: #9ca3af;
+        color: #4a5568;
         font-weight: 600;
         font-size: 16px;
         padding: 0 24px;
@@ -95,24 +104,44 @@ st.markdown("""
 
     /* Dataframes */
     [data-testid="stDataFrame"] {
-        background-color: #1a1d24;
-        border-radius: 10px;
-        border: 1px solid #2d3139;
+        background-color: #ffffff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
     /* Sidebar */
     [data-testid="stSidebar"] {
-        background-color: #1a1d24;
+        background: linear-gradient(180deg, #ffffff 0%, #f7fafc 100%);
+        border-right: 1px solid #e2e8f0;
     }
 
     [data-testid="stSidebar"] * {
-        color: #ffffff;
+        color: #1a202c;
+    }
+
+    [data-testid="stSidebar"] h1,
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3 {
+        color: #2d3748;
+    }
+
+    /* Input fields */
+    .stNumberInput > div > div > input {
+        background-color: #ffffff;
+        color: #1a202c;
+        border: 1px solid #cbd5e0;
+        border-radius: 6px;
+    }
+
+    .stSlider > div > div > div {
+        color: #1a202c;
     }
 
     /* Dividers */
     hr {
         margin: 30px 0;
-        border-color: #2d3139;
+        border-color: #cbd5e0;
     }
 
     /* Containers */
@@ -122,34 +151,59 @@ st.markdown("""
 
     /* Captions */
     .st-emotion-cache-16idsys p {
-        color: #9ca3af;
+        color: #718096;
         font-size: 14px;
     }
 
     /* Success/Info/Warning boxes */
     .stSuccess {
-        background-color: #1a3d2e;
+        background-color: #f0fdf4;
         border-left: 4px solid #10b981;
         border-radius: 8px;
+        color: #065f46;
     }
 
     .stInfo {
-        background-color: #1e3a5f;
+        background-color: #eff6ff;
         border-left: 4px solid #3b82f6;
         border-radius: 8px;
+        color: #1e40af;
     }
 
     .stWarning {
-        background-color: #3d2a1a;
+        background-color: #fffbeb;
         border-left: 4px solid #f59e0b;
         border-radius: 8px;
+        color: #92400e;
+    }
+
+    .stError {
+        background-color: #fef2f2;
+        border-left: 4px solid #ef4444;
+        border-radius: 8px;
+        color: #991b1b;
     }
 
     /* Expanders */
     .streamlit-expanderHeader {
-        background-color: #262a33;
+        background-color: #f7fafc;
         border-radius: 8px;
         font-weight: 600;
+        color: #2d3748;
+    }
+
+    /* Text areas */
+    textarea {
+        background-color: #ffffff;
+        color: #1a202c;
+        border: 1px solid #cbd5e0;
+        border-radius: 6px;
+    }
+
+    /* Select boxes */
+    .stSelectbox > div > div {
+        background-color: #ffffff;
+        color: #1a202c;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -304,7 +358,7 @@ def fetch_live_games(sport_keys):
 col1, col2, col3 = st.columns([2, 3, 2])
 with col2:
     st.markdown("<h1 style='text-align: center; margin-bottom: 5px;'>🎯 Philly P Sniper</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #9ca3af; font-size: 16px; margin-top: 0;'>Advanced Betting Intelligence Platform</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #718096; font-size: 16px; margin-top: 0; font-weight: 500;'>Advanced Betting Intelligence Platform</p>", unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -400,11 +454,11 @@ if conn:
                     for _, row in top_15.iterrows():
                         with st.container():
                             st.markdown(f"""
-                            <div style='background: linear-gradient(135deg, #1a1d24 0%, #262a33 100%); padding: 15px; border-radius: 10px; border-left: 4px solid #667eea; margin-bottom: 10px;'>
-                                <p style='color: #9ca3af; font-size: 12px; margin: 0;'>{row['Sport']} • {row['Kickoff']}</p>
-                                <p style='color: white; font-size: 16px; font-weight: 600; margin: 5px 0;'>{row['Event']}</p>
-                                <p style='color: #667eea; font-size: 14px; margin: 5px 0;'>👉 {row['Selection']} @ {row['Dec_Odds']:.2f}</p>
-                                <p style='color: #10b981; font-size: 14px; margin: 5px 0;'>Edge: {row['Edge']} | Stake: {row['Stake']}</p>
+                            <div style='background: #ffffff; padding: 15px; border-radius: 10px; border-left: 4px solid #667eea; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+                                <p style='color: #718096; font-size: 12px; margin: 0;'>{row['Sport']} • {row['Kickoff']}</p>
+                                <p style='color: #1a202c; font-size: 16px; font-weight: 600; margin: 5px 0;'>{row['Event']}</p>
+                                <p style='color: #667eea; font-size: 14px; margin: 5px 0; font-weight: 600;'>👉 {row['Selection']} @ {row['Dec_Odds']:.2f}</p>
+                                <p style='color: #10b981; font-size: 14px; margin: 5px 0; font-weight: 600;'>Edge: {row['Edge']} | Stake: {row['Stake']}</p>
                             </div>
                             """, unsafe_allow_html=True)
                 else:
@@ -438,13 +492,13 @@ if conn:
                     with st.container():
                         if mobile_view:
                             st.markdown(f"""
-                            <div style='background: #1a1d24; padding: 20px; border-radius: 10px; border: 1px solid #2d3139; margin-bottom: 15px;'>
-                                <p style='color: #9ca3af; font-size: 13px; margin-bottom: 8px;'>{row['Sport']} • Kickoff: {row['Kickoff']}</p>
-                                <h4 style='color: white; margin: 8px 0;'>{row['Event']}</h4>
+                            <div style='background: #ffffff; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+                                <p style='color: #718096; font-size: 13px; margin-bottom: 8px;'>{row['Sport']} • Kickoff: {row['Kickoff']}</p>
+                                <h4 style='color: #1a202c; margin: 8px 0;'>{row['Event']}</h4>
                                 <p style='color: #667eea; font-size: 16px; font-weight: 600; margin: 10px 0;'>👉 {row['Selection']} @ {row['Dec_Odds']:.2f}</p>
                                 <div style='margin: 15px 0;'>
-                                    <span style='color: #10b981; font-size: 14px; margin-right: 20px;'>Edge: {row['Edge']}</span>
-                                    <span style='color: #f59e0b; font-size: 14px;'>Stake: {row['Stake']}</span>
+                                    <span style='color: #10b981; font-size: 14px; font-weight: 600; margin-right: 20px;'>Edge: {row['Edge']}</span>
+                                    <span style='color: #f59e0b; font-size: 14px; font-weight: 600;'>Stake: {row['Stake']}</span>
                                 </div>
                                 <div style='margin-top: 12px;'>{badge}</div>
                             </div>

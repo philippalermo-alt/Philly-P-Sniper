@@ -4,6 +4,7 @@ from scipy import stats
 from config import Config
 from utils import log, _num
 from database import safe_execute
+from smart_staking import calculate_smart_stake, get_performance_multipliers
 
 # One-time debug counters for calculate_match_stats TypeErrors
 _calc_stats_typeerror_count = 0
@@ -117,13 +118,16 @@ def calculate_match_stats(home, away, ratings, target_sport):
         log("ERROR", f"calculate_match_stats unexpected error for {home} vs {away} ({sport}): {e}")
         return None, None, None, None
 
-def calculate_kelly_stake(edge, decimal_odds):
+def calculate_kelly_stake(edge, decimal_odds, sport=None, use_smart_staking=True, multipliers=None):
     """
-    Calculate Kelly Criterion stake size.
+    Calculate Kelly Criterion stake size with optional smart staking adjustments.
 
     Args:
         edge: Edge value (positive expected value)
         decimal_odds: Decimal odds
+        sport: Sport category (for smart staking)
+        use_smart_staking: Whether to apply performance-based adjustments
+        multipliers: Pre-calculated multipliers (optional, will fetch if needed)
 
     Returns:
         float: Recommended stake amount
@@ -136,12 +140,18 @@ def calculate_kelly_stake(edge, decimal_odds):
     q = 1 - p
 
     f_star = (b * p - q) / b
-    stake = f_star * Config.KELLY_FRAC * Config.BANKROLL
+    base_stake = f_star * Config.KELLY_FRAC * Config.BANKROLL
     max_stake = Config.BANKROLL * Config.MAX_STAKE_PCT
 
-    return min(stake, max_stake)
+    base_stake = min(base_stake, max_stake)
 
-def process_markets(match, ratings, calibration, cur, all_opps, target_sport, seen_matches, sharp_data, is_soccer=False, predictions=None):
+    # Apply smart staking if enabled and sport is provided
+    if use_smart_staking and sport:
+        return calculate_smart_stake(base_stake, sport, edge, multipliers)
+
+    return base_stake
+
+def process_markets(match, ratings, calibration, cur, all_opps, target_sport, seen_matches, sharp_data, is_soccer=False, predictions=None, multipliers=None):
     """
     Process betting markets for a match and identify valuable opportunities.
 
@@ -156,6 +166,7 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
         sharp_data: Public betting splits data
         is_soccer: Boolean indicating if this is a soccer match
         predictions: Soccer predictions (if applicable)
+        multipliers: Pre-calculated smart staking multipliers (optional)
     """
     now_utc = datetime.now(timezone.utc)
     mdt = datetime.fromisoformat(match['commence_time'].replace('Z', '+00:00'))
@@ -359,7 +370,7 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
                 edge = ((tp * price) - 1) * (0.75 if sport == 'NHL' else 1.0)
 
                 if Config.MIN_EDGE <= edge < Config.MAX_EDGE:
-                    stake = calculate_kelly_stake(edge, price)
+                    stake = calculate_kelly_stake(edge, price, sport=sport, multipliers=multipliers)
                     opp = {
                         'Date': mdt.strftime('%Y-%m-%d'), 'Kickoff': match['commence_time'], 'Sport': sport, 'Event': f"{away} @ {home}",
                         'Selection': sel, 'True_Prob': tp, 'Target': 1/tp if tp else 0, 'Dec_Odds': price,

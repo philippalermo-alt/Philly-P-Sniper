@@ -101,62 +101,50 @@ def confirm_bet(event_id, current_status, user_odds=None, user_stake=None):
         conn.commit(); cur.close(); st.rerun()
     except Exception as e: st.error(f"Error: {e}")
 
+
+    
 @st.cache_data(ttl=60)
-def fetch_live_scores(sport_keys):
-    scores = {}
+def fetch_live_games(sport_keys):
+    games = []
     logs = []
     api_key = os.getenv('ODDS_API_KEY')
-    
-    if not api_key: 
-        logs.append("❌ API Key missing!")
-        return {}, logs
+    if not api_key: return [], ["❌ No API Key"]
     
     unique_sports = set(sport_keys)
-    logs.append(f"🔍 Checking sports: {unique_sports}")
-    logs.append(f"🔑 Key used: {api_key[:4]}...")
-    
-    # Map short names (DB) to API keys (The Odds API)
     SPORT_MAP = {
         'NBA': 'basketball_nba',
         'NCAAB': 'basketball_ncaab', 
         'NFL': 'americanfootball_nfl',
         'NHL': 'icehockey_nhl',
         'MLB': 'baseball_mlb',
-        'SOCCER': 'soccer_epl' # Defaulting soccer to EPL for now, harder to distuinguish
+        'SOCCER': 'soccer_epl'
     }
-
+    
     for sport_short in unique_sports:
         try:
-            # Convert to API key if possible, else try raw
             sport = SPORT_MAP.get(sport_short, sport_short)
-            
             url = f"https://api.the-odds-api.com/v4/sports/{sport}/scores/?apiKey={api_key}&daysFrom=3"
             r = requests.get(url, timeout=5)
-            logs.append(f"📡 {sport} (was {sport_short}): Status {r.status_code}")
-            
-            if r.status_code != 200:
-                logs.append(f"⚠️ Error response: {r.text[:100]}")
-                continue
-                
-            res = r.json()
-            if isinstance(res, list):
-                logs.append(f"✅ Found {len(res)} games for {sport}")
-                for game in res:
-                    if game.get('completed') or game.get('scores'):
-                         h = game['home_team']
-                         a = game['away_team']
-                         h_score = next((s['score'] for s in game['scores'] if s['name'] == h), 0)
-                         a_score = next((s['score'] for s in game['scores'] if s['name'] == a), 0)
-                         status = "🏁" if game['completed'] else "🔴"
-                         score_str = f"{status} {h} {h_score} - {a} {a_score}"
-                         scores[h] = score_str
-                         scores[a] = score_str
+            if r.status_code == 200:
+                res = r.json()
+                for g in res:
+                    if g.get('scores'): # Only care if scores exist
+                        h = g['home_team']
+                        a = g['away_team']
+                        h_s = next((s['score'] for s in g['scores'] if s['name'] == h), 0)
+                        a_s = next((s['score'] for s in g['scores'] if s['name'] == a), 0)
+                        status = "🏁" if g['completed'] else "🔴"
+                        games.append({
+                            'home': h, 'away': a,
+                            'score': f"{status} {h} {h_s} - {a} {a_s}",
+                            'commence': g['commence_time']
+                        })
             else:
-                logs.append(f"⚠️ Unexpected JSON: {type(res)}")
+                logs.append(f"⚠️ {sport}: {r.status_code}")
         except Exception as e:
-            logs.append(f"❌ Exception for {sport}: {e}")
-            pass
-    return scores, logs
+            logs.append(f"❌ {sport}: {e}")
+            
+    return games, logs
 
 # --- 4. Main Dashboard ---
 st.title("🎯 Philly P Sniper: Live Dashboard")
@@ -305,29 +293,35 @@ if conn:
             else: 
                 # Live Score Integration
                 sport_keys = my_bets['sport'].unique()
-                live_data, debug_logs = fetch_live_scores(sport_keys)
+                live_games, debug_logs = fetch_live_games(sport_keys)
                 
                 # DEBUG: Show what we found
                 with st.expander("Debug Live Scores", expanded=False):
-                    for l in debug_logs:
-                        st.text(l)
-                    st.write("Live Data Keys (First 10):", list(live_data.keys())[:10])
+                    for l in debug_logs: st.text(l)
+                    st.write(f"Found {len(live_games)} live games")
 
                 def get_score(row):
-                    # Match score by looking up team names
                     event = row['Event'].replace(' @ ', ' vs ')
                     teams = event.split(' vs ')
-                    if len(teams) >= 2:
-                        # Try exact match first
-                        score = live_data.get(teams[0]) or live_data.get(teams[1])
-                        if score: return score
+                    if len(teams) < 2: return "Upcoming 🕒"
+                    
+                    t1, t2 = teams[0], teams[1]
+                    
+                    for g in live_games:
+                        # Check strictly if BOTH teams are in the game object
+                        # We use simple string inclusion because "Buffalo" is in "Buffalo Sabres"
+                        # But we demand BOTH match to avoid "Washington Capitals" matching "Washington Wizards" vs "Miami Heat" (unlikely across sports but still)
                         
-                        # Try partial match (e.g. "Buffalo" in "Buffalo Sabres")
-                        for team_name in teams:
-                            for live_team, live_score in live_data.items():
-                                if team_name in live_team or live_team in team_name:
-                                    return live_score
-                                    
+                        h, a = g['home'], g['away']
+                        
+                        # Match t1 against home OR away
+                        t1_match = (t1 in h or h in t1) or (t1 in a or a in t1)
+                        # Match t2 against home OR away
+                        t2_match = (t2 in h or h in t2) or (t2 in a or a in t2)
+                        
+                        if t1_match and t2_match:
+                            return g['score']
+                            
                     return "Upcoming 🕒"
 
                 my_bets['Live Score'] = my_bets.apply(get_score, axis=1)

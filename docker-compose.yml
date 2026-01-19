@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      # Internal Docker network connection string
+      - DATABASE_URL=postgresql://user:password@db:5432/philly_sniper
+    # Load other keys (API_KEY, DASHBOARD_PASSWORD, etc) from .env
+    env_file:
+      - .env
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=philly_sniper
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

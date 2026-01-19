@@ -1,0 +1,237 @@
+Running python hard_rock_model.py on philly-p-sniper-web...
+[G[1A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣾[0m
+[G[1A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣽[0m
+[G[1A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣻[0m
+[G[1A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⢿[0m starting, run.5104
+[G[1A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⡿[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣟[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣯[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣷[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣾[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣽[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣻[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⢿[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⡿[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣟[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣯[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣷[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣾[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣽[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣻[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⢿[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⡿[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣟[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣯[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣷[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣾[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣽[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣻[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⢿[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⡿[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣟[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣯[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣷[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣾[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣽[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣻[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⢿[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⡿[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣟[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣯[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣷[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣾[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣽[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣻[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⢿[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⡿[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣟[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣯[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣷[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣾[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣽[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣻[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⢿[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⡿[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣟[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣯[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣷[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣾[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣽[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣻[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⢿[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⡿[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣟[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣯[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... [38;5;104m⣷[0m connecting, run.5104
+[G[2A[JRunning python hard_rock_model.py on philly-p-sniper-web... up, run.5104
+🔄 [INIT] Starting Philly P Sniper...
+🔄 [DB] Initializing database schema...
+🔄 [GRADING] Checking for pending bets to settle...
+🔄 [GRADING] Found 46 past-due bets waiting for scores.
+🔄 [RATINGS] Fetching KenPom, NBA, NHL, and NFL data...
+🔄 [RATINGS] Loaded NFL ratings for 32 teams
+🔄 [RATINGS] Loaded 32 NHL ratings
+🔄 [RATINGS] Loaded 365 KenPom ratings
+🔄 [RATINGS] Loaded NBA ratings
+🔄 [SHARP] Fetching Action Network Pro data (market-specific)...
+🔄 [SHARP] Loaded market-specific sharp splits for 64 matchups
+🔄 [TIME] Window: 2026-01-19 19:06 UTC to 2026-01-22 19:06 UTC
+🔄 [SCAN] Scanning NBA (basketball_nba)... Calibration: 0.88x
+🔄 [SCAN] Found 9 matches
+🔄 [SCAN] Scanning NCAAB (basketball_ncaab)... Calibration: 0.85x
+🔄 [SCAN] Found 47 matches
+🔄 [SCAN] Scanning NFL (americanfootball_nfl)... Calibration: 1.00x
+🔄 [SCAN] Found 0 matches
+🔄 [SCAN] Scanning NHL (icehockey_nhl)... Calibration: 1.00x
+🔄 [SCAN] Found 18 matches
+🔄 [SCAN] Scanning EPL (soccer_epl)... Calibration: 1.00x
+🔄 [SCAN] Found 1 matches
+🔄 [SCAN] Scanning LIGA (soccer_spain_la_liga)... Calibration: 1.00x
+🔄 [SCAN] Found 1 matches
+🔄 [SCAN] Scanning BUNDESLIGA (soccer_germany_bundesliga)... Calibration: 1.00x
+🔄 [SCAN] Found 0 matches
+🔄 [SCAN] Scanning ONE (soccer_france_ligue_one)... Calibration: 1.00x
+🔄 [SCAN] Found 0 matches
+🔄 [SCAN] Scanning A (soccer_italy_serie_a)... Calibration: 1.00x
+🔄 [SCAN] Found 2 matches
+🔄 [SCAN] Scanning BUNDESLIGA2 (soccer_germany_bundesliga2)... Calibration: 1.00x
+🔄 [SCAN] Found 0 matches
+🔄 [SCAN] Scanning CHAMP (soccer_efl_champ)... Calibration: 1.00x
+🔄 [SCAN] Found 12 matches
+
+✅ Scan complete. Found 110 valid bets.
+
+============================================================
+🎯 [TOP 15 PICKS] (Diversity Enforced)
+============================================================
+      Date              Kickoff  Sport                                                Event                          Selection  True_Prob   Target  Dec_Odds  Edge  Stake
+2026-01-19 2026-01-19T19:40:00Z    NBA          Oklahoma City Thunder @ Cleveland Cavaliers            Cleveland Cavaliers  ML   0.495059 2.019963      2.85 41.1% $12.53
+2026-01-20 2026-01-20T03:00:00Z    NHL               New York Islanders @ Vancouver Canucks              Vancouver Canucks  ML   0.679568 1.471524      2.22 38.1% $17.63
+2026-01-19 2026-01-19T23:00:00Z  NCAAB          Providence Friars @ Marquette Golden Eagles                        Under 167.5   0.688923 1.451541      1.95 34.3% $20.39
+2026-01-20 2026-01-20T01:00:00Z  NCAAB            Texas Southern Tigers @ Jackson St Tigers                        Under 153.5   0.688923 1.451541      1.95 34.3% $20.39
+2026-01-20 2026-01-20T01:00:00Z    NHL           Philadelphia Flyers @ Vegas Golden Knights            Philadelphia Flyers  ML   0.540027 1.851759      2.68 33.5% $11.26
+2026-01-20 2026-01-20T00:30:00Z  NCAAB Stephen F. Austin Lumberjacks @ Nicholls St Colonels           Nicholls St Colonels  ML   0.524143 1.907876      2.54 33.1% $12.13
+2026-01-20 2026-01-20T01:00:00Z  NCAAB     Montana Grizzlies @ Northern Arizona Lumberjacks   Northern Arizona Lumberjacks  ML   0.524143 1.907876      2.54 33.1% $12.13
+2026-01-19 2026-01-19T22:10:00Z    NBA                        Utah Jazz @ San Antonio Spurs                   Utah Jazz  +16.5   0.689720 1.449863      1.93 33.1% $20.08
+2026-01-20 2026-01-20T03:10:00Z    NBA                   Miami Heat @ Golden State Warriors                        Under 239.5   0.689720 1.449863      1.93 33.1% $20.08
+2026-01-20 2026-01-20T01:00:00Z  NCAAB   Florida A&M Rattlers @ Miss Valley St Delta Devils Miss Valley St Delta Devils  +11.5   0.689720 1.449863      1.93 33.1% $20.08
+2026-01-20 2026-01-20T00:00:00Z  NCAAB              New Haven Chargers @ Chicago St Cougars                         Over 129.5   0.690534 1.448155      1.91 31.9% $19.76
+2026-01-21 2026-01-21T00:00:00Z    NHL              Ottawa Senators @ Columbus Blue Jackets                          Under 6.5   0.684115 1.461742      2.08 31.7% $16.56
+2026-01-20 2026-01-20T19:45:00Z SOCCER                Birmingham City @ Sheffield Wednesday                            Draw ML   0.285122 3.507271      4.10 16.9%  $3.07
+2026-01-20 2026-01-20T19:45:00Z SOCCER                          Bristol City @ Ipswich Town                            Draw ML   0.295128 3.388358      3.90 15.1%  $2.94
+2026-01-20 2026-01-20T19:45:00Z SOCCER                             Millwall @ Coventry City                            Draw ML   0.300526 3.327496      3.80 14.2%  $2.86
+
+============================================================
+📜 [ALL RECOMMENDED BETS]
+============================================================
+      Date              Kickoff  Sport                                                       Event                              Selection  True_Prob   Target  Dec_Odds  Edge  Stake
+2026-01-19 2026-01-19T19:40:00Z    NBA                 Oklahoma City Thunder @ Cleveland Cavaliers                Cleveland Cavaliers  ML   0.495059 2.019963      2.85 41.1% $12.53
+2026-01-20 2026-01-20T03:00:00Z    NHL                      New York Islanders @ Vancouver Canucks                  Vancouver Canucks  ML   0.679568 1.471524      2.22 38.1% $17.63
+2026-01-20 2026-01-20T01:00:00Z  NCAAB                   Texas Southern Tigers @ Jackson St Tigers                            Under 153.5   0.688923 1.451541      1.95 34.3% $20.39
+2026-01-19 2026-01-19T23:00:00Z  NCAAB                 Providence Friars @ Marquette Golden Eagles                            Under 167.5   0.688923 1.451541      1.95 34.3% $20.39
+2026-01-20 2026-01-20T01:00:00Z    NHL                  Philadelphia Flyers @ Vegas Golden Knights                Philadelphia Flyers  ML   0.540027 1.851759      2.68 33.5% $11.26
+2026-01-20 2026-01-20T00:30:00Z  NCAAB        Stephen F. Austin Lumberjacks @ Nicholls St Colonels               Nicholls St Colonels  ML   0.524143 1.907876      2.54 33.1% $12.13
+2026-01-20 2026-01-20T01:00:00Z  NCAAB            Montana Grizzlies @ Northern Arizona Lumberjacks       Northern Arizona Lumberjacks  ML   0.524143 1.907876      2.54 33.1% $12.13
+2026-01-20 2026-01-20T01:00:00Z  NCAAB          Florida A&M Rattlers @ Miss Valley St Delta Devils     Miss Valley St Delta Devils  +11.5   0.689720 1.449863      1.93 33.1% $20.08
+2026-01-20 2026-01-20T03:10:00Z    NBA                          Miami Heat @ Golden State Warriors                            Under 239.5   0.689720 1.449863      1.93 33.1% $20.08
+2026-01-19 2026-01-19T22:10:00Z    NBA                               Utah Jazz @ San Antonio Spurs                       Utah Jazz  +16.5   0.689720 1.449863      1.93 33.1% $20.08
+2026-01-19 2026-01-19T22:10:00Z    NBA                               Utah Jazz @ San Antonio Spurs                            Under 240.5   0.690534 1.448155      1.91 31.9% $19.76
+2026-01-19 2026-01-19T20:10:00Z    NBA                   Los Angeles Clippers @ Washington Wizards                            Under 226.5   0.690534 1.448155      1.91 31.9% $19.76
+2026-01-20 2026-01-20T01:00:00Z  NCAAB          Northwestern St Demons @ Houston Christian Huskies                            Under 139.5   0.690534 1.448155      1.91 31.9% $19.76
+2026-01-20 2026-01-20T00:00:00Z  NCAAB                     New Haven Chargers @ Chicago St Cougars                             Over 129.5   0.690534 1.448155      1.91 31.9% $19.76
+2026-01-21 2026-01-21T00:00:00Z  NCAAB                         Michigan St Spartans @ Oregon Ducks                     Oregon Ducks  +9.5   0.690534 1.448155      1.91 31.9% $19.76
+2026-01-21 2026-01-21T02:00:00Z  NCAAB                          Georgia Bulldogs @ Missouri Tigers                            Under 166.5   0.690534 1.448155      1.91 31.9% $19.76
+2026-01-19 2026-01-19T22:10:00Z    NBA                          Dallas Mavericks @ New York Knicks                            Under 230.5   0.690534 1.448155      1.91 31.9% $19.76
+2026-01-21 2026-01-21T02:00:00Z  NCAAB                 Vanderbilt Commodores @ Arkansas Razorbacks                            Under 173.5   0.690534 1.448155      1.91 31.9% $19.76
+2026-01-19 2026-01-19T19:40:00Z    NBA                 Oklahoma City Thunder @ Cleveland Cavaliers                            Under 230.5   0.690534 1.448155      1.91 31.9% $19.76
+2026-01-21 2026-01-21T00:00:00Z    NHL                     Ottawa Senators @ Columbus Blue Jackets                              Under 6.5   0.684115 1.461742      2.08 31.7% $16.56
+2026-01-20 2026-01-20T00:40:00Z    NBA                                Phoenix Suns @ Brooklyn Nets                    Brooklyn Nets  +9.0   0.691365 1.446414      1.89 30.7% $19.43
+2026-01-20 2026-01-20T01:10:00Z    NBA                            Boston Celtics @ Detroit Pistons                            Under 223.5   0.691365 1.446414      1.89 30.7% $19.43
+2026-01-20 2026-01-20T03:10:00Z    NBA                          Miami Heat @ Golden State Warriors                         Miami Heat  ML   0.458080 2.183024      2.84 30.1%  $9.22
+2026-01-21 2026-01-21T03:00:00Z  NCAAB                           Purdue Boilermakers @ UCLA Bruins                      UCLA Bruins  +5.5   0.676962 1.477187      1.91 29.3% $18.16
+2026-01-20 2026-01-20T00:40:00Z    NBA                                Phoenix Suns @ Brooklyn Nets                            Under 215.5   0.675136 1.481183      1.91 29.0% $17.94
+2026-01-21 2026-01-21T01:00:00Z    NHL                              St Louis Blues @ Winnipeg Jets                     St Louis Blues  ML   0.624120 1.602255      2.22 28.9% $13.37
+2026-01-19 2026-01-19T19:40:00Z    NBA                 Oklahoma City Thunder @ Cleveland Cavaliers              Cleveland Cavaliers  +5.5   0.651784 1.534250      1.95 27.1% $16.09
+2026-01-19 2026-01-19T21:00:00Z  NCAAB                    McNeese Cowboys @ Texas A&M-CC Islanders           Texas A&M-CC Islanders  +8.5   0.693967 1.440990      1.83 27.0% $18.34
+2026-01-20 2026-01-20T03:00:00Z    NHL                            New York Rangers @ Anaheim Ducks                    Anaheim Ducks  -1.5   0.506002 1.976279      2.68 26.7%  $8.96
+2026-01-20 2026-01-20T01:00:00Z  NCAAB            Montana Grizzlies @ Northern Arizona Lumberjacks     Northern Arizona Lumberjacks  +3.5   0.631642 1.583174      1.98 25.1% $14.42
+2026-01-19 2026-01-19T22:10:00Z    NBA                          Dallas Mavericks @ New York Knicks                Dallas Mavericks  +10.5   0.653395 1.530467      1.91 24.8% $15.37
+2026-01-19 2026-01-19T20:00:00Z  NCAAB                    Prairie View Panthers @ Alcorn St Braves                   Alcorn St Braves  ML   0.528647 1.891620      2.36 24.8% $10.27
+2026-01-21 2026-01-21T02:00:00Z  NCAAB                       Texas Tech Red Raiders @ Baylor Bears                            Under 159.5   0.652608 1.532313      1.91 24.6% $15.28
+2026-01-20 2026-01-20T00:30:00Z  NCAAB        Stephen F. Austin Lumberjacks @ Nicholls St Colonels             Nicholls St Colonels  +4.5   0.657463 1.520998      1.89 24.3% $15.37
+2026-01-19 2026-01-19T21:00:00Z    NHL                    Washington Capitals @ Colorado Avalanche                              Under 6.5   0.690534 1.448155      1.91 23.9% $14.82
+2026-01-20 2026-01-20T01:30:00Z    NHL                          Winnipeg Jets @ Chicago Blackhawks                              Under 5.5   0.638384 1.566456      2.06 23.6% $12.57
+2026-01-21 2026-01-21T02:00:00Z  NCAAB                    SMU Mustangs @ Wake Forest Demon Deacons                            Under 158.5   0.638724 1.565622      1.91 22.0% $13.63
+2026-01-19 2026-01-19T23:30:00Z  NCAAB Bethune-Cookman Wildcats @ Arkansas-Pine Bluff Golden Lions   Arkansas-Pine Bluff Golden Lions  ML   0.530305 1.885706      2.30 22.0%  $9.53
+2026-01-20 2026-01-20T00:30:00Z    NHL                        Minnesota Wild @ Toronto Maple Leafs                Toronto Maple Leafs  ML   0.675353 1.480707      1.91 21.7% $13.48
+2026-01-20 2026-01-20T02:00:00Z    NHL                          New Jersey Devils @ Calgary Flames                  New Jersey Devils  ML   0.693081 1.442833      1.85 21.2% $14.04
+2026-01-20 2026-01-20T02:00:00Z    NHL                          New Jersey Devils @ Calgary Flames                New Jersey Devils  -1.5   0.419760 2.382312      3.05 21.0%  $5.78
+2026-01-19 2026-01-19T20:00:00Z  NCAAB                             Saint Joseph's Hawks @ VCU Rams                            Under 153.5   0.619293 1.614744      1.95 20.8% $12.33
+2026-01-19 2026-01-19T20:00:00Z  NCAAB                    Prairie View Panthers @ Alcorn St Braves                 Alcorn St Braves  +2.5   0.607640 1.645712      1.98 20.3% $11.69
+2026-01-20 2026-01-20T03:10:00Z    NBA                          Miami Heat @ Golden State Warriors                       Miami Heat  +5.5   0.622363 1.606780      1.93 20.1% $12.20
+2026-01-20 2026-01-20T01:00:00Z    NHL                  Philadelphia Flyers @ Vegas Golden Knights                              Under 6.5   0.694418 1.440056      1.82 19.8% $13.61
+2026-01-21 2026-01-21T00:00:00Z    NHL                       San Jose Sharks @ Tampa Bay Lightning                  San Jose Sharks  +1.5   0.639356 1.564073      1.96 19.0% $11.15
+2026-01-19 2026-01-19T23:30:00Z  NCAAB Bethune-Cookman Wildcats @ Arkansas-Pine Bluff Golden Lions Arkansas-Pine Bluff Golden Lions  +2.5   0.609602 1.640414      1.93 17.7% $10.70
+2026-01-19 2026-01-19T20:00:00Z  NCAAB                             Saint Joseph's Hawks @ VCU Rams            Saint Joseph's Hawks  +14.5   0.626838 1.595309      1.87 17.2% $11.16
+2026-01-20 2026-01-20T03:00:00Z    NHL                      New York Islanders @ Vancouver Canucks                               Over 5.5   0.697227 1.434253      1.76 17.0% $12.64
+2026-01-20 2026-01-20T19:45:00Z SOCCER                       Birmingham City @ Sheffield Wednesday                                Draw ML   0.285122 3.507271      4.10 16.9%  $3.07
+2026-01-21 2026-01-21T00:00:00Z  NCAAB                         Michigan St Spartans @ Oregon Ducks                             Over 137.5   0.608859 1.642415      1.91 16.3% $10.10
+2026-01-21 2026-01-21T00:00:00Z    NHL                         Minnesota Wild @ Montréal Canadiens                              Under 6.5   0.699209 1.430187      1.72 15.2% $11.90
+2026-01-20 2026-01-20T03:00:00Z    NHL                            New York Rangers @ Anaheim Ducks                      Anaheim Ducks  ML   0.699209 1.430187      1.72 15.2% $11.90
+2026-01-20 2026-01-20T19:45:00Z SOCCER                                 Bristol City @ Ipswich Town                                Draw ML   0.295128 3.388358      3.90 15.1%  $2.94
+2026-01-20 2026-01-20T01:00:00Z    NHL                  Philadelphia Flyers @ Vegas Golden Knights              Philadelphia Flyers  +1.5   0.699719 1.429145      1.71 14.7% $11.71
+2026-01-21 2026-01-21T03:00:00Z    NHL                        New York Rangers @ Los Angeles Kings                Los Angeles Kings  -1.5   0.524496 1.906591      2.28 14.7%  $6.47
+2026-01-20 2026-01-20T01:30:00Z    NHL                          Winnipeg Jets @ Chicago Blackhawks                 Chicago Blackhawks  ML   0.542537 1.843191      2.20 14.5%  $6.82
+2026-01-21 2026-01-21T03:00:00Z    NHL                         New Jersey Devils @ Edmonton Oilers                              Under 6.5   0.700235 1.428091      1.70 14.3% $11.50
+2026-01-20 2026-01-20T19:45:00Z SOCCER                         Norwich City @ West Bromwich Albion                        Norwich City ML   0.300526 3.327496      3.80 14.2%  $2.86
+2026-01-20 2026-01-20T19:45:00Z SOCCER                                    Millwall @ Coventry City                                Draw ML   0.300526 3.327496      3.80 14.2%  $2.86
+2026-01-20 2026-01-20T00:30:00Z    NHL                        Minnesota Wild @ Toronto Maple Leafs              Toronto Maple Leafs  -1.5   0.370753 2.697212      3.20 14.0%  $3.58
+2026-01-19 2026-01-19T21:00:00Z    NHL                    Washington Capitals @ Colorado Avalanche              Washington Capitals  +1.5   0.700757 1.427027      1.69 13.8% $11.30
+2026-01-21 2026-01-21T00:00:00Z    NHL                         Minnesota Wild @ Montréal Canadiens                 Montréal Canadiens  ML   0.701286 1.425952      1.68 13.4% $11.08
+2026-01-19 2026-01-19T23:30:00Z  NCAAB Bethune-Cookman Wildcats @ Arkansas-Pine Bluff Golden Lions                            Under 155.5   0.592948 1.686490      1.91 13.3%  $8.21
+2026-01-21 2026-01-21T00:00:00Z    NHL                       San Jose Sharks @ Tampa Bay Lightning                              Under 6.5   0.632120 1.581979      1.85 12.7%  $8.43
+2026-01-19 2026-01-19T20:00:00Z  NCAAB                              LIU Sharks @ Le Moyne Dolphins                  Le Moyne Dolphins  ML   0.536517 1.863875      2.10 12.7%  $6.49
+2026-01-21 2026-01-21T00:00:00Z    NHL                     Ottawa Senators @ Columbus Blue Jackets              Columbus Blue Jackets  ML   0.611870 1.634334      1.91 12.7%  $7.84
+2026-01-19 2026-01-19T20:00:00Z  NCAAB                              LIU Sharks @ Le Moyne Dolphins                Le Moyne Dolphins  +1.5   0.584765 1.710089      1.91 11.7%  $7.24
+2026-01-21 2026-01-21T02:00:00Z  NCAAB                       Texas Tech Red Raiders @ Baylor Bears                     Baylor Bears  +1.5   0.584765 1.710089      1.91 11.7%  $7.24
+2026-01-20 2026-01-20T20:00:00Z SOCCER                                Leicester City @ Wrexham AFC                                Draw ML   0.318571 3.139013      3.50 11.5%  $2.59
+2026-01-19 2026-01-19T22:00:00Z    NHL                        Pittsburgh Penguins @ Seattle Kraken                              Under 5.5   0.575481 1.737676      2.00 11.3%  $6.39
+2026-01-19 2026-01-19T23:00:00Z    NHL                          San Jose Sharks @ Florida Panthers                              Under 6.5   0.592813 1.686872      1.94 11.3%  $6.75
+2026-01-20 2026-01-20T01:00:00Z  NCAAB          Florida A&M Rattlers @ Miss Valley St Delta Devils                             Over 139.5   0.575626 1.737240      1.93 11.1%  $6.73
+2026-01-19 2026-01-19T23:00:00Z    NHL                          San Jose Sharks @ Florida Panthers                  San Jose Sharks  +1.5   0.704593 1.419260      1.62 10.6%  $9.65
+2026-01-19 2026-01-19T21:00:00Z    NHL                    Washington Capitals @ Colorado Avalanche                Washington Capitals  ML   0.430788 2.321327      2.64 10.3%  $3.54
+2026-01-19 2026-01-19T21:00:00Z  NCAAB                    McNeese Cowboys @ Texas A&M-CC Islanders                             Over 139.5   0.576439 1.734788      1.91 10.1%  $6.26
+2026-01-21 2026-01-21T02:00:00Z  NCAAB                    SMU Mustangs @ Wake Forest Demon Deacons        Wake Forest Demon Deacons  +1.5   0.586445 1.705190      1.87  9.7%  $6.27
+2026-01-21 2026-01-21T02:00:00Z  NCAAB                             Auburn Tigers @ Ole Miss Rebels                  Ole Miss Rebels  +1.5   0.586445 1.705190      1.87  9.7%  $6.27
+2026-01-21 2026-01-21T00:00:00Z  NCAAB                 Oklahoma Sooners @ South Carolina Gamecocks         South Carolina Gamecocks  +1.5   0.586445 1.705190      1.87  9.7%  $6.27
+2026-01-20 2026-01-20T19:45:00Z SOCCER                             Blackburn Rovers @ Swansea City                                Draw ML   0.336154 2.974828      3.25  9.3%  $2.32
+2026-01-21 2026-01-21T00:00:00Z    NHL                         Minnesota Wild @ Montréal Canadiens               Montréal Canadiens  -1.5   0.431024 2.320057      2.60  9.0%  $3.19
+2026-01-21 2026-01-21T00:00:00Z    NHL                       San Jose Sharks @ Tampa Bay Lightning                    San Jose Sharks  ML   0.332986 3.003129      3.35  8.7%  $2.08
+2026-01-19 2026-01-19T23:00:00Z    NHL                          San Jose Sharks @ Florida Panthers                    San Jose Sharks  ML   0.438282 2.281637      2.52  7.8%  $2.91
+2026-01-20 2026-01-20T02:00:00Z    NHL                          New Jersey Devils @ Calgary Flames                              Under 5.5   0.520445 1.921433      2.12  7.8%  $3.90
+2026-01-19 2026-01-19T20:00:00Z SOCCER                                          Sevilla @ Elche CF                                Draw ML   0.356667 2.803738      3.00  7.0%  $1.97
+2026-01-21 2026-01-21T03:00:00Z    NHL                         New Jersey Devils @ Edmonton Oilers                New Jersey Devils  +1.5   0.710039 1.408373      1.53  6.5%  $6.89
+2026-01-21 2026-01-21T01:00:00Z    NHL                              St Louis Blues @ Winnipeg Jets                              Under 5.5   0.505894 1.976697      2.14  6.2%  $3.07
+2026-01-21 2026-01-21T03:00:00Z    NHL                        New York Rangers @ Los Angeles Kings                  Los Angeles Kings  ML   0.710684 1.407095      1.52  6.0%  $6.53
+2026-01-19 2026-01-19T19:45:00Z SOCCER                                                Como @ Lazio                                Draw ML   0.367778 2.719033      2.88  5.9%  $1.78
+2026-01-21 2026-01-21T00:30:00Z    NHL                                Boston Bruins @ Dallas Stars                    Boston Bruins  +1.5   0.685525 1.458736      1.57  5.7%  $5.66
+2026-01-20 2026-01-20T00:30:00Z  NCAAB          SE Louisiana Lions @ UT Rio Grande Valley Vaqueros                             Over 135.5   0.558670 1.789966      1.89  5.6%  $3.54
+2026-01-19 2026-01-19T23:00:00Z  NCAAB             East Texas A&M Lions @ Incarnate Word Cardinals                            Under 143.5   0.552685 1.809350      1.91  5.6%  $3.45
+2026-01-21 2026-01-21T01:00:00Z    NHL                        Buffalo Sabres @ Nashville Predators                              Under 6.5   0.586530 1.704944      1.83  5.5%  $3.74
+2026-01-21 2026-01-21T01:00:00Z    NHL                              St Louis Blues @ Winnipeg Jets                   St Louis Blues  +1.5   0.712671 1.403172      1.49  4.6%  $5.34
+2026-01-20 2026-01-20T03:00:00Z    NHL                      New York Islanders @ Vancouver Canucks                Vancouver Canucks  +1.5   0.713351 1.401834      1.48  4.2%  $4.91
+2026-01-20 2026-01-20T01:30:00Z    NHL                          Winnipeg Jets @ Chicago Blackhawks               Chicago Blackhawks  +1.5   0.713351 1.401834      1.48  4.2%  $4.91
+2026-01-21 2026-01-21T01:00:00Z    NHL                        Buffalo Sabres @ Nashville Predators                   Buffalo Sabres  +1.5   0.714041 1.400480      1.47  3.7%  $4.47
+2026-01-20 2026-01-20T03:00:00Z    NHL                            New York Rangers @ Anaheim Ducks                               Over 6.5   0.569823 1.754930      1.83  3.2%  $2.18
+2026-01-21 2026-01-21T03:00:00Z    NHL                         New Jersey Devils @ Edmonton Oilers                  New Jersey Devils  ML   0.452617 2.209374      2.30  3.1%  $1.33
+2026-01-19 2026-01-19T20:00:00Z  NCAAB                    Prairie View Panthers @ Alcorn St Braves                            Under 152.5   0.542679 1.842710      1.89  2.6%  $1.63
+2026-01-20 2026-01-20T01:00:00Z  NCAAB                       Montana St Bobcats @ N Colorado Bears                            Under 152.5   0.542679 1.842710      1.89  2.6%  $1.63
+2026-01-21 2026-01-21T00:30:00Z    NHL                                Boston Bruins @ Dallas Stars                              Under 5.5   0.475624 2.102500      2.16  2.1%  $1.00
+2026-01-19 2026-01-19T22:00:00Z  NCAAB                   Alabama A&M Bulldogs @ Alabama St Hornets                 Alabama St Hornets  ML   0.545302 1.833847      1.87  2.0%  $1.28
+2026-01-20 2026-01-20T00:30:00Z  NCAAB          SE Louisiana Lions @ UT Rio Grande Valley Vaqueros                 SE Louisiana Lions  ML   0.375633 2.662172      2.70  1.4%  $0.47
+2026-01-20 2026-01-20T02:00:00Z  NCAAB                 North Carolina A&T Aggies @ Hampton Pirates                            Under 142.5   0.519489 1.924968      1.95  1.3%  $0.77
+2026-01-19 2026-01-19T23:00:00Z  NCAAB                      Princeton Tigers @ Dartmouth Big Green                Dartmouth Big Green  ML   0.546169 1.830935      1.85  1.0%  $0.69
+2026-01-19 2026-01-19T22:00:00Z  NCAAB                  GW Revolutionaries @ George Mason Patriots                            Under 151.5   0.523073 1.911780      1.93  1.0%  $0.58
+2026-01-19 2026-01-19T22:00:00Z    NHL                        Pittsburgh Penguins @ Seattle Kraken                   Seattle Kraken  +1.5   0.719143 1.390544      1.40  0.5%  $0.72
+2026-01-20 2026-01-20T00:00:00Z  NCAAB                     New Haven Chargers @ Chicago St Cougars                 Chicago St Cougars  ML   0.547055 1.827969      1.83  0.1%  $0.08
+2026-01-20 2026-01-20T00:30:00Z  NCAAB          SE Louisiana Lions @ UT Rio Grande Valley Vaqueros               SE Louisiana Lions  +4.5   0.534979 1.869231      1.87  0.0%  $0.03

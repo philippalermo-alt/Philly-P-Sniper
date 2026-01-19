@@ -1,0 +1,13 @@
+pandas
+numpy
+scipy
+requests
+streamlit
+gspread
+oauth2client
+pytz
+psycopg2-binary
+lxml
+html5lib
+beautifulsoup4
+twilio

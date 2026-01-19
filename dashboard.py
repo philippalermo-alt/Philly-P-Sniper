@@ -337,6 +337,14 @@ with st.sidebar:
     st.divider()
     st.markdown("### 🎛️ Filters")
     sharp_filter = st.slider("Min Sharp Score", 0, 100, 0, help="Filter opportunities by minimum sharp score")
+
+    st.markdown("#### Edge Range")
+    col1, col2 = st.columns(2)
+    with col1:
+        min_edge_filter = st.number_input("Min Edge %", min_value=0.0, max_value=100.0, value=0.0, step=0.5, help="Minimum edge percentage")
+    with col2:
+        max_edge_filter = st.number_input("Max Edge %", min_value=0.0, max_value=100.0, value=100.0, step=0.5, help="Maximum edge percentage")
+
     mobile_view = st.checkbox("📱 Mobile View", value=False, help="Optimized layout for mobile devices")
 
     st.divider()
@@ -411,8 +419,15 @@ if conn:
             now_est = pd.Timestamp.now(tz='US/Eastern')
             sniper_df = df_pending[(df_pending['user_bet'] == False) & (df_pending['kickoff'] > now_est)].copy()
 
+            # Apply sharp score filter
             if 'sharp_score' in sniper_df.columns:
                 sniper_df = sniper_df[pd.to_numeric(sniper_df['sharp_score'], errors='coerce').fillna(0) >= sharp_filter]
+
+            # Apply edge range filter
+            if 'Edge_Val' in sniper_df.columns:
+                edge_min = min_edge_filter / 100.0  # Convert percentage to decimal
+                edge_max = max_edge_filter / 100.0
+                sniper_df = sniper_df[(sniper_df['Edge_Val'] >= edge_min) & (sniper_df['Edge_Val'] <= edge_max)]
 
             if sniper_df.empty:
                 st.info("🎯 No plays match your current filters")

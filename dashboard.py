@@ -104,29 +104,46 @@ def confirm_bet(event_id, current_status, user_odds=None, user_stake=None):
 @st.cache_data(ttl=60)
 def fetch_live_scores(sport_keys):
     scores = {}
+    logs = []
     api_key = os.getenv('ODDS_API_KEY')
-    if not api_key: return {}
+    
+    if not api_key: 
+        logs.append("❌ API Key missing!")
+        return {}, logs
     
     unique_sports = set(sport_keys)
+    logs.append(f"🔍 Checking sports: {unique_sports}")
+    logs.append(f"🔑 Key used: {api_key[:4]}...")
+
     for sport in unique_sports:
         try:
-            # The Odds API: Fetch scores for the sport
             url = f"https://api.the-odds-api.com/v4/sports/{sport}/scores/?apiKey={api_key}&daysFrom=3"
-            res = requests.get(url, timeout=5).json()
+            r = requests.get(url, timeout=5)
+            logs.append(f"📡 {sport}: Status {r.status_code}")
+            
+            if r.status_code != 200:
+                logs.append(f"⚠️ Error response: {r.text[:100]}")
+                continue
+                
+            res = r.json()
             if isinstance(res, list):
+                logs.append(f"✅ Found {len(res)} games for {sport}")
                 for game in res:
                     if game.get('completed') or game.get('scores'):
                          h = game['home_team']
                          a = game['away_team']
-                         # Find scores
                          h_score = next((s['score'] for s in game['scores'] if s['name'] == h), 0)
                          a_score = next((s['score'] for s in game['scores'] if s['name'] == a), 0)
                          status = "🏁" if game['completed'] else "🔴"
                          score_str = f"{status} {h} {h_score} - {a} {a_score}"
                          scores[h] = score_str
                          scores[a] = score_str
-        except: pass
-    return scores
+            else:
+                logs.append(f"⚠️ Unexpected JSON: {type(res)}")
+        except Exception as e:
+            logs.append(f"❌ Exception for {sport}: {e}")
+            pass
+    return scores, logs
 
 # --- 4. Main Dashboard ---
 st.title("🎯 Philly P Sniper: Live Dashboard")
@@ -275,13 +292,13 @@ if conn:
             else: 
                 # Live Score Integration
                 sport_keys = my_bets['sport'].unique()
-                live_data = fetch_live_scores(sport_keys)
+                live_data, debug_logs = fetch_live_scores(sport_keys)
                 
                 # DEBUG: Show what we found
                 with st.expander("Debug Live Scores", expanded=False):
-                    st.write("Sports:", sport_keys)
-                    st.write("Live Data Keys:", list(live_data.keys()))
-                    st.write("First 5 Live Data Items:", dict(list(live_data.items())[:5]))
+                    for l in debug_logs:
+                        st.text(l)
+                    st.write("Live Data Keys (First 10):", list(live_data.keys())[:10])
 
                 def get_score(row):
                     # Match score by looking up team names

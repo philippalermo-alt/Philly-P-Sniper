@@ -221,23 +221,26 @@ if conn:
         tab1, tab2, tab3, tab4 = st.tabs(["🔫 Live Sniper", "💼 Portfolio", "📊 Performance", "📋 Paste"])
 
         with tab1:
+            
+            # Global filter for Tab 1: Only show future games
+            now_est = pd.Timestamp.now(tz='US/Eastern')
+            future_pending = df_pending[df_pending['kickoff'] > now_est]
 
             if mobile_view:
                 st.success("📱 Mobile View Active")
                 st.subheader("🎯 Top Picks")
-                if not df_pending.empty:
-                    top_15 = df_pending.sort_values(by='Edge_Val', ascending=False).head(5) # Show fewer on mobile top list
+                if not future_pending.empty:
+                    top_15 = future_pending.sort_values(by='Edge_Val', ascending=False).head(5) # Show fewer on mobile top list
                     for _, row in top_15.iterrows():
                         st.info(f"**{row['Event']}**\n\n👉 {row['Selection']} ({row['Edge']})")
             else:
                 st.subheader("🎯 [TOP 15 PICKS]")
-                if not df_pending.empty:
-                    top_15 = df_pending.sort_values(by='Edge_Val', ascending=False).head(15)
+                if not future_pending.empty:
+                    top_15 = future_pending.sort_values(by='Edge_Val', ascending=False).head(15)
                     st.table(top_15[['Date', 'Kickoff', 'Sport', 'Event', 'Selection', 'Edge', 'Stake']])
             
             st.divider()
-            now_est = pd.Timestamp.now(tz='US/Eastern')
-            sniper_df = df_pending[(df_pending['user_bet'] == False) & (df_pending['kickoff'] > now_est)].copy()
+            sniper_df = future_pending[future_pending['user_bet'] == False].copy()
             
             if 'sharp_score' in sniper_df.columns:
                 sniper_df = sniper_df[pd.to_numeric(sniper_df['sharp_score'], errors='coerce').fillna(0) >= sharp_filter]

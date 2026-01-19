@@ -39,7 +39,6 @@ def main():
 
     # Save results to file
     import json
-    from datetime import datetime
 
     filename = f"backtest_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
 

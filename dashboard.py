@@ -114,12 +114,25 @@ def fetch_live_scores(sport_keys):
     unique_sports = set(sport_keys)
     logs.append(f"🔍 Checking sports: {unique_sports}")
     logs.append(f"🔑 Key used: {api_key[:4]}...")
+    
+    # Map short names (DB) to API keys (The Odds API)
+    SPORT_MAP = {
+        'NBA': 'basketball_nba',
+        'NCAAB': 'basketball_ncaab', 
+        'NFL': 'americanfootball_nfl',
+        'NHL': 'icehockey_nhl',
+        'MLB': 'baseball_mlb',
+        'SOCCER': 'soccer_epl' # Defaulting soccer to EPL for now, harder to distuinguish
+    }
 
-    for sport in unique_sports:
+    for sport_short in unique_sports:
         try:
+            # Convert to API key if possible, else try raw
+            sport = SPORT_MAP.get(sport_short, sport_short)
+            
             url = f"https://api.the-odds-api.com/v4/sports/{sport}/scores/?apiKey={api_key}&daysFrom=3"
             r = requests.get(url, timeout=5)
-            logs.append(f"📡 {sport}: Status {r.status_code}")
+            logs.append(f"📡 {sport} (was {sport_short}): Status {r.status_code}")
             
             if r.status_code != 200:
                 logs.append(f"⚠️ Error response: {r.text[:100]}")

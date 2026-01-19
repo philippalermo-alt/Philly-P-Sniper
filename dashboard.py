@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import psycopg2
 import os
+import requests
 from datetime import datetime
 
 # 🎯 STEP 1: Page Configuration
@@ -99,6 +100,33 @@ def confirm_bet(event_id, current_status, user_odds=None, user_stake=None):
             
         conn.commit(); cur.close(); st.rerun()
     except Exception as e: st.error(f"Error: {e}")
+
+@st.cache_data(ttl=60)
+def fetch_live_scores(sport_keys):
+    scores = {}
+    api_key = os.getenv('ODDS_API_KEY')
+    if not api_key: return {}
+    
+    unique_sports = set(sport_keys)
+    for sport in unique_sports:
+        try:
+            # The Odds API: Fetch scores for the sport
+            url = f"https://api.the-odds-api.com/v4/sports/{sport}/scores/?apiKey={api_key}&daysFrom=3"
+            res = requests.get(url, timeout=5).json()
+            if isinstance(res, list):
+                for game in res:
+                    if game.get('completed') or game.get('scores'):
+                         h = game['home_team']
+                         a = game['away_team']
+                         # Find scores
+                         h_score = next((s['score'] for s in game['scores'] if s['name'] == h), 0)
+                         a_score = next((s['score'] for s in game['scores'] if s['name'] == a), 0)
+                         status = "🏁" if game['completed'] else "🔴"
+                         score_str = f"{status} {h} {h_score} - {a} {a_score}"
+                         scores[h] = score_str
+                         scores[a] = score_str
+        except: pass
+    return scores
 
 # --- 4. Main Dashboard ---
 st.title("🎯 Philly P Sniper: Live Dashboard")
@@ -242,8 +270,22 @@ if conn:
         with tab2:
             st.subheader("💼 Active Wagers")
             my_bets = df_pending[df_pending['user_bet'] == True].copy()
-            if my_bets.empty: st.info("No active bets.")
-            else: st.dataframe(my_bets[['Date', 'Kickoff', 'Sport', 'Event', 'Selection', 'Dec_Odds', 'Stake']], use_container_width=True)
+            if my_bets.empty: 
+                st.info("No active bets.")
+            else: 
+                # Live Score Integration
+                sport_keys = my_bets['sport'].unique()
+                live_data = fetch_live_scores(sport_keys)
+
+                def get_score(row):
+                    # Match score by looking up team names
+                    teams = row['Event'].split(' vs ')
+                    if len(teams) >= 2:
+                        return live_data.get(teams[0]) or live_data.get(teams[1]) or "Upcoming 🕒"
+                    return "Upcoming 🕒"
+
+                my_bets['Live Score'] = my_bets.apply(get_score, axis=1)
+                st.dataframe(my_bets[['Date', 'Kickoff', 'Sport', 'Event', 'Selection', 'Live Score', 'Dec_Odds', 'Stake']], use_container_width=True)
 
         with tab3:
             st.subheader("📈 Bankroll Performance")

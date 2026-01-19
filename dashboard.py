@@ -279,9 +279,19 @@ if conn:
 
                 def get_score(row):
                     # Match score by looking up team names
-                    teams = row['Event'].split(' vs ')
+                    event = row['Event'].replace(' @ ', ' vs ')
+                    teams = event.split(' vs ')
                     if len(teams) >= 2:
-                        return live_data.get(teams[0]) or live_data.get(teams[1]) or "Upcoming 🕒"
+                        # Try exact match first
+                        score = live_data.get(teams[0]) or live_data.get(teams[1])
+                        if score: return score
+                        
+                        # Try partial match (e.g. "Buffalo" in "Buffalo Sabres")
+                        for team_name in teams:
+                            for live_team, live_score in live_data.items():
+                                if team_name in live_team or live_team in team_name:
+                                    return live_score
+                                    
                     return "Upcoming 🕒"
 
                 my_bets['Live Score'] = my_bets.apply(get_score, axis=1)

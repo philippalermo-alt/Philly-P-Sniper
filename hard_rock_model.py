@@ -16,6 +16,7 @@ from ratings import get_team_ratings
 from api_clients import get_action_network_data, get_soccer_predictions
 from probability_models import process_markets
 from closing_line import fetch_closing_odds
+from smart_staking import get_performance_multipliers, print_multiplier_report
 
 def run_sniper():
     """Main execution function that orchestrates the betting intelligence pipeline."""
@@ -29,6 +30,14 @@ def run_sniper():
 
     # Fetch closing odds for bets about to start (CLV tracking)
     fetch_closing_odds()
+
+    # Get smart staking multipliers based on historical performance
+    log("SMART_STAKE", "Calculating performance-based stake multipliers...")
+    multipliers = get_performance_multipliers(days_back=60, min_bets=10)
+    if multipliers:
+        print_multiplier_report(multipliers)
+    else:
+        log("SMART_STAKE", "Not enough historical data yet, using standard Kelly")
 
     # Fetch team ratings from multiple sources
     ratings = get_team_ratings()
@@ -83,7 +92,7 @@ def run_sniper():
                 process_markets(
                     m, ratings, calibration, cur, all_opps, target_sport,
                     seen_matches, sharp_data, is_soccer=('soccer' in league),
-                    predictions=preds
+                    predictions=preds, multipliers=multipliers
                 )
 
                 # Fetch exotic markets for select sports
@@ -95,7 +104,8 @@ def run_sniper():
                         if 'id' in deep:
                             process_markets(
                                 deep, ratings, calibration, cur, all_opps,
-                                target_sport, seen_matches, sharp_data, is_soccer=False
+                                target_sport, seen_matches, sharp_data, is_soccer=False,
+                                multipliers=multipliers
                             )
 
                     except:

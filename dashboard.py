@@ -448,22 +448,30 @@ if conn:
         with tab1:
             if not df_pending.empty:
                 st.markdown("### 🎯 Top Opportunities")
-                top_15 = df_pending.sort_values(by='Edge_Val', ascending=False).head(15)
 
-                if mobile_view:
-                    for _, row in top_15.iterrows():
-                        with st.container():
-                            st.markdown(f"""
-                            <div style='background: #ffffff; padding: 15px; border-radius: 10px; border-left: 4px solid #667eea; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
-                                <p style='color: #718096; font-size: 12px; margin: 0;'>{row['Sport']} • {row['Kickoff']}</p>
-                                <p style='color: #1a202c; font-size: 16px; font-weight: 600; margin: 5px 0;'>{row['Event']}</p>
-                                <p style='color: #667eea; font-size: 14px; margin: 5px 0; font-weight: 600;'>👉 {row['Selection']} @ {row['Dec_Odds']:.2f}</p>
-                                <p style='color: #10b981; font-size: 14px; margin: 5px 0; font-weight: 600;'>Edge: {row['Edge']} | Stake: {row['Stake']}</p>
-                            </div>
-                            """, unsafe_allow_html=True)
+                # Filter out games that have already started
+                now_est = pd.Timestamp.now(tz='US/Eastern')
+                df_upcoming = df_pending[df_pending['kickoff'] > now_est].copy()
+
+                top_15 = df_upcoming.sort_values(by='Edge_Val', ascending=False).head(15) if not df_upcoming.empty else pd.DataFrame()
+
+                if not top_15.empty:
+                    if mobile_view:
+                        for _, row in top_15.iterrows():
+                            with st.container():
+                                st.markdown(f"""
+                                <div style='background: #ffffff; padding: 15px; border-radius: 10px; border-left: 4px solid #667eea; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+                                    <p style='color: #718096; font-size: 12px; margin: 0;'>{row['Sport']} • {row['Kickoff']}</p>
+                                    <p style='color: #1a202c; font-size: 16px; font-weight: 600; margin: 5px 0;'>{row['Event']}</p>
+                                    <p style='color: #667eea; font-size: 14px; margin: 5px 0; font-weight: 600;'>👉 {row['Selection']} @ {row['Dec_Odds']:.2f}</p>
+                                    <p style='color: #10b981; font-size: 14px; margin: 5px 0; font-weight: 600;'>Edge: {row['Edge']} | Stake: {row['Stake']}</p>
+                                </div>
+                                """, unsafe_allow_html=True)
+                    else:
+                        display_cols = ['Sport', 'Kickoff', 'Event', 'Selection', 'Dec_Odds', 'Edge', 'Stake']
+                        st.dataframe(top_15[display_cols], use_container_width=True, hide_index=True, height=400)
                 else:
-                    display_cols = ['Sport', 'Kickoff', 'Event', 'Selection', 'Dec_Odds', 'Edge', 'Stake']
-                    st.dataframe(top_15[display_cols], use_container_width=True, hide_index=True, height=400)
+                    st.info("📭 No upcoming opportunities available")
             else:
                 st.info("📭 No opportunities available at the moment")
 

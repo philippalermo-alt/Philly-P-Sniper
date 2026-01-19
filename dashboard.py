@@ -276,6 +276,12 @@ if conn:
                 # Live Score Integration
                 sport_keys = my_bets['sport'].unique()
                 live_data = fetch_live_scores(sport_keys)
+                
+                # DEBUG: Show what we found
+                with st.expander("Debug Live Scores", expanded=False):
+                    st.write("Sports:", sport_keys)
+                    st.write("Live Data Keys:", list(live_data.keys()))
+                    st.write("First 5 Live Data Items:", dict(list(live_data.items())[:5]))
 
                 def get_score(row):
                     # Match score by looking up team names

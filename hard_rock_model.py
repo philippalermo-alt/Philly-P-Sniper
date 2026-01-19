@@ -321,8 +321,13 @@ def grade_bet(selection, home_team, away_team, home_score, away_score, period_sc
     if " ML" in selection:
         # Clean the name: Remove "1H", "1st Half", "ML", then trim and lowercase
         pick = selection.replace(" ML", "").replace("1H", "").replace("1st Half", "").strip().lower()
-        if margin > 0 and pick == home_team.lower(): return 'WON'
-        if margin < 0 and pick == away_team.lower(): return 'WON'
+        
+        # Fuzzy match logic (similar to dashboard)
+        pick_matches_home = pick in home_team.lower() or home_team.lower() in pick
+        pick_matches_away = pick in away_team.lower() or away_team.lower() in pick
+        
+        if margin > 0 and pick_matches_home: return 'WON'
+        if margin < 0 and pick_matches_away: return 'WON'
         if margin == 0: return 'PUSH'
         return 'LOST'
 
@@ -339,9 +344,13 @@ def grade_bet(selection, home_team, away_team, home_score, away_score, period_sc
             # Clean the team name so "Purdue 1H" matches "Purdue"
             clean_team = raw_team.replace("1H", "").replace("1st Half", "").strip().lower()
             
-            if clean_team == home_team.lower():
+            # Fuzzy match for spreads too
+            matches_home = clean_team in home_team.lower() or home_team.lower() in clean_team
+            matches_away = clean_team in away_team.lower() or away_team.lower() in clean_team
+            
+            if matches_home:
                 cov = margin + spread
-            elif clean_team == away_team.lower():
+            elif matches_away:
                 cov = -margin + spread
             else:
                 return 'PENDING' # Safety: Name still doesn't match
@@ -390,13 +399,15 @@ def settle_pending_bets():
         if not pending: return
 
         sport_map = {
-
-            'NBA': 'basketball_nba', 'NCAAB': 'basketball_ncaab', 'NFL': 'americanfootball_nfl', 
-
-            'NHL': 'icehockey_nhl', 'EPL': 'soccer_epl', 'LALIGA': 'soccer_spain_la_liga',
-
-            'CHAMP': 'soccer_efl_champ'
-
+            'NBA': 'basketball_nba', 
+            'NCAAB': 'basketball_ncaab', 
+            'NFL': 'americanfootball_nfl', 
+            'NHL': 'icehockey_nhl', 
+            'EPL': 'soccer_epl', 
+            'LALIGA': 'soccer_spain_la_liga',
+            'CHAMP': 'soccer_efl_champ',
+            'MLB': 'baseball_mlb',
+            'SOCCER': 'soccer_epl' # Default fallback
         }
 
         graded = 0
@@ -429,7 +440,8 @@ def settle_pending_bets():
 
                         if event_id.startswith(game['id']): 
 
-                            outcome = grade_bet(selection, home, away, scores[home], scores[away])
+                            # Pass game['scores'] to enable 1H grading logic
+                            outcome = grade_bet(selection, home, away, scores[home], scores[away], game['scores'])
 
                             if outcome:
                                 safe_execute(cur, "UPDATE intelligence_log SET outcome = %s WHERE event_id = %s", (outcome, event_id))

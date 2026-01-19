@@ -792,10 +792,9 @@ def get_team_ratings():
     # --- NBA ---
 
     try:
-
         url = 'https://www.teamrankings.com/nba/stat/offensive-efficiency'
-
-        df = pd.read_html(StringIO(requests.get(url, headers=headers, timeout=10).text))[0]
+        nba_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+        df = pd.read_html(StringIO(requests.get(url, headers=nba_headers, timeout=10).text))[0]
 
         col = next((c for c in df.columns if '2024' in str(c) or '2025' in str(c) or 'Last' in str(c)), None)
 

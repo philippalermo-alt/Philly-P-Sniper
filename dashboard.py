@@ -4,6 +4,7 @@ import psycopg2
 import os
 import requests
 from datetime import datetime
+from backtesting import analyze_by_edge_bucket
 
 # 🎨 Modern Page Configuration
 st.set_page_config(
@@ -29,8 +30,13 @@ st.markdown("""
     }
 
     h2, h3 {
-        color: #fafafa;
+        color: #ffffff;
         font-weight: 600;
+    }
+
+    /* All paragraph and label text */
+    p, label, span, div {
+        color: #ffffff;
     }
 
     /* Metrics */
@@ -97,6 +103,10 @@ st.markdown("""
     /* Sidebar */
     [data-testid="stSidebar"] {
         background-color: #1a1d24;
+    }
+
+    [data-testid="stSidebar"] * {
+        color: #ffffff;
     }
 
     /* Dividers */
@@ -595,6 +605,39 @@ if conn:
                 final_df = pd.concat([total_row, perf_df]).drop(columns=['raw_profit'])
 
                 st.dataframe(final_df, use_container_width=True, hide_index=True, height=400)
+            else:
+                st.info("📊 No settled bets to analyze yet")
+
+            st.markdown("---")
+            st.markdown("### 💰 Performance by Edge")
+
+            if not df_settled.empty:
+                # Calculate edge analysis using the backtesting module
+                edge_results = analyze_by_edge_bucket(df_settled)
+
+                if edge_results:
+                    edge_df = pd.DataFrame(edge_results)
+                    edge_df = edge_df.rename(columns={
+                        'edge_bucket': 'Edge Range',
+                        'count': 'Bets',
+                        'win_rate': 'Win %',
+                        'profit': 'Profit',
+                        'roi': 'ROI',
+                        'avg_edge': 'Avg Edge'
+                    })
+
+                    # Format display columns
+                    edge_display = edge_df.copy()
+                    edge_display['Win %'] = edge_display['Win %'].apply(lambda x: f"{x:.1f}%")
+                    edge_display['Profit'] = edge_display['Profit'].apply(lambda x: f"${x:.2f}")
+                    edge_display['ROI'] = edge_display['ROI'].apply(lambda x: f"{x:.1f}%")
+                    edge_display['Avg Edge'] = edge_display['Avg Edge'].apply(lambda x: f"{x:.2f}%")
+
+                    st.dataframe(edge_display, use_container_width=True, hide_index=True, height=300)
+
+                    st.caption("💡 This shows how your bets perform based on the calculated edge. Higher edge bets should ideally show better ROI.")
+                else:
+                    st.info("📊 Not enough data for edge analysis")
             else:
                 st.info("📊 No settled bets to analyze yet")
 

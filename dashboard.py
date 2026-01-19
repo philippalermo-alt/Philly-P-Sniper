@@ -363,6 +363,75 @@ if conn:
             st.caption(f"Active Exposure: ${active_exposure:.2f}")
             st.line_chart(pd.DataFrame({'Bankroll': balance}))
 
+            st.divider()
+            st.subheader("📊 Model Performance by Sport")
+            
+            if not df_settled.empty:
+                # Group by Sport
+                sports = df_settled['Sport'].unique()
+                stats_data = []
+                
+                total_w, total_l, total_p = 0, 0, 0
+                total_profit = 0.0
+                total_stake = 0.0
+                
+                for sport in sports:
+                    sdf = df_settled[df_settled['Sport'] == sport]
+                    wins = len(sdf[sdf['outcome'] == 'WON'])
+                    losses = len(sdf[sdf['outcome'] == 'LOST'])
+                    pushes = len(sdf[sdf['outcome'] == 'PUSH'])
+                    
+                    # Calculate profit
+                    profit = 0.0
+                    sport_stake = 0.0
+                    for _, row in sdf.iterrows():
+                        if row['outcome'] == 'WON':
+                            profit += row['Stake_Val'] * (row['Dec_Odds'] - 1)
+                            sport_stake += row['Stake_Val']
+                        elif row['outcome'] == 'LOST':
+                            profit -= row['Stake_Val']
+                            sport_stake += row['Stake_Val']
+                        elif row['outcome'] == 'PUSH':
+                            sport_stake += row['Stake_Val'] # Count stake for ROI? Usually yes or no depending on pref. Let's include denominator.
+                    
+                    roi = (profit / sport_stake * 100) if sport_stake > 0 else 0.0
+                    win_rate = (wins / (wins + losses) * 100) if (wins + losses) > 0 else 0.0
+                    
+                    stats_data.append({
+                        "Sport": sport,
+                        "Record": f"{wins}-{losses}-{pushes}",
+                        "Win %": f"{win_rate:.1f}%",
+                        "Profit": f"${profit:.2f}",
+                        "ROI": f"{roi:.1f}%",
+                        "raw_profit": profit # For sorting
+                    })
+                    
+                    total_w += wins; total_l += losses; total_p += pushes
+                    total_profit += profit; total_stake += sport_stake
+                
+                # Create DF
+                perf_df = pd.DataFrame(stats_data).sort_values(by='raw_profit', ascending=False)
+                
+                # Total Row
+                tot_roi = (total_profit / total_stake * 100) if total_stake > 0 else 0.0
+                tot_win_rate = (total_w / (total_w + total_l) * 100) if (total_w + total_l) > 0 else 0.0
+                
+                # Append Total using pandas (concat)
+                total_row = pd.DataFrame([{
+                    "Sport": "🔥 TOTAL", 
+                    "Record": f"{total_w}-{total_l}-{total_p}",
+                    "Win %": f"{tot_win_rate:.1f}%",
+                    "Profit": f"${total_profit:.2f}",
+                    "ROI": f"{tot_roi:.1f}%",
+                    "raw_profit": 9999999 # Keep at top or bottom? Let's put at top
+                }])
+                
+                final_df = pd.concat([total_row, perf_df]).drop(columns=['raw_profit'])
+                
+                st.dataframe(final_df, use_container_width=True, hide_index=True)
+            else:
+                st.info("No settled bets to analyze yet.")
+
         with tab4:
             st.subheader("📋 Tabbed for Paste")
             if not df_pending.empty:

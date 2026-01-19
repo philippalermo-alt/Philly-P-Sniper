@@ -324,7 +324,9 @@ def fetch_live_games(sport_keys):
         'NFL': 'americanfootball_nfl',
         'NHL': 'icehockey_nhl',
         'MLB': 'baseball_mlb',
-        'SOCCER': 'soccer_epl'
+        'SOCCER': 'soccer_epl',
+        'CHAMPIONS': 'soccer_uefa_champs_league',
+        'UEFA': 'soccer_uefa_champs_league'
     }
 
     for sport_short in unique_sports:

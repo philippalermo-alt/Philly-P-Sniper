@@ -49,7 +49,7 @@ class Config:
         'basketball_nba', 'basketball_ncaab', 'americanfootball_nfl', 'icehockey_nhl',
         'soccer_epl', 'soccer_spain_la_liga', 'soccer_germany_bundesliga',
         'soccer_france_ligue_one', 'soccer_italy_serie_a', 'soccer_germany_bundesliga2',
-        'soccer_efl_champ'
+        'soccer_efl_champ', 'soccer_uefa_champs_league'
     ]
 
     # Soccer League IDs for Football API
@@ -60,5 +60,6 @@ class Config:
         'soccer_france_ligue_one': 61,
         'soccer_italy_serie_a': 135,
         'soccer_germany_bundesliga2': 79,
-        'soccer_efl_champ': 40
+        'soccer_efl_champ': 40,
+        'soccer_uefa_champs_league': 2
     }

@@ -51,7 +51,8 @@ def get_action_network_data():
         'NBA': 'nba/public-betting.json',
         'NCAAB': 'ncaab/public-betting.json',
         'NHL': 'nhl/public-betting.json',
-        'SOCCER': 'soccer/public-betting.json'
+        'SOCCER': 'soccer/public-betting.json',
+        'UCL': 'soccer/champions-league/public-betting.json'
     }
 
     sharp_data = {}

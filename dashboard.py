@@ -445,6 +445,19 @@ if conn:
         df_pending = clean_df(df_p)
         df_settled = clean_df(df_s)
 
+        # --- Sidebar Sport Filter ---
+        if not df_pending.empty:
+            all_sports = sorted(df_pending['Sport'].unique())
+            with st.sidebar:
+                st.markdown("#### 🏆 Sport Filter")
+                selected_sports = st.multiselect("Select Sports", options=all_sports, default=all_sports, label_visibility="collapsed")
+            
+            if selected_sports:
+                df_pending = df_pending[df_pending['Sport'].isin(selected_sports)]
+            else:
+                st.warning("⚠️ Please select at least one sport in the sidebar.")
+                df_pending = df_pending[0:0] # Show empty if nothing selected
+
         tab1, tab2, tab3, tab4 = st.tabs(["🔫 Live Sniper Feed", "💼 Active Portfolio", "📈 Performance Analytics", "📋 Export Data"])
 
         with tab1:

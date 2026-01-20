@@ -180,19 +180,22 @@ def process_nhl_props(match, props_data, player_stats, calibration, cur, all_opp
             continue
 
         for outcome in market['outcomes']:
-            player_name_odds = outcome['name']
-            price = outcome.get('price')
-            point = outcome.get('point')
-            description = outcome.get('description') # Usually 'Over' or 'Under'
+            # Robust Name Matching
+            # Odds API sometimes puts player name in 'description' and 'Over'/'Under' in 'name'
+            raw_name = outcome.get('name', '')
+            raw_desc = outcome.get('description', '')
             
+            if raw_name in ['Over', 'Under'] and raw_desc:
+                player_name_odds = raw_desc
+                description = raw_name
+            else:
+                player_name_odds = raw_name
+                description = raw_desc
+
             if not point or not price or not description:
                 continue
-                
-            # Name Matching
-            # API Stats key: 'Connor McDavid', Odds key: 'Connor McDavid' -> usually matches.
-            # But sometimes 'C. McDavid'.
-            # We use fuzzy matching against the player_stats keys
             
+            # 1. Fuzzy Match
             best_match = difflib.get_close_matches(player_name_odds, player_stats.keys(), n=1, cutoff=0.85)
             if not best_match:
                 continue

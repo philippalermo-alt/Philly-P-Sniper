@@ -45,9 +45,9 @@ def run_sniper():
     # Fetch public betting splits
     sharp_data = get_action_network_data()
 
-    # Pre-fetch NHL Player Stats (since user has paid API)
-    # We load this once to avoid re-fetching per game
+    # Pre-fetch NHL Player Stats
     nhl_player_stats = get_nhl_player_stats()
+    print(f"📊 [DEBUG] Loaded {len(nhl_player_stats)} NHL Players")
 
     # Get database connection
     conn = get_db()

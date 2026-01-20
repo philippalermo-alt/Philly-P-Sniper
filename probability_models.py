@@ -240,9 +240,14 @@ def process_nhl_props(match, props_data, player_stats, calibration, cur, all_opp
             # Standard Kelly formulation
             edge = (true_prob * price) - 1
             
-            # Require higher edge for props due to variance
-            if edge >= 0.04: # 4% min edge
-                stake = calculate_kelly_stake(edge, price) * 0.5 # 50% stake for props
+            # FLOODGATES DEBUG: Show everything found
+            print(f"   🏒 [PROP] {sel} | Edge: {edge*100:.1f}%")
+            
+            if edge >= -10.0: # ALLOW EVERYTHING (Debug Request)
+                # Calculate stake nicely even if negative edge (min $0.10)
+                stake = max(0.10, calculate_kelly_stake(max(0.01, edge), price) * 0.5) if edge > 0 else 0.00
+                
+                opp = {
                 
                 opp = {
                     'Date': mdt.strftime('%Y-%m-%d'),

@@ -14,3 +14,6 @@ twilio
 scikit-learn
 python-dotenv
 nba_api
+kenpompy
+mechanicalsoup
+bs4

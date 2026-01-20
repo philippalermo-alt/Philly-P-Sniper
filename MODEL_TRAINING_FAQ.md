@@ -24,15 +24,15 @@ Since your app is hosted on **Heroku**, you must run the training script in the 
 ### Step-by-Step Command
 Run this in your terminal:
 ```bash
-heroku run python3 models/logistic_v2.py
+heroku run python3 -m models.train_v2
 ```
 
 ### What happens next?
 1.  The script connects to your Heroku Postgres database.
-2.  It pulls all `WON` and `LOST` bets that have data.
-3.  It splits them into Training (80%) and Test (20%) sets.
-4.  It trains the Logistic Regression classifier.
-5.  It outputs the **Accuracy** and **Log Loss** to your terminal.
+2.  It loops through **NBA, Soccer, NCAAB** and other sports.
+3.  It pulls all `WON` and `LOST` bets for that sport.
+4.  It trains a specific model for each sport (e.g., `models/nba_model.pkl` using DvP, `models/ncaab_model.pkl` using KenPom).
+5.  It outputs the **Accuracy** and **Log Loss** for each.
 6.  It saves the model file (`models/v2_logistic.pkl`) *temporarily* in the Heroku dyno.
 
 > **⚠️ CRITICAL NOTE for Heroku:**

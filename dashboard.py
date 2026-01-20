@@ -341,6 +341,9 @@ def fetch_live_games(sport_keys):
     # ESPN date param format: YYYYMMDD
     date_str = now_et.strftime('%Y%m%d')
 
+    # Log keys for debugging
+    logs.append(f"Keys: {list(unique_sports)}")
+
     for sport_key in unique_sports:
         espn_path = ESPN_MAP.get(sport_key)
         if not espn_path or espn_path in processed_paths:
@@ -350,12 +353,20 @@ def fetch_live_games(sport_keys):
 
         try:
             url = f"https://site.api.espn.com/apis/site/v2/sports/{espn_path}/scoreboard?dates={date_str}"
-            # logs.append(f"Fetching {url}")
-            r = requests.get(url, timeout=5)
+            
+            # Use User-Agent to avoid generic bot blocking
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+            
+            r = requests.get(url, headers=headers, timeout=5)
             
             if r.status_code == 200:
                 res = r.json()
-                for event in res.get('events', []):
+                events = res.get('events', [])
+                logs.append(f"✅ {espn_path}: {len(events)} events (Date: {date_str})")
+                
+                for event in events:
                     # ESPN structure: events -> competitions[0] -> competitors
                     comp = event['competitions'][0]
                     status_detail = event.get('status', {}).get('type', {}).get('shortDetail', 'Scheduled')

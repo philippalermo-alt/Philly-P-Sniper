@@ -1,15 +1,16 @@
 import pandas as pd
 import itertools
 
-def generate_parlays(df, max_legs=3, min_edge=0.01, max_edge=0.10, min_odds=1.4, max_odds=3.0):
+def generate_parlays(df, max_legs=3, min_edge=0.01, max_edge=0.10, min_odds=1.4, max_odds=3.0, min_sharp_score=30):
     """
     Generates recommended parlays from a DataFrame of single bets.
     
     Strategy: "The Sniper Triples"
     1. Filter: Edge between 1% and 10% (Goldilocks Zone).
     2. Filter: Odds between -250 (1.4) and +200 (3.0).
-    3. Independence: Group by EventID and pick ONLY the single best edge per event.
-    4. Combine: Generate 3-leg combinations.
+    3. Filter: Sharp Score >= 30 (Strict Quality Control).
+    4. Independence: Group by EventID and pick ONLY the single best edge per event.
+    5. Combine: Generate 3-leg combinations.
     """
     
     # 1. Validation
@@ -29,6 +30,11 @@ def generate_parlays(df, max_legs=3, min_edge=0.01, max_edge=0.10, min_odds=1.4,
         (candidates['Edge_Val'] >= min_edge) & 
         (candidates['Edge_Val'] <= max_edge)
     ]
+    
+    # Sharp Score Filter (User Request: >= 30)
+    if 'sharp_score' in candidates.columns:
+        candidates['sharp_score'] = pd.to_numeric(candidates['sharp_score'], errors='coerce').fillna(0)
+        candidates = candidates[candidates['sharp_score'] >= min_sharp_score]
     
     # Odds Filter (Dec_Odds)
     candidates = candidates[
@@ -86,10 +92,28 @@ def generate_parlays(df, max_legs=3, min_edge=0.01, max_edge=0.10, min_odds=1.4,
         # ROI = (Probability * Odds) - 1
         parlay_ev = (combined_prob * combined_odds) - 1
         
+        # Smart Staking (Kelly Criterion for Parlay)
+        # b = combined_odds - 1
+        # p = combined_prob
+        # q = 1 - p
+        # f = (bp - q) / b
+        bankroll = 1000.0 # Default fallback, dashboard should override or we return percentage
+        
+        if parlay_ev > 0:
+            b = combined_odds - 1
+            p = combined_prob
+            q = 1 - p
+            kelly_fraction = (b*p - q) / b
+            # Conservative Parlay Factor (0.25 Kelly) due to high variance
+            kelly_stake_pct = max(0, kelly_fraction * 0.25)
+        else:
+            kelly_stake_pct = 0
+            
         rec = {
             'legs': legs,
             'combined_odds': round(combined_odds, 2),
             'expected_value': parlay_ev,
+            'kelly_pct': kelly_stake_pct,
             'diversity_score': len(set(leg['Sport'] for leg in legs)) # Count unique sports
         }
         recommendations.append(rec)

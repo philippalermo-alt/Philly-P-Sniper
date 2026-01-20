@@ -311,6 +311,28 @@ def confirm_bet(event_id, current_status, user_odds=None, user_stake=None):
     except Exception as e:
         st.error(f"Error: {e}")
 
+def confirm_parlay(event_id, odds, stake, selection_text, legs_desc):
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        
+        # Check if already exists (it shouldn't, but safety first)
+        cur.execute("SELECT event_id FROM intelligence_log WHERE event_id = %s", (event_id,))
+        if cur.fetchone():
+            return # Already tracked
+            
+        cur.execute("""
+            INSERT INTO intelligence_log 
+            (event_id, timestamp, kickoff, sport, teams, selection, odds, true_prob, edge, stake, user_bet, user_odds, user_stake, outcome)
+            VALUES (%s, NOW(), NOW(), 'PARLAY', 'Sniper Triple', %s, %s, 0, 0, %s, TRUE, %s, %s, 'PENDING')
+        """, (event_id, selection_text, odds, stake, odds, stake))
+        
+        conn.commit()
+        cur.close()
+        st.rerun()
+    except Exception as e:
+        st.error(f"Error tracking parlay: {e}")
+
 @st.cache_data(ttl=60)
 def fetch_live_games(sport_keys):
     """
@@ -548,25 +570,51 @@ if conn:
             
             # --- PARLAY SUGGESTIONS (Moved to Tab 1 v272) ---
             try:
-                parlays = generate_parlays(df_pending)
+                # Pass Sharp Score filter (User Request)
+                parlays = generate_parlays(df_pending, min_sharp_score=30)
                 
                 st.subheader("🧪 Sniper Triples (Recommended Parlays)")
                 
                 if parlays:
-                    st.caption("Auto-generated 3-leg parlays using strictly independent +EV bets (1-10% Edge).")
+                    st.caption(f"Auto-generated 3-leg parlays using strictly independent +EV bets (1-10% Edge) & Sharp Score ≥ 30.")
                     cols = st.columns(len(parlays) if len(parlays) < 3 else 3)
+                    
+                    # Fetch current bankroll for staking
+                    current_br = get_starting_bankroll()
+                    
                     for idx, p in enumerate(parlays[:3]): # Show top 3
                         with cols[idx]:
                             with st.container(border=True):
                                 st.markdown(f"**Option #{idx+1}**")
                                 st.metric("Total Odds", f"+{int((p['combined_odds']-1)*100)}")
+                                
+                                # Smart Staking Display
+                                rec_stake = p['kelly_pct'] * current_br
+                                st.metric("Rec. Stake", f"${rec_stake:.2f}", help=f"Kelly-based stake ({p['kelly_pct']*100:.1f}%) adjusted for parlay variance.")
+                                
                                 st.caption(f"Est. EV: +{p['expected_value']*100:.1f}%")
                                 
+                                leg_desc = []
                                 for leg in p['legs']:
                                     st.text(f"• {leg['Sport']} {leg['Selection']}")
                                     st.caption(f"{leg['Event']} ({leg['Dec_Odds']})")
+                                    leg_desc.append(f"{leg['Selection']} ({leg['Dec_Odds']})")
+                                
+                                # Track Button
+                                full_desc = " + ".join(leg_desc)
+                                if st.button("Track Triple", key=f"track_parlay_{idx}", use_container_width=True):
+                                    pid = f"parlay_{int(datetime.now().timestamp())}_{idx}"
+                                    confirm_parlay(
+                                        event_id=pid, 
+                                        odds=p['combined_odds'], 
+                                        stake=rec_stake, 
+                                        selection_text=f"Parlay (3 Legs): {full_desc}",
+                                        legs_desc=full_desc
+                                    )
+                                    st.toast("✅ Parlay tracked successfully!")
+                                    
                 else:
-                    st.info("ℹ️ No 'Sniper Triples' found right now.\n\nCriteria not met: 3 Independent Events with 1-10% Edge & -250 to +200 Odds.")
+                    st.info("ℹ️ No 'Sniper Triples' found right now.\n\nCriteria not met: 3 Independent Events with 1-10% Edge, -250 to +200 Odds & Sharp Score ≥ 30.")
                     
             except Exception as e:
                 st.error(f"Parlay Error: {e}")
@@ -848,6 +896,14 @@ if conn:
                     edge_display['Avg Edge'] = edge_display['Avg Edge'].apply(lambda x: f"{x:.2f}%")
 
                     st.dataframe(edge_display, use_container_width=True, hide_index=True, height=300)
+
+            # ALL GRADED BETS (New v274)
+            st.markdown("---")
+            with st.expander("📜 Full Betting History (All Graded Bets)", expanded=False):
+                if not df_settled.empty:
+                    st.dataframe(df_settled, use_container_width=True, hide_index=True)
+                else:
+                    st.info("No graded history available.")
 
                     st.caption("💡 This shows how your bets perform based on the calculated edge. Higher edge bets should ideally show better ROI.")
                 else:

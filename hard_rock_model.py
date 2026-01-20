@@ -124,9 +124,11 @@ def run_sniper():
                                 print(f"   ⚠️ [DEBUG] Props missing for {m['id']}. Resp: {list(prop_res.keys())}")
                             
                             if 'bookmakers' in prop_res:
-                                process_nhl_props(
-                                    prop_res, prop_res, nhl_player_stats, calibration, cur, all_opps, seen_matches
-                                )
+                                # DISABLED (User Request v280): Settlement logic needs tuning. Architecture preserved.
+                                # process_nhl_props(
+                                #    prop_res, prop_res, nhl_player_stats, calibration, cur, all_opps, seen_matches
+                                # )
+                                pass
 
                     except Exception as e:
                         log("WARN", f"Exotic/Prop fetch failed for {league}: {e}")

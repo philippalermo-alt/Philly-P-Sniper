@@ -175,6 +175,18 @@ def process_nhl_props(match, props_data, player_stats, calibration, cur, all_opp
         return
     seen_matches.add(prop_id)
 
+    # DEBUG: Log available bookies
+    available_keys = [b['key'] for b in match.get('bookmakers', [])]
+    print(f"   🔍 [DEBUG-PROP] {match.get('home_team')} vs {match.get('away_team')} | Bookies: {available_keys}")
+
+    bookie = next((b for b in match.get('bookmakers', []) if b['key'] in Config.PREFERRED_BOOKS), None)
+    if not bookie:
+        print(f"   ⚠️ [DEBUG-PROP] No preferred bookie found. (Preferred: {Config.PREFERRED_BOOKS})")
+        return
+    
+    # Trace selected bookie
+    print(f"   ✅ [DEBUG-PROP] Using Bookie: {bookie['key']}")
+
     for market in bookie['markets']:
         if market['key'] != 'player_shots_on_goal':
             continue

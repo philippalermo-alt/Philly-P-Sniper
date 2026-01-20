@@ -333,6 +333,14 @@ def fetch_live_games(sport_keys):
 
     processed_paths = set()
 
+    # FORCE US/EASTERN DATE logic
+    # Heroku is UTC. If it is 2 AM UTC, it's 9 PM ET. We want "today" to be 9 PM ET.
+    import pytz
+    tz = pytz.timezone('US/Eastern')
+    now_et = datetime.now(tz)
+    # ESPN date param format: YYYYMMDD
+    date_str = now_et.strftime('%Y%m%d')
+
     for sport_key in unique_sports:
         espn_path = ESPN_MAP.get(sport_key)
         if not espn_path or espn_path in processed_paths:
@@ -341,7 +349,7 @@ def fetch_live_games(sport_keys):
         processed_paths.add(espn_path)
 
         try:
-            url = f"https://site.api.espn.com/apis/site/v2/sports/{espn_path}/scoreboard"
+            url = f"https://site.api.espn.com/apis/site/v2/sports/{espn_path}/scoreboard?dates={date_str}"
             # logs.append(f"Fetching {url}")
             r = requests.get(url, timeout=5)
             

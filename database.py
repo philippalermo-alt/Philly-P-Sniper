@@ -54,12 +54,16 @@ def init_db():
         if not cur.fetchone():
             cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS user_stake REAL")
 
-        # Phase 2 Metrics: xG and DvP and KenPom
+        # Phase 2 Metrics: xG and DvP
         cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name='intelligence_log' AND column_name='home_xg'")
         if not cur.fetchone():
             cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS home_xg REAL")
             cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS away_xg REAL")
             cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS dvp_rank REAL")
+
+        # KenPom Metrics
+        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name='intelligence_log' AND column_name='home_adj_em'")
+        if not cur.fetchone():
             cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS home_adj_em REAL")
             cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS away_adj_em REAL")
 

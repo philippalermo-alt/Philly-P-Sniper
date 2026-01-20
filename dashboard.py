@@ -621,14 +621,14 @@ if conn:
                     sport_keys = my_bets['sport'].unique()
                     live_games, debug_logs = fetch_live_games(sport_keys)
 
-                    with st.expander("🔍 Live Score Debug", expanded=False):
-                        st.write(f"Updated: {datetime.now().strftime('%H:%M:%S')} | Games Found: {len(live_games)}")
-                        st.write("Live Games List:")
-                        st.json(live_games)
-                        if debug_logs:
-                            st.error("Errors:")
-                            for l in debug_logs:
-                                st.text(l)
+                    # with st.expander("🔍 Live Score Debug", expanded=False):
+                    #     st.write(f"Updated: {datetime.now().strftime('%H:%M:%S')} | Games Found: {len(live_games)}")
+                    #     st.write("Live Games List:")
+                    #     st.json(live_games)
+                    #     if debug_logs:
+                    #         st.error("Errors:")
+                    #         for l in debug_logs:
+                    #             st.text(l)
 
                     def get_score(row):
                         event = row['Event'].replace(' @ ', ' vs ')
@@ -640,6 +640,8 @@ if conn:
 
                         for g in live_games:
                             h, a = g['home'], g['away']
+                            
+                            # Tier 1: Direct Substring Match
                             t1_match = (t1 in h or h in t1) or (t1 in a or a in t1)
                             t2_match = (t2 in h or h in t2) or (t2 in a or a in t2)
 
@@ -678,7 +680,7 @@ if conn:
                             "Live Score": st.column_config.TextColumn(
                                 "Live Score",
                                 help="Updates every 60s via ESPN",
-                                width="medium"
+                                width="large"
                             )
                         }
                     )

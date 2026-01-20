@@ -523,6 +523,19 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
                         
                         if Config.MIN_EDGE <= edge < Config.MAX_EDGE:
                             stake = calculate_kelly_stake(edge, price) * 0.5 # Half stake on 1H
+                            
+                            side_key = None
+                            if sel.startswith(home):
+                                side_key = home
+                            elif sel.startswith(away):
+                                side_key = away
+                            elif sel.startswith("Draw") or "Draw" in sel:
+                                side_key = "Draw"
+                                
+                            m_val, t_val, sharp_score_val = (None, None, 0)
+                            if side_key:
+                                m_val, t_val, sharp_score_val = get_sharp_split("moneyline", side_key)
+                                
                             soccer_match_opps.append({
                                 'Date': mdt.strftime('%Y-%m-%d'),
                                 'Kickoff': match['commence_time'],
@@ -534,7 +547,8 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
                                 'Dec_Odds': price,
                                 'Edge_Val': edge,
                                 'Edge': f"{edge*100:.1f}%",
-                                'Stake': f"${stake:.2f}"
+                                'Stake': f"${stake:.2f}",
+                                'Sharp_Score': sharp_score_val
                             })
 
             if soccer_match_opps:
@@ -553,16 +567,9 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
                                 closing_odds=EXCLUDED.closing_odds, ticket_pct=EXCLUDED.ticket_pct, money_pct=EXCLUDED.money_pct, sharp_score=EXCLUDED.sharp_score;
                         """
 
-                        side_key = None
-                        if best_opp['Selection'].startswith(home):
-                            side_key = home
-                        elif best_opp['Selection'].startswith(away):
-                            side_key = away
-                        elif best_opp['Selection'].startswith("Draw"):
-                            side_key = "Draw"
-                        m_val, t_val, sharp_score_val = (None, None, 0)
-                        if side_key:
-                            m_val, t_val, sharp_score_val = get_sharp_split("moneyline", side_key)
+                        # Values already calculated above
+                        sharp_score_val = best_opp.get('Sharp_Score', 0)
+                        
                         params = (
                             unique_id, datetime.now(), best_opp['Kickoff'], 'SOCCER', best_opp['Event'],
                             best_opp['Selection'], float(best_opp['Dec_Odds']), float(best_opp['True_Prob']),
@@ -633,31 +640,34 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
 
                 if Config.MIN_EDGE <= edge < Config.MAX_EDGE:
                     stake = calculate_kelly_stake(edge, price, sport=sport, multipliers=multipliers)
+                    
+                    # Calculate Sharp Score BEFORE creating object
+                    sharp_market = None
+                    sharp_side = None
+                    if 'spreads' in key:
+                        sharp_market = "spread"
+                        sharp_side = name
+                    elif 'h2h' in key:
+                        sharp_market = "moneyline"
+                        sharp_side = "Draw" if ('draw' in str(name).lower() or 'tie' in str(name).lower()) else name
+                    elif 'totals' in key:
+                        sharp_market = "total"
+                        sharp_side = "Over" if str(name).lower() == "over" else "Under"
+
+                    m_val, t_val, sharp_score_val = (None, None, 0)
+                    if sharp_market and sharp_side:
+                        m_val, t_val, sharp_score_val = get_sharp_split(sharp_market, sharp_side)
+
                     opp = {
                         'Date': mdt.strftime('%Y-%m-%d'), 'Kickoff': match['commence_time'], 'Sport': sport, 'Event': f"{away} @ {home}",
                         'Selection': sel, 'True_Prob': tp, 'Target': 1/tp if tp else 0, 'Dec_Odds': price,
-                        'Edge_Val': edge, 'Edge': f"{edge*100:.1f}%", 'Stake': f"${stake:.2f}"
+                        'Edge_Val': edge, 'Edge': f"{edge*100:.1f}%", 'Stake': f"${stake:.2f}",
+                        'Sharp_Score': sharp_score_val # Added for alerts
                     }
                     all_opps.append(opp)
                     if cur:
                         try:
                             unique_id = f"{match['id']}_{sel.replace(' ', '_')}"
-
-                            sharp_market = None
-                            sharp_side = None
-                            if 'spreads' in key:
-                                sharp_market = "spread"
-                                sharp_side = name
-                            elif 'h2h' in key:
-                                sharp_market = "moneyline"
-                                sharp_side = "Draw" if ('draw' in str(name).lower() or 'tie' in str(name).lower()) else name
-                            elif 'totals' in key:
-                                sharp_market = "total"
-                                sharp_side = "Over" if str(name).lower() == "over" else "Under"
-
-                            m_val, t_val, sharp_score_val = (None, None, 0)
-                            if sharp_market and sharp_side:
-                                m_val, t_val, sharp_score_val = get_sharp_split(sharp_market, sharp_side)
                             sql = """
                                 INSERT INTO intelligence_log
                                 (event_id, timestamp, kickoff, sport, teams, selection, odds, true_prob, edge, stake, trigger_type, closing_odds, ticket_pct, money_pct, sharp_score)

@@ -323,12 +323,19 @@ def fetch_live_games(sport_keys):
     # Format: {sport}/{league}
     ESPN_MAP = {
         'basketball_nba': 'basketball/nba',
+        'NBA': 'basketball/nba',
         'basketball_ncaab': 'basketball/mens-college-basketball',
+        'NCAAB': 'basketball/mens-college-basketball',
         'icehockey_nhl': 'hockey/nhl',
+        'NHL': 'hockey/nhl',
         'americanfootball_nfl': 'football/nfl',
+        'NFL': 'football/nfl',
         'baseball_mlb': 'baseball/mlb',
+        'MLB': 'baseball/mlb',
         'soccer_epl': 'soccer/eng.1',
-        'soccer_uefa_champs_league': 'soccer/uefa.champions' 
+        'SOCCER': 'soccer/eng.1',
+        'soccer_uefa_champs_league': 'soccer/uefa.champions',
+        'CHAMPIONS': 'soccer/uefa.champions'
     }
 
     processed_paths = set()

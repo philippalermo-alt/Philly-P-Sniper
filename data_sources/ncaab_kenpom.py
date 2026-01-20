@@ -55,19 +55,25 @@ class KenPomClient:
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.droplevel(0)
             
-            # Rename/Map columns if needed
-            # Sometimes 'Tempo' is the column name instead of 'AdjT'
-            if 'AdjT' not in df.columns and 'Tempo' in df.columns:
-                df['AdjT'] = df['Tempo']
-                
+            # Handle specific column structure seen in logs
+            # Available: ['Team', 'Conference', 'Tempo-Adj', ... 'Off. Efficiency-Adj', ... 'Def. Efficiency-Adj', ...]
+            rename_map = {
+                'Off. Efficiency-Adj': 'AdjO',
+                'Def. Efficiency-Adj': 'AdjD',
+                'Tempo-Adj': 'AdjT'
+            }
+            df = df.rename(columns=rename_map)
+
+            # Calculate AdjEM if missing (AdjO - AdjD)
+            if 'AdjEM' not in df.columns and 'AdjO' in df.columns and 'AdjD' in df.columns:
+                df['AdjEM'] = df['AdjO'] - df['AdjD']
+
             # Filter for required columns
-            # Check overlap first
             required = ['Team', 'AdjEM', 'AdjO', 'AdjD', 'AdjT']
             missing = [c for c in required if c not in df.columns]
+            
             if missing:
                 print(f"⚠️ Missing columns in KenPom data: {missing}. Available: {df.columns.tolist()}")
-                # Try to fuzzy match or just return what we have?
-                # If crucial metrics are missing, we might as well fail or fallback.
                 raise Exception(f"Missing columns: {missing}")
 
             return df[required]

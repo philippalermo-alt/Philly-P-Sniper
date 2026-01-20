@@ -188,6 +188,8 @@ def process_nhl_props(match, props_data, player_stats, calibration, cur, all_opp
     print(f"   ✅ [DEBUG-PROP] Using Bookie: {bookie['key']}")
 
     for market in bookie['markets']:
+        # LOG MARKET
+        print(f"   ℹ️ [DEBUG-PROP] Checking market: {market['key']}")
         if market['key'] != 'player_shots_on_goal':
             continue
 
@@ -197,6 +199,9 @@ def process_nhl_props(match, props_data, player_stats, calibration, cur, all_opp
             raw_name = outcome.get('name', '')
             raw_desc = outcome.get('description', '')
             
+            # LOG OUTCOME
+            print(f"   ℹ️ [DEBUG-PROP] Processing: {raw_name} | {raw_desc}")
+
             if raw_name in ['Over', 'Under'] and raw_desc:
                 player_name_odds = raw_desc
                 description = raw_name
@@ -210,7 +215,12 @@ def process_nhl_props(match, props_data, player_stats, calibration, cur, all_opp
             # 1. Fuzzy Match
             best_match = difflib.get_close_matches(player_name_odds, player_stats.keys(), n=1, cutoff=0.85)
             if not best_match:
+                # LOG FAIL
+                print(f"   ❌ [DEBUG-PROP] No name match for: {player_name_odds}")
                 continue
+            
+            # LOG SUCCESS
+            print(f"   ✅ [DEBUG-PROP] Matched: {player_name_odds} -> {best_match[0]}")
                 
             p_stats = player_stats[best_match[0]]
             

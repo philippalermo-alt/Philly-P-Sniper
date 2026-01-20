@@ -603,9 +603,13 @@ if conn:
                     live_games, debug_logs = fetch_live_games(sport_keys)
 
                     with st.expander("🔍 Live Score Debug", expanded=False):
-                        for l in debug_logs:
-                            st.text(l)
-                        st.write(f"Updated: {datetime.now().strftime('%H:%M:%S')} | Games: {len(live_games)}")
+                        st.write(f"Updated: {datetime.now().strftime('%H:%M:%S')} | Games Found: {len(live_games)}")
+                        st.write("Live Games List:")
+                        st.json(live_games)
+                        if debug_logs:
+                            st.error("Errors:")
+                            for l in debug_logs:
+                                st.text(l)
 
                     def get_score(row):
                         event = row['Event'].replace(' @ ', ' vs ')
@@ -622,7 +626,10 @@ if conn:
 
                             if t1_match and t2_match:
                                 return g['score']
-
+                        
+                        # DEBUG: If no match, maybe log why?
+                        # This would flood the UI so we keep it simple, but we can verify the 'live_games' list in the expander above.
+                        
                         return "🕒 Upcoming"
 
                     my_bets['Live Score'] = my_bets.apply(get_score, axis=1)
@@ -631,7 +638,14 @@ if conn:
                         my_bets[['Date', 'Kickoff', 'Sport', 'Event', 'Selection', 'Live Score', 'Dec_Odds', 'Stake']],
                         use_container_width=True,
                         hide_index=True,
-                        height=400
+                        height=400,
+                        column_config={
+                            "Live Score": st.column_config.TextColumn(
+                                "Live Score",
+                                help="Updates every 60s via ESPN",
+                                width="medium"
+                            )
+                        }
                     )
             
             # Call the fragment

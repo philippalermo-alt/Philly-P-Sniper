@@ -311,48 +311,74 @@ def confirm_bet(event_id, current_status, user_odds=None, user_stake=None):
 
 @st.cache_data(ttl=60)
 def fetch_live_games(sport_keys):
+    """
+    Fetch live scores from ESPN's public hidden API (Free).
+    """
     games = []
     logs = []
-    api_key = os.getenv('ODDS_API_KEY')
-    if not api_key:
-        return [], ["❌ No API Key"]
-
+    
     unique_sports = set(sport_keys)
-    SPORT_MAP = {
-        'NBA': 'basketball_nba',
-        'NCAAB': 'basketball_ncaab',
-        'NFL': 'americanfootball_nfl',
-        'NHL': 'icehockey_nhl',
-        'MLB': 'baseball_mlb',
-        'SOCCER': 'soccer_epl',
-        'CHAMPIONS': 'soccer_uefa_champs_league',
-        'UEFA': 'soccer_uefa_champs_league'
+    
+    # Map internal keys to ESPN API paths
+    # Format: {sport}/{league}
+    ESPN_MAP = {
+        'basketball_nba': 'basketball/nba',
+        'basketball_ncaab': 'basketball/mens-college-basketball',
+        'icehockey_nhl': 'hockey/nhl',
+        'americanfootball_nfl': 'football/nfl',
+        'baseball_mlb': 'baseball/mlb',
+        'soccer_epl': 'soccer/eng.1',
+        'soccer_uefa_champs_league': 'soccer/uefa.champions' 
     }
 
-    for sport_short in unique_sports:
+    processed_paths = set()
+
+    for sport_key in unique_sports:
+        espn_path = ESPN_MAP.get(sport_key)
+        if not espn_path or espn_path in processed_paths:
+            continue
+            
+        processed_paths.add(espn_path)
+
         try:
-            sport = SPORT_MAP.get(sport_short, sport_short)
-            url = f"https://api.the-odds-api.com/v4/sports/{sport}/scores/?apiKey={api_key}&daysFrom=3"
+            url = f"https://site.api.espn.com/apis/site/v2/sports/{espn_path}/scoreboard"
+            # logs.append(f"Fetching {url}")
             r = requests.get(url, timeout=5)
+            
             if r.status_code == 200:
                 res = r.json()
-                for g in res:
-                    if g.get('scores'):
-                        h = g['home_team']
-                        a = g['away_team']
-                        h_s = next((s['score'] for s in g['scores'] if s['name'] == h), 0)
-                        a_s = next((s['score'] for s in g['scores'] if s['name'] == a), 0)
-                        status = "🏁" if g['completed'] else "🔴 LIVE"
-                        games.append({
-                            'home': h,
-                            'away': a,
-                            'score': f"{status} {h} {h_s} - {a} {a_s}",
-                            'commence': g['commence_time']
-                        })
+                for event in res.get('events', []):
+                    # ESPN structure: events -> competitions[0] -> competitors
+                    comp = event['competitions'][0]
+                    status_detail = event.get('status', {}).get('type', {}).get('shortDetail', 'Scheduled')
+                    is_complete = event.get('status', {}).get('type', {}).get('completed', False)
+                    
+                    # Teams
+                    competitors = comp.get('competitors', [])
+                    home_comp = next((c for c in competitors if c['homeAway'] == 'home'), {})
+                    away_comp = next((c for c in competitors if c['homeAway'] == 'away'), {})
+                    
+                    h_name = home_comp.get('team', {}).get('displayName', 'Home')
+                    a_name = away_comp.get('team', {}).get('displayName', 'Away')
+                    h_score = home_comp.get('score', '0')
+                    a_score = away_comp.get('score', '0')
+                    
+                    # Formatting: "Q3 4:21" or "Final"
+                    # status_icon = "🏁" if is_complete else "🔴"
+                    
+                    # Normalize names for matching logic (remove rank numbers which ESPN adds sometimes)
+                    # For now, pass raw names. Fuzzy match in UI handles the rest.
+                    
+                    games.append({
+                        'home': h_name,
+                        'away': a_name,
+                        'score': f"{status_detail}: {a_name} {a_score} - {h_name} {h_score}",
+                        'commence': event.get('date') # ISO string
+                    })
             else:
-                logs.append(f"⚠️ {sport}: {r.status_code}")
+                logs.append(f"⚠️ {espn_path}: {r.status_code}")
         except Exception as e:
-            logs.append(f"❌ {sport}: {e}")
+            logs.append(f"❌ {sport_key}: {e}")
 
     return games, logs
 
@@ -555,31 +581,23 @@ if conn:
                         st.markdown("---")
 
         with tab2:
-            @st.fragment
+            @st.fragment(run_every=60)
             def render_active_portfolio(df_source):
                 st.markdown("### 💼 Your Active Wagers")
+                st.caption("🟢 Live Updates: Auto-refreshing via ESPN (Free)")
                 
                 my_bets = df_source[df_source['user_bet'] == True].copy()
 
                 if my_bets.empty:
                     st.info("📭 No active bets in your portfolio")
                 else:
-                    live_games = []
-                    debug_logs = []
-                    
-                    col_status, col_btn = st.columns([3, 1])
-                    with col_status:
-                        st.caption("ℹ️ Scores update manually to save API credits.")
-                    with col_btn:
-                        if st.button("🔄 Check Live Scores", use_container_width=True):
-                            sport_keys = my_bets['sport'].unique()
-                            live_games, debug_logs = fetch_live_games(sport_keys)
+                    sport_keys = my_bets['sport'].unique()
+                    live_games, debug_logs = fetch_live_games(sport_keys)
 
-                    if debug_logs:
-                        with st.expander("🔍 Live Score Debug", expanded=False):
-                            for l in debug_logs:
-                                st.text(l)
-                            st.write(f"Updated: {datetime.now().strftime('%H:%M:%S')} | Games: {len(live_games)}")
+                    with st.expander("🔍 Live Score Debug", expanded=False):
+                        for l in debug_logs:
+                            st.text(l)
+                        st.write(f"Updated: {datetime.now().strftime('%H:%M:%S')} | Games: {len(live_games)}")
 
                     def get_score(row):
                         event = row['Event'].replace(' @ ', ' vs ')

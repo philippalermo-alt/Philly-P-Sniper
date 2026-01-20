@@ -50,9 +50,27 @@ class KenPomClient:
         try:
             # Default to current season if None
             df = get_efficiency(self.browser, season=season)
-            # Columns usually: Team, Conf, W-L, AdjEM, AdjO, AdjD, ...
-            # We care about 'Team' and 'AdjEM'
-            return df[['Team', 'AdjEM', 'AdjO', 'AdjD', 'AdjT']]
+            
+            # Handle MultiIndex headers (common with pd.read_html on KenPom)
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.droplevel(0)
+            
+            # Rename/Map columns if needed
+            # Sometimes 'Tempo' is the column name instead of 'AdjT'
+            if 'AdjT' not in df.columns and 'Tempo' in df.columns:
+                df['AdjT'] = df['Tempo']
+                
+            # Filter for required columns
+            # Check overlap first
+            required = ['Team', 'AdjEM', 'AdjO', 'AdjD', 'AdjT']
+            missing = [c for c in required if c not in df.columns]
+            if missing:
+                print(f"⚠️ Missing columns in KenPom data: {missing}. Available: {df.columns.tolist()}")
+                # Try to fuzzy match or just return what we have?
+                # If crucial metrics are missing, we might as well fail or fallback.
+                raise Exception(f"Missing columns: {missing}")
+
+            return df[required]
         except Exception as e:
             print(f"❌ Error fetching KenPom stats (kenpompy): {e}")
             

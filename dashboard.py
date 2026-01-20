@@ -631,6 +631,32 @@ if conn:
                     #         for l in debug_logs:
                     #             st.text(l)
 
+                    # --- PARLAY SUGGESTIONS (New v270) ---
+                    try:
+                        parlays = generate_parlays(df_pending)
+                        
+                        st.markdown("---")
+                        st.subheader("🧪 Sniper Triples (Experimental Parlays)")
+                        
+                        if parlays:
+                            st.caption("Auto-generated 3-leg parlays using strictly independent +EV bets (1-10% Edge).")
+                            cols = st.columns(len(parlays) if len(parlays) < 3 else 3)
+                            for idx, p in enumerate(parlays[:3]): # Show top 3
+                                with cols[idx]:
+                                    with st.container(border=True):
+                                        st.markdown(f"**Option #{idx+1}**")
+                                        st.metric("Total Odds", f"+{int((p['combined_odds']-1)*100)}")
+                                        st.caption(f"Est. EV: +{p['expected_value']*100:.1f}%")
+                                        
+                                        for leg in p['legs']:
+                                            st.text(f"• {leg['Sport']} {leg['Selection']}")
+                                            st.caption(f"{leg['Event']} ({leg['Dec_Odds']})")
+                        else:
+                            st.info("ℹ️ No 'Sniper Triples' found right now.\n\nCriteria not met: 3 Independent Events with 1-10% Edge & -250 to +200 Odds.")
+                            
+                    except Exception as e:
+                        st.error(f"Parlay Error: {e}")
+
                     def get_score(row):
                         event = row['Event'].replace(' @ ', ' vs ')
                         teams = event.split(' vs ')

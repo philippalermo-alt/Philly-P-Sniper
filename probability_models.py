@@ -268,9 +268,9 @@ def process_nhl_props(match, props_data, player_stats, calibration, cur, all_opp
             # FLOODGATES DEBUG: Show everything found
             print(f"   🏒 [PROP] {sel} | Edge: {edge*100:.1f}%")
             
-            if edge >= -10.0: # ALLOW EVERYTHING (Debug Request)
-                # Calculate stake nicely even if negative edge (min $0.10)
-                stake = max(0.10, calculate_kelly_stake(max(0.01, edge), price) * 0.5) if edge > 0 else 0.00
+            if edge >= Config.MIN_EDGE: # Regular Filter (Positive Edge only)
+                # Calculate stake 
+                stake = calculate_kelly_stake(edge, price) * 0.5 # Half stake for props volatility
                 
                 opp = {
                     'Date': mdt.strftime('%Y-%m-%d'),

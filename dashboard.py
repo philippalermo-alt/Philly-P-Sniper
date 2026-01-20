@@ -555,24 +555,31 @@ if conn:
                         st.markdown("---")
 
         with tab2:
-            @st.fragment(run_every=60)
+            @st.fragment
             def render_active_portfolio(df_source):
                 st.markdown("### 💼 Your Active Wagers")
-                st.caption("🟢 Live Updates: This section auto-refreshes every 60 seconds")
                 
                 my_bets = df_source[df_source['user_bet'] == True].copy()
 
                 if my_bets.empty:
                     st.info("📭 No active bets in your portfolio")
                 else:
-                    sport_keys = my_bets['sport'].unique()
-                    # FETCH LATEST SCORES inside the fragment
-                    live_games, debug_logs = fetch_live_games(sport_keys)
+                    live_games = []
+                    debug_logs = []
+                    
+                    col_status, col_btn = st.columns([3, 1])
+                    with col_status:
+                        st.caption("ℹ️ Scores update manually to save API credits.")
+                    with col_btn:
+                        if st.button("🔄 Check Live Scores", use_container_width=True):
+                            sport_keys = my_bets['sport'].unique()
+                            live_games, debug_logs = fetch_live_games(sport_keys)
 
-                    with st.expander("🔍 Live Score Debug", expanded=False):
-                        for l in debug_logs:
-                            st.text(l)
-                        st.write(f"Updated: {datetime.now().strftime('%H:%M:%S')} | Games: {len(live_games)}")
+                    if debug_logs:
+                        with st.expander("🔍 Live Score Debug", expanded=False):
+                            for l in debug_logs:
+                                st.text(l)
+                            st.write(f"Updated: {datetime.now().strftime('%H:%M:%S')} | Games: {len(live_games)}")
 
                     def get_score(row):
                         event = row['Event'].replace(' @ ', ' vs ')

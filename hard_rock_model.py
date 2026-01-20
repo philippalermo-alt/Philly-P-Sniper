@@ -100,7 +100,7 @@ def run_sniper():
                 )
 
                 # Fetch exotic markets for select sports
-                if sport_key in ['NBA', 'NFL', 'NCAAB', 'NHL']:
+                if sport_key in ['NBA', 'NFL', 'NCAAB', 'NHL'] or 'soccer' in league:
                     try:
                         # Bulk Fetch Exotics (Half markets)
                         # Do NOT include props here as it breaks the bulk endpoint

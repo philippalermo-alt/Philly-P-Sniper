@@ -3,6 +3,8 @@ import pytz
 from datetime import datetime
 from hard_rock_model import run_sniper
 
+from settle_props import settle_props
+
 def main():
     # Set timezone to US/Eastern
     tz = pytz.timezone('US/Eastern')
@@ -35,6 +37,8 @@ def main():
         print("✅ Schedule Match! Execution starting...")
         try:
             run_sniper()
+            print("🏒 Running Prop Settlement...")
+            settle_props()
             print("🚀 Job completed successfully.")
         except Exception as e:
             print(f"❌ Job failed: {e}")

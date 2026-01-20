@@ -275,7 +275,7 @@ def process_nhl_props(match, props_data, player_stats, calibration, cur, all_opp
                 opp = {
                     'Date': mdt.strftime('%Y-%m-%d'),
                     'Kickoff': match['commence_time'],
-                    'Sport': 'NHL',
+                    'Sport': 'NHL_PROP',
                     'Event': f"{away} @ {home}",
                     'Selection': sel,
                     'True_Prob': true_prob,
@@ -293,7 +293,7 @@ def process_nhl_props(match, props_data, player_stats, calibration, cur, all_opp
                         sql = """
                             INSERT INTO intelligence_log
                             (event_id, timestamp, kickoff, sport, teams, selection, odds, true_prob, edge, stake, trigger_type, closing_odds, ticket_pct, money_pct, sharp_score)
-                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                            VALUES (%s,%s,%s,'NHL_PROP',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                             ON CONFLICT (event_id) DO UPDATE SET
                                 odds=EXCLUDED.odds, true_prob=EXCLUDED.true_prob, edge=EXCLUDED.edge,
                                 stake=EXCLUDED.stake, selection=EXCLUDED.selection, timestamp=EXCLUDED.timestamp;
@@ -390,47 +390,152 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
         if pred:
             soccer_match_opps = []
             for m in bookie['markets']:
-                if m['key'] != 'h2h':
-                    continue
-                for o in m.get('outcomes', []):
-                    name = o['name']
-                    price = o.get('price')
-                    if price is None or price == 0:
-                        continue
+                if m['key'] == 'h2h':
+                    for o in m.get('outcomes', []):
+                        name = o['name']
+                        price = o.get('price')
+                        if not price: continue
 
-                    if name == home:
-                        mp = pred['home_win']
-                        sel = f"{home} ML"
-                    elif name == away:
-                        mp = pred['away_win']
-                        sel = f"{away} ML"
-                    elif 'Draw' in name or 'Tie' in name:
-                        mp = pred['draw']
-                        sel = "Draw ML"
-                    else:
-                        continue
+                        if name == home:
+                            mp = pred['home_win']
+                            sel = f"{home} ML"
+                        elif name == away:
+                            mp = pred['away_win']
+                            sel = f"{away} ML"
+                        elif 'Draw' in name or 'Tie' in name:
+                            mp = pred['draw']
+                            sel = "Draw ML"
+                        else:
+                            continue
 
-                    mp *= calibration
-                    mp = min(mp, Config.MAX_PROBABILITY)
+                        mp *= calibration
+                        mp = min(mp, Config.MAX_PROBABILITY)
 
-                    tp = (Config.MARKET_WEIGHT_SOCCER * (1 / price)) + ((1 - Config.MARKET_WEIGHT_SOCCER) * mp)
-                    edge = (tp * price) - 1
+                        tp = (Config.MARKET_WEIGHT_SOCCER * (1 / price)) + ((1 - Config.MARKET_WEIGHT_SOCCER) * mp)
+                        edge = (tp * price) - 1
+                        
+                        if Config.MIN_EDGE <= edge < Config.MAX_EDGE:
+                            stake = calculate_kelly_stake(edge, price)
+                            soccer_match_opps.append({
+                                'Date': mdt.strftime('%Y-%m-%d'),
+                                'Kickoff': match['commence_time'],
+                                'Sport': 'SOCCER',
+                                'Event': mk,
+                                'Selection': sel,
+                                'True_Prob': tp,
+                                'Target': 1 / tp if tp else 0,
+                                'Dec_Odds': price,
+                                'Edge_Val': edge,
+                                'Edge': f"{edge*100:.1f}%",
+                                'Stake': f"${stake:.2f}"
+                            })
 
-                    if Config.MIN_EDGE <= edge < Config.MAX_EDGE:
-                        stake = calculate_kelly_stake(edge, price)
-                        soccer_match_opps.append({
-                            'Date': mdt.strftime('%Y-%m-%d'),
-                            'Kickoff': match['commence_time'],
-                            'Sport': 'SOCCER',
-                            'Event': mk,
-                            'Selection': sel,
-                            'True_Prob': tp,
-                            'Target': 1 / tp if tp else 0,
-                            'Dec_Odds': price,
-                            'Edge_Val': edge,
-                            'Edge': f"{edge*100:.1f}%",
-                            'Stake': f"${stake:.2f}"
-                        })
+                elif m['key'] == 'totals':
+                    # Parse goal stats for totals
+                    if 'home_goals' not in pred: continue
+                    
+                    proj_total = pred['home_goals'] + pred['away_goals']
+                    
+                    for o in m.get('outcomes', []):
+                        name = o['name'] # Over / Under
+                        price = o.get('price')
+                        point = o.get('point') # e.g. 2.5
+                        if not price or not point: continue
+                        
+                        # Poisson sum: T ~ Pois(lambda1 + lambda2)
+                        # P(Over X) = 1 - cdf(X, lambda_total)
+                        # P(Under X) = cdf(X, lambda_total)
+                        
+                        if name == 'Over':
+                            # P(total > point) = P(total >= point_int + 1) = 1 - P(total <= floor(point))
+                            prob = 1 - stats.poisson.cdf(int(point), proj_total)
+                            sel = f"Over {point} Goals"
+                        else: # Under
+                            prob = stats.poisson.cdf(int(point), proj_total)
+                            sel = f"Under {point} Goals"
+                            
+                        prob *= calibration
+                        prob = min(prob, Config.MAX_PROBABILITY)
+                        
+                        # Market weight logic
+                        tp = (Config.MARKET_WEIGHT_SOCCER * (1 / price)) + ((1 - Config.MARKET_WEIGHT_SOCCER) * prob)
+                        edge = (tp * price) - 1
+                        
+                        if Config.MIN_EDGE <= edge < Config.MAX_EDGE:
+                            stake = calculate_kelly_stake(edge, price)
+                            soccer_match_opps.append({
+                                'Date': mdt.strftime('%Y-%m-%d'),
+                                'Kickoff': match['commence_time'],
+                                'Sport': 'SOCCER',
+                                'Event': mk,
+                                'Selection': sel,
+                                'True_Prob': tp,
+                                'Target': 1 / tp if tp else 0,
+                                'Dec_Odds': price,
+                                'Edge_Val': edge,
+                                'Edge': f"{edge*100:.1f}%",
+                                'Stake': f"${stake:.2f}"
+                            })
+
+                elif m['key'] == 'h2h_h1':
+                     # 1st Half Logic
+                     # Heuristic: 1H goals approx 45% of FT goals
+                     if 'home_goals' not in pred: continue
+                     
+                     h_goals_1h = pred['home_goals'] * 0.45
+                     a_goals_1h = pred['away_goals'] * 0.45
+                     
+                     # Calculate Win/Draw/Loss probs for 1H using Poisson difference (Skellam? or simple simulation?)
+                     # Simpler: P(H) = sum(P(h_goals=i)*P(a_goals=j) where i > j)
+                     # Since we need this for grading, let's implement the generic Poisson match calculator
+                     
+                     p_home, p_draw, p_away = 0, 0, 0
+                     for i in range(10): # Max 10 goals
+                         for j in range(10):
+                             prob_score = stats.poisson.pmf(i, h_goals_1h) * stats.poisson.pmf(j, a_goals_1h)
+                             if i > j: p_home += prob_score
+                             elif i == j: p_draw += prob_score
+                             else: p_away += prob_score
+                             
+                     for o in m.get('outcomes', []):
+                        name = o['name']
+                        price = o.get('price')
+                        if not price: continue
+
+                        if name == home:
+                            mp = p_home
+                            sel = f"1H {home} ML"
+                        elif name == away:
+                            mp = p_away
+                            sel = f"1H {away} ML"
+                        elif 'Draw' in name or 'Tie' in name:
+                            mp = p_draw
+                            sel = "1H Draw ML"
+                        else:
+                            continue
+
+                        mp *= calibration
+                        # Less confident in 1H heuristic, clamp tighter
+                        mp = min(mp, 0.65) 
+
+                        tp = (Config.MARKET_WEIGHT_SOCCER * (1 / price)) + ((1 - Config.MARKET_WEIGHT_SOCCER) * mp)
+                        edge = (tp * price) - 1
+                        
+                        if Config.MIN_EDGE <= edge < Config.MAX_EDGE:
+                            stake = calculate_kelly_stake(edge, price) * 0.5 # Half stake on 1H
+                            soccer_match_opps.append({
+                                'Date': mdt.strftime('%Y-%m-%d'),
+                                'Kickoff': match['commence_time'],
+                                'Sport': 'SOCCER',
+                                'Event': mk,
+                                'Selection': sel,
+                                'True_Prob': tp,
+                                'Target': 1 / tp if tp else 0,
+                                'Dec_Odds': price,
+                                'Edge_Val': edge,
+                                'Edge': f"{edge*100:.1f}%",
+                                'Stake': f"${stake:.2f}"
+                            })
 
             if soccer_match_opps:
                 best_opp = sorted(soccer_match_opps, key=lambda x: x['Edge_Val'], reverse=True)[0]

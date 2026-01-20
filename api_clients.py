@@ -211,11 +211,20 @@ def get_soccer_predictions(league_key):
                         ).json()
 
                         if p_res.get('results', 0) > 0:
-                            p = p_res['response'][0]['predictions']['percent']
+                            pred_data = p_res['response'][0]['predictions']
+                            p = pred_data['percent']
+                            goals = pred_data.get('goals', {})
+                            
+                            # Parse goals (often string "-1.5" or "1.5")
+                            h_goals = abs(float(goals.get('home', 0))) if goals.get('home') else 1.2
+                            a_goals = abs(float(goals.get('away', 0))) if goals.get('away') else 1.0
+                            
                             preds[mk] = {
                                 'home_win': float(p['home'].strip('%')) / 100,
                                 'draw': float(p['draw'].strip('%')) / 100,
-                                'away_win': float(p['away'].strip('%')) / 100
+                                'away_win': float(p['away'].strip('%')) / 100,
+                                'home_goals': h_goals,
+                                'away_goals': a_goals
                             }
 
                 except:

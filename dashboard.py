@@ -311,6 +311,18 @@ def confirm_bet(event_id, current_status, user_odds=None, user_stake=None):
     except Exception as e:
         st.error(f"Error: {e}")
 
+def cancel_bet_db(event_id):
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        # Set user_bet to FALSE (removes from portfolio, keeps in potential plays)
+        cur.execute("UPDATE intelligence_log SET user_bet = FALSE WHERE event_id = %s", (event_id,))
+        conn.commit()
+        cur.close()
+        st.rerun()
+    except Exception as e:
+        st.error(f"Error cancelling bet: {e}")
+
 def confirm_parlay(event_id, odds, stake, selection_text, legs_desc):
     conn = get_db()
     try:
@@ -600,18 +612,23 @@ if conn:
                                     st.caption(f"{leg['Event']} ({leg['Dec_Odds']})")
                                     leg_desc.append(f"{leg['Selection']} ({leg['Dec_Odds']})")
                                 
-                                # Track Button
+                                # Track Button (with Popover for Odds Edit)
                                 full_desc = " + ".join(leg_desc)
-                                if st.button("Track Triple", key=f"track_parlay_{idx}", use_container_width=True):
-                                    pid = f"parlay_{int(datetime.now().timestamp())}_{idx}"
-                                    confirm_parlay(
-                                        event_id=pid, 
-                                        odds=p['combined_odds'], 
-                                        stake=rec_stake, 
-                                        selection_text=f"Parlay (3 Legs): {full_desc}",
-                                        legs_desc=full_desc
-                                    )
-                                    st.toast("✅ Parlay tracked successfully!")
+                                with st.popover("Track Triple", use_container_width=True):
+                                    st.markdown("##### Confirm Parlay Details")
+                                    p_odds = st.number_input("Total Odds (Decimal)", value=float(p['combined_odds']), key=f"p_odds_{idx}")
+                                    p_stake = st.number_input("Stake ($)", value=float(rec_stake), key=f"p_stake_{idx}")
+                                    
+                                    if st.button("Confirm Tracking", key=f"confirm_parlay_{idx}", use_container_width=True):
+                                        pid = f"parlay_{int(datetime.now().timestamp())}_{idx}"
+                                        confirm_parlay(
+                                            event_id=pid, 
+                                            odds=p_odds, 
+                                            stake=p_stake, 
+                                            selection_text=f"Parlay (3 Legs): {full_desc}",
+                                            legs_desc=full_desc
+                                        )
+                                        st.toast("✅ Parlay tracked successfully!")
                                     
                 else:
                     st.info("ℹ️ No 'Sniper Triples' found right now.\n\nCriteria not met: 3 Independent Events with 1-10% Edge, -250 to +200 Odds & Sharp Score ≥ 30.")
@@ -749,19 +766,24 @@ if conn:
 
                     my_bets['Live Score'] = my_bets.apply(get_score, axis=1)
 
-                    st.dataframe(
-                        my_bets[['Date', 'Kickoff', 'Sport', 'Event', 'Selection', 'Live Score', 'Dec_Odds', 'Stake']],
-                        use_container_width=True,
-                        hide_index=True,
-                        height=400,
-                        column_config={
-                            "Live Score": st.column_config.TextColumn(
-                                "Live Score",
-                                help="Updates every 60s via ESPN",
-                                width="large"
-                            )
-                        }
-                    )
+                    
+                    # Convert to editable editor or add button column
+                    # Streamlit data_editor supports 'delete' for rows but we need custom logic
+                    # Instead, iterate and show a "Cancel" button for each
+                    
+                    for idx, row in my_bets.iterrows():
+                        with st.container():
+                            c1, c2, c3, c4, c5 = st.columns([1, 2, 2, 1, 1])
+                            c1.caption(f"{row['Sport']}\n{row['Kickoff']}")
+                            c2.markdown(f"**{row['Event']}**")
+                            c3.text(f"{row['Selection']} ({row['Dec_Odds']})")
+                            c3.caption(f"Live: {row['Live Score']}")
+                            c4.metric("Stake", row['Stake'])
+                            
+                            with c5:
+                                if st.button("❌ Cancel", key=f"cancel_{row['event_id']}"):
+                                    cancel_bet_db(row['event_id'])
+                            st.divider()
             
             # Call the fragment
             render_active_portfolio(df_pending)

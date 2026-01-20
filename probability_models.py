@@ -147,7 +147,12 @@ def calculate_kelly_stake(edge, decimal_odds, sport=None, use_smart_staking=True
 
     # Apply smart staking if enabled and sport is provided
     if use_smart_staking and sport:
-        return calculate_smart_stake(base_stake, sport, edge, multipliers)
+        base_stake = calculate_smart_stake(base_stake, sport, edge, multipliers)
+
+    # FINAL CHECK: Enforce strict $1.00 minimum for any positive bet
+    # If the calculated stake is positive but less than $1.00, bump it to $1.00
+    if base_stake > 0:
+        base_stake = max(base_stake, 1.00)
 
     return base_stake
 
@@ -570,6 +575,12 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
                         # Values already calculated above
                         sharp_score_val = best_opp.get('Sharp_Score', 0)
                         
+                        params = (
+                            unique_id, datetime.now(), best_opp['Kickoff'], 'SOCCER', best_opp['Event'], 
+                            best_opp['Selection'], float(best_opp['Dec_Odds']), float(best_opp['True_Prob']), 
+                            float(best_opp['Edge_Val']), float(best_opp['Stake'].replace('$','')), 'model', float(best_opp['Dec_Odds']),
+                            None, None, int(sharp_score_val)
+                        )
 
                         safe_execute(cur, sql, params)
                     except Exception as e:

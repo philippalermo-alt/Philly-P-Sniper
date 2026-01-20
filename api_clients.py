@@ -284,3 +284,116 @@ def get_nhl_player_stats(season=20242025):
     except Exception as e:
         log("ERROR", f"Failed to fetch NHL stats: {e}")
         return {}
+
+def fetch_espn_scores(sport_keys):
+    """
+    Fetch live scores from ESPN's public hidden API (Free).
+    Used for both Dashboard Live Scores and Bet Grading.
+    
+    Args:
+        sport_keys (list): List of sport/league keys (e.g. ['NBA', 'NFL'])
+        
+    Returns:
+        list: List of game dictionaries with keys: home, away, score, commence, status, home_score, away_score, is_complete
+    """
+    import pytz
+    
+    games = []
+    unique_sports = set(sport_keys)
+    
+    # Map internal keys to ESPN API paths
+    # Format: {sport}/{league}
+    ESPN_MAP = {
+        'basketball_nba': 'basketball/nba',
+        'NBA': 'basketball/nba',
+        'basketball_ncaab': 'basketball/mens-college-basketball',
+        'NCAAB': 'basketball/mens-college-basketball',
+        'icehockey_nhl': 'hockey/nhl',
+        'NHL': 'hockey/nhl',
+        'americanfootball_nfl': 'football/nfl',
+        'NFL': 'football/nfl',
+        'baseball_mlb': 'baseball/mlb',
+        'MLB': 'baseball/mlb',
+        'soccer_epl': 'soccer/eng.1',
+        'SOCCER': 'soccer/eng.1',
+        'soccer_uefa_champs_league': 'soccer/uefa.champions',
+        'CHAMPIONS': 'soccer/uefa.champions',
+        'soccer_spain_la_liga': 'soccer/esp.1',
+        'LALIGA': 'soccer/esp.1',
+        'soccer_germany_bundesliga': 'soccer/ger.1',
+        'BUNDESLIGA': 'soccer/ger.1',
+        'soccer_italy_serie_a': 'soccer/ita.1',
+        'SERIEA': 'soccer/ita.1',
+        'soccer_france_ligue_one': 'soccer/fra.1',
+        'LIGUE1': 'soccer/fra.1'
+    }
+
+    processed_paths = set()
+
+    # FORCE US/EASTERN DATE logic for grading relevancy
+    tz = pytz.timezone('US/Eastern')
+    now_et = datetime.now(tz)
+    
+    # Check Today and Yesterday to catch late night games finished past midnight UTC
+    dates_to_check = [now_et.strftime('%Y%m%d'), (now_et - timedelta(days=1)).strftime('%Y%m%d')]
+
+    for date_str in dates_to_check:
+        for sport_key in unique_sports:
+            espn_path = ESPN_MAP.get(sport_key)
+            if not espn_path:
+                continue
+                
+            # Avoid duplicate calls if multiple keys map to same path
+            path_date_key = f"{espn_path}_{date_str}"
+            if path_date_key in processed_paths:
+                continue
+            processed_paths.add(path_date_key)
+
+            try:
+                url = f"https://site.api.espn.com/apis/site/v2/sports/{espn_path}/scoreboard?dates={date_str}"
+                
+                # Use User-Agent to avoid generic bot blocking
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                }
+                
+                r = requests.get(url, headers=headers, timeout=5)
+                
+                if r.status_code == 200:
+                    res = r.json()
+                    events = res.get('events', [])
+                    
+                    for event in events:
+                        # ESPN structure: events -> competitions[0] -> competitors
+                        comp = event['competitions'][0]
+                        status_detail = event.get('status', {}).get('type', {}).get('shortDetail', 'Scheduled')
+                        is_complete = event.get('status', {}).get('type', {}).get('completed', False)
+                        
+                        # Teams
+                        competitors = comp.get('competitors', [])
+                        home_comp = next((c for c in competitors if c['homeAway'] == 'home'), {})
+                        away_comp = next((c for c in competitors if c['homeAway'] == 'away'), {})
+                        
+                        h_name = home_comp.get('team', {}).get('displayName', 'Home')
+                        a_name = away_comp.get('team', {}).get('displayName', 'Away')
+                        h_score = int(home_comp.get('score', 0))
+                        a_score = int(away_comp.get('score', 0))
+                        
+                        games.append({
+                            'id': event['id'],
+                            'sport_key': sport_key,
+                            'home': h_name,
+                            'away': a_name,
+                            'home_score': h_score,
+                            'away_score': a_score,
+                            'status': status_detail,
+                            'is_complete': is_complete,
+                            'score_text': f"{status_detail}: {a_name} {a_score} - {h_name} {h_score}",
+                            'commence': event.get('date') # ISO string
+                        })
+
+            except Exception as e:
+                log("WARN", f"ESPN fetch failed for {espn_path}: {e}")
+                continue
+                
+    return games

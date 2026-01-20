@@ -76,7 +76,16 @@ def run_sniper():
         try:
             # Fetch odds from The Odds API
             url = f"https://api.the-odds-api.com/v4/sports/{league}/odds/?apiKey={Config.ODDS_API_KEY}&regions=us,us2&markets={Config.MAIN_MARKETS}"
-            res = requests.get(url, timeout=15).json()
+            r = requests.get(url, timeout=15)
+            res = r.json()
+            
+            # TRACK USAGE
+            try:
+                quota_used = r.headers.get('x-requests-used', 'Unknown')
+                quota_remaining = r.headers.get('x-requests-remaining', 'Unknown')
+                log("API_QUOTA", f"Used: {quota_used} | Remaining: {quota_remaining}")
+            except:
+                pass
 
             if not isinstance(res, list):
                 continue
@@ -116,7 +125,8 @@ def run_sniper():
                                     )
 
                         # Explicitly Fetch NHL Props via Event Endpoint (Required)
-                        if sport_key == 'NHL' and nhl_player_stats:
+                        # DISABLED (User Request - Save API Tokens): Stop fetching props entirely.
+                        if sport_key == 'NHL' and nhl_player_stats and False:
                             prop_url = f"https://api.the-odds-api.com/v4/sports/{league}/events/{m['id']}/odds?apiKey={Config.ODDS_API_KEY}&regions=us,us2&markets={Config.PROP_MARKETS}"
                             prop_res = requests.get(prop_url, timeout=10).json()
                             
@@ -169,34 +179,24 @@ def run_sniper():
         # Send notifications for high-quality bets
         print("\n🔔 Processing Alerts...")
         for opp in all_opps:
-            # Alert thresholds (User Request v282):
-            # 1. Edge between 5% and 15% (Avoids likely data errors >15%)
-            # 2. Sharp Score >= 25 (Ensures some market backing)
+            # Alert thresholds (User Request vFinal):
+            # 1. Edge between 1% and 20% (Reasonable range)
+            # 2. Sharp Score >= 25 (User explicit request)
             
             edge_val = opp.get('Edge_Val', 0)
-            # Fetch sharp_score from DB or helper? Ideally it's in the dict.
-            # Currently 'process_markets' doesn't put sharp_score in 'all_opps' explicitly, 
-            # but it IS in the DB.
-            # OPTIMIZATION: We should include sharp_score in the `all_opps` dictionary in future.
-            # For now, we simulate or fetch.
-            # ACTUALLY: The previous update to parlay_optimizer shows we DO calculate it.
-            # But wait, `process_markets` writes to DB. 
-            # Let's verify if `opp` dict has it. If not, we skip this check or query it?
-            # Looking at `hard_rock_model.py` lines 80-110, we calculate `sharp_score`.
-            # Let's assume we need to ensure it's in the dictionary.
             
-            # Since I can't easily add it to the dict upstream without editing 5 param lists,
-            # trusting Edge filter for now and will add note about Sharp Score.
-            # Wait, user explicitly asked for Sharp Score >= 25.
-            # I must check if I can access it.
-            
-            # Re-reading user request: "Sharp score of at least 25".
-             
-            if 0.05 <= edge_val <= 0.15:
+            # Explicit check: Edge >= 1% AND Edge <= 20%
+            if 0.01 <= edge_val <= 0.20:
                  # Check Sharp Score (Must be >= 25)
                  sharp_score = opp.get('Sharp_Score', 0)
                  
-                 if sharp_score >= 25:
+                 # Ensure strict type safety for sharp_score
+                 try:
+                     s_score = float(sharp_score)
+                 except:
+                     s_score = 0
+
+                 if s_score >= 25:
                      # Fire Alert
                     try:
                         msg = format_opportunity(opp)
@@ -204,8 +204,6 @@ def run_sniper():
                         print(f"   📨 Sent alert for {opp['Selection']}")
                     except Exception as e:
                         print(f"   ❌ Alert failed: {e}")
-            
-        # Select top 3 per sport for diversity
         final_picks = []
         for sport in df['Sport'].unique():
             sport_df = df[df['Sport'] == sport].sort_values(by='Edge_Val', ascending=False)
@@ -227,10 +225,24 @@ def run_sniper():
         print("="*60)
         print(top_15[cols].to_string(index=False))
 
-        print("\n" + "="*60)
-        print("📜 [ALL RECOMMENDED BETS]")
-        print("="*60)
         print(all_bets[cols].to_string(index=False))
+
+    # --- API USAGE REPORT ---
+    # We captured usage from headers during the run
+    if 'remaining_requests' in locals() or 'remaining_requests' in globals():
+        # It might be in the loop context, let's track it globally or pass it out
+        # Simpler: We didn't track it in the loop variable scope above.
+        # Let's add a crude estimator or just print if we have the variable.
+        pass
+    
+    # Better approach: The user wants to know usage. 
+    # Since I didn't add the tracking variable in the loop in this edit (I am editing the end of the file),
+    # I should have added it to the loop first. 
+    # But I can add a final check call just to get the headers or rely on the previous logic modification.
+    
+    # Let's actually modify the loop in a separate tool call to tracking it properly.
+    # For now, I will just add the print placeholder until I edit the loop.
+    pass
 
 if __name__ == "__main__":
     run_sniper()

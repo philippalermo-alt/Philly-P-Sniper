@@ -118,60 +118,100 @@ def settle_pending_bets():
         if not pending:
             return
 
+        # Map Sport Column to Internal Keys (for api_clients.py)
         sport_map = {
-            'NBA': 'basketball_nba',
-            'NCAAB': 'basketball_ncaab',
-            'NFL': 'americanfootball_nfl',
-            'NHL': 'icehockey_nhl',
-            'EPL': 'soccer_epl',
-            'LALIGA': 'soccer_spain_la_liga',
-            'CHAMP': 'soccer_efl_champ',
-            'MLB': 'baseball_mlb',
-            'SOCCER': 'soccer_epl'  # Default fallback
+            'NBA': 'NBA',
+            'NCAAB': 'NCAAB',
+            'NFL': 'NFL',
+            'NHL': 'NHL',
+            'EPL': 'SOCCER',
+            'LALIGA': 'LALIGA',
+            'CHAMP': 'SOCCER', # Fallback for Championship to generic English soccer if mapped
+            'MLB': 'MLB',
+            'SOCCER': 'SOCCER',
+            'BUNDESLIGA': 'BUNDESLIGA',
+            'SERIEA': 'SERIEA',
+            'LIGUE1': 'LIGUE1',
+            'CHAMPIONS': 'CHAMPIONS'
         }
 
-        graded = 0
+        # Gather relevant sport keys
+        active_sports = set()
+        for p in pending:
+            s_key = p[1]
+            mapped = sport_map.get(s_key, s_key) # Default to self if not in map
+            active_sports.add(mapped)
 
-        for sport in set([p[1] for p in pending]):
-            league = sport_map.get(sport)
-            if not league:
+        log("GRADING", f"Fetching LIVE scores for: {list(active_sports)} (Source: ESPN)")
+        
+        from api_clients import fetch_espn_scores
+        live_games = fetch_espn_scores(list(active_sports))
+        
+        if not live_games:
+            log("GRADING", "No live/recent games found.")
+            return
+
+        graded = 0
+        
+        # Grading Logic
+        for game in live_games:
+            # We only grade if game is "Completed" (Final)
+            # ESPN Status: "Final", "Final/OT", "Scheduled", "Live", etc.
+            if not game.get('is_complete') and "Final" not in game['status']:
                 continue
 
-            try:
-                url = f"https://api.the-odds-api.com/v4/sports/{league}/scores/?apiKey={Config.ODDS_API_KEY}&daysFrom=3"
-                res = requests.get(url, timeout=10).json()
-
-                if not isinstance(res, list):
-                    continue
-
-                for game in res:
-                    if not game.get('completed') or not game.get('scores'):
-                        continue
-
-                    scores = {s['name']: int(s['score']) for s in game['scores']}
-                    home, away = game['home_team'], game['away_team']
-
-                    if home not in scores or away not in scores:
-                        continue
-
-                    for event_id, _, selection in pending:
-                        if event_id.startswith(game['id']):
-                            outcome = grade_bet(selection, home, away, scores[home], scores[away], game['scores'])
-
-                            if outcome:
-                                safe_execute(cur, "UPDATE intelligence_log SET outcome = %s WHERE event_id = %s", (outcome, event_id))
-                                graded += 1
-
-            except:
-                pass
+            home = game['home']
+            away = game['away']
+            h_score = game['home_score']
+            a_score = game['away_score']
+            
+            # Match Pending Bets to this Game
+            for event_id, sport, selection in pending:
+                # Name Matching
+                # DB stores "Home vs Away" usually.
+                # Simplest check: do BOTH names appear in the DB "teams" column?
+                # Actually `pending` tuple above is: (event_id, sport, selection)
+                # We need the 'teams' column to match robustly!
+                # Let's fetch 'teams' in the query above.
+                pass 
+                
+        # Re-query with teams column included
+        cur.execute("SELECT event_id, sport, selection, teams FROM intelligence_log WHERE outcome = 'PENDING' AND kickoff < NOW()")
+        pending_detailed = cur.fetchall()
+        
+        for event_id, sport, selection, teams_str in pending_detailed:
+             # Match logic: Checks if ESPN names are loosely in DB names
+             # DB: "Philadelphia 76ers vs Boston Celtics"
+             # ESPN: "76ers" vs "Celtics" (often shorter)
+             
+             # Clean match check
+             match_found = False
+             
+             # Case 1: Loose containment
+             if home in teams_str and away in teams_str:
+                 match_found = True
+             # Case 2: Reverse
+             elif away in teams_str and home in teams_str:
+                 match_found = True
+                 
+             if match_found:
+                 # Grade it
+                 try:
+                     outcome = grade_bet(selection, home, away, h_score, a_score, period_scores=None)
+                     if outcome and outcome != 'PENDING':
+                         safe_execute(cur, "UPDATE intelligence_log SET outcome = %s WHERE event_id = %s", (outcome, event_id))
+                         graded += 1
+                         log("GRADING", f"✅ Graded {event_id}: {selection} -> {outcome}")
+                 except Exception as e:
+                     log("ERROR", f"Grading error {event_id}: {e}")
 
         conn.commit()
 
         if graded > 0:
-            log("GRADING", f"Graded {graded} bets")
+            log("GRADING", f"✨ Successfully graded {graded} bets via ESPN (Free).")
 
-    except:
-        pass
+    except Exception as e:
+        log("ERROR", f"Grading run failed: {e}")
     finally:
         cur.close()
         conn.close()

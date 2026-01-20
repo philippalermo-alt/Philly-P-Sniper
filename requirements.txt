@@ -13,3 +13,4 @@ beautifulsoup4
 twilio
 scikit-learn
 python-dotenv
+nba_api

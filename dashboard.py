@@ -767,37 +767,71 @@ if conn:
             render_active_portfolio(df_pending)
 
         with tab3:
-            st.markdown("### 📈 Bankroll Tracker")
-
-            STARTING_BANKROLL = current_br
-
-            balance = [STARTING_BANKROLL]
-            if not df_settled.empty:
-                df_settled_sorted = df_settled.sort_values(by='kickoff')
-                for _, row in df_settled_sorted.iterrows():
-                    amt = row['Stake_Val']
+            st.markdown("### 📈 Performance Analytics")
+            
+            if df_settled.empty:
+                st.info("No settled bets to analyze yet.")
+            else:
+                # --- Metrics ---
+                total_bets = len(df_settled)
+                wins = len(df_settled[df_settled['outcome'] == 'WON'])
+                losses = len(df_settled[df_settled['outcome'] == 'LOST'])
+                pushes = len(df_settled[df_settled['outcome'] == 'PUSH'])
+                win_rate = (wins / (wins + losses)) * 100 if (wins + losses) > 0 else 0.0
+                
+                # Calculate P&L
+                # If WON: Profit = Stake * (Odds - 1)
+                # If LOST: Profit = -Stake
+                # If PUSH: Profit = 0
+                def calc_pnl(row):
                     if row['outcome'] == 'WON':
-                        balance.append(balance[-1] + amt * (row['Dec_Odds'] - 1))
+                        return row['Stake_Val'] * (row['Dec_Odds'] - 1)
                     elif row['outcome'] == 'LOST':
-                        balance.append(balance[-1] - amt)
+                        return -row['Stake_Val']
+                    return 0.0
 
-            active_exposure = 0.0
-            if not df_pending.empty:
-                active_exposure = df_pending[df_pending['user_bet'] == True]['Stake_Val'].sum()
+                df_settled['PnL'] = df_settled.apply(calc_pnl, axis=1)
+                total_pnl = df_settled['PnL'].sum()
+                roi_pct = (total_pnl / df_settled['Stake_Val'].sum()) * 100 if df_settled['Stake_Val'].sum() > 0 else 0.0
 
-            current_balance = balance[-1] - active_exposure
-            balance.append(current_balance)
+                # Summary Row
+                c1, c2, c3, c4 = st.columns(4)
+                c1.metric("Total P&L", f"${total_pnl:+.2f}", delta_color="normal")
+                c2.metric("ROI", f"{roi_pct:+.2f}%")
+                c3.metric("Win Rate", f"{win_rate:.1f}%")
+                c4.metric("Volume", f"${df_settled['Stake_Val'].sum():.0f}")
 
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric(
-                    "Current Bankroll",
-                    f"${current_balance:.2f}",
-                    delta=f"${current_balance - STARTING_BANKROLL:+.2f}"
-                )
-            with col2:
-                roi = ((current_balance - STARTING_BANKROLL) / STARTING_BANKROLL * 100) if STARTING_BANKROLL > 0 else 0
-                st.metric("ROI", f"{roi:.1f}%")
+                st.divider()
+
+                # --- Market Type Deduction ---
+                def detect_market(sel):
+                    sel = sel.lower()
+                    if 'over' in sel or 'under' in sel: return 'Total'
+                    if '+' in sel or '-' in sel: return 'Spread' # Simple heuristic, check for points vs ML
+                    if 'draw' in sel or ' ml' in sel or 'moneyline' in sel: return 'Moneyline'
+                    return 'Prop/Other' # Default fallback
+
+                df_settled['Market_Type'] = df_settled['Selection'].apply(detect_market)
+
+                # --- Charts: By Sport ---
+                st.subheader("📊 Profit by Sport")
+                sport_pnl = df_settled.groupby('Sport')['PnL'].sum().reset_index().sort_values('PnL', ascending=False)
+                st.bar_chart(sport_pnl, x='Sport', y='PnL', use_container_width=True)
+
+                # --- Charts: By Market Type ---
+                st.subheader("📊 Profit by Market Type")
+                market_pnl = df_settled.groupby('Market_Type')['PnL'].sum().reset_index().sort_values('PnL', ascending=False)
+                st.bar_chart(market_pnl, x='Market_Type', y='PnL', use_container_width=True)
+
+                # --- Bankroll Growth ---
+                st.subheader("💰 Bankroll Growth")
+                df_settled_sorted = df_settled.sort_values('kickoff').copy()
+                df_settled_sorted['Cumulative PnL'] = df_settled_sorted['PnL'].cumsum()
+                st.line_chart(df_settled_sorted, x='kickoff', y='Cumulative PnL', use_container_width=True)
+
+                # --- Raw Data ---
+                with st.expander("View Raw Performance Data"):
+                    st.dataframe(df_settled[['Date', 'kickoff', 'Sport', 'Event', 'Selection', 'Market_Type', 'Dec_Odds', 'outcome', 'PnL']])
             with col3:
                 st.metric("Active Exposure", f"${active_exposure:.2f}")
 

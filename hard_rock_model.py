@@ -118,6 +118,11 @@ def run_sniper():
                         if sport_key == 'NHL' and nhl_player_stats:
                             prop_url = f"https://api.the-odds-api.com/v4/sports/{league}/events/{m['id']}/odds?apiKey={Config.ODDS_API_KEY}&regions=us,us2&markets={Config.PROP_MARKETS}"
                             prop_res = requests.get(prop_url, timeout=10).json()
+                            
+                            # DEBUG RESPONSE
+                            if 'bookmakers' not in prop_res:
+                                print(f"   ⚠️ [DEBUG] Props missing for {m['id']}. Resp: {list(prop_res.keys())}")
+                            
                             if 'bookmakers' in prop_res:
                                 process_nhl_props(
                                     prop_res, prop_res, nhl_player_stats, calibration, cur, all_opps, seen_matches

@@ -794,12 +794,18 @@ if conn:
                 total_pnl = df_settled['PnL'].sum()
                 roi_pct = (total_pnl / df_settled['Stake_Val'].sum()) * 100 if df_settled['Stake_Val'].sum() > 0 else 0.0
 
+                # Calculate Active Exposure
+                active_exposure = 0.0
+                if not df_pending.empty:
+                    active_exposure = df_pending[df_pending['user_bet'] == True]['Stake_Val'].sum()
+
                 # Summary Row
-                c1, c2, c3, c4 = st.columns(4)
+                c1, c2, c3, c4, c5 = st.columns(5)
                 c1.metric("Total P&L", f"${total_pnl:+.2f}", delta_color="normal")
                 c2.metric("ROI", f"{roi_pct:+.2f}%")
                 c3.metric("Win Rate", f"{win_rate:.1f}%")
                 c4.metric("Volume", f"${df_settled['Stake_Val'].sum():.0f}")
+                c5.metric("Active Exposure", f"${active_exposure:.2f}")
 
                 st.divider()
 
@@ -825,17 +831,25 @@ if conn:
 
                 # --- Bankroll Growth ---
                 st.subheader("💰 Bankroll Growth")
+                
+                # Re-calculate running bankroll
+                current_br = get_starting_bankroll()
+                # We need to construct the history backwards or forwards.
+                # Simplified: Start with current, subtract PnL to go back? 
+                # Better: Start with (Current - Total PnL) and add PnL forward.
+                # Wait, 'current_br' from settings is the *Starting* bankroll usually? 
+                # logic in get_starting_bankroll() returns 'starting_bankroll' value.
+                start_br = current_br
+                
                 df_settled_sorted = df_settled.sort_values('kickoff').copy()
                 df_settled_sorted['Cumulative PnL'] = df_settled_sorted['PnL'].cumsum()
-                st.line_chart(df_settled_sorted, x='kickoff', y='Cumulative PnL', use_container_width=True)
+                df_settled_sorted['Bankroll'] = start_br + df_settled_sorted['Cumulative PnL']
+                
+                st.line_chart(df_settled_sorted, x='kickoff', y='Bankroll', use_container_width=True)
 
                 # --- Raw Data ---
                 with st.expander("View Raw Performance Data"):
                     st.dataframe(df_settled[['Date', 'kickoff', 'Sport', 'Event', 'Selection', 'Market_Type', 'Dec_Odds', 'outcome', 'PnL']])
-            with col3:
-                st.metric("Active Exposure", f"${active_exposure:.2f}")
-
-            st.line_chart(pd.DataFrame({'Bankroll': balance}), use_container_width=True, height=300)
 
             st.markdown("---")
             st.markdown("### 📊 Performance by Sport")

@@ -897,19 +897,22 @@ if conn:
 
                     st.dataframe(edge_display, use_container_width=True, hide_index=True, height=300)
 
-            # ALL GRADED BETS (New v274)
+                else:
+                    st.info("📊 Not enough data for edge analysis")
+
+                st.caption("💡 This shows how your bets perform based on the calculated edge. Higher edge bets should ideally show better ROI.")
+
+            else:
+                st.info("📊 No settled bets to analyze yet")
+
+            # ALL GRADED BETS (New v274) - Moved to bottom of tab
             st.markdown("---")
             with st.expander("📜 Full Betting History (All Graded Bets)", expanded=False):
                 if not df_settled.empty:
-                    st.dataframe(df_settled, use_container_width=True, hide_index=True)
+                    # Sort by date desc
+                    st.dataframe(df_settled.sort_values('kickoff', ascending=False), use_container_width=True, hide_index=True)
                 else:
                     st.info("No graded history available.")
-
-                st.caption("💡 This shows how your bets perform based on the calculated edge. Higher edge bets should ideally show better ROI.")
-            else:
-                 st.info("📊 Not enough data for edge analysis")
-        else:
-             st.info("📊 No settled bets to analyze yet")
 
         with tab4:
             st.markdown("### 📋 Export to Spreadsheet")

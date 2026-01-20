@@ -2,7 +2,7 @@ pandas
 numpy
 scipy
 requests
-streamlit
+streamlit>=1.37.0
 gspread
 oauth2client
 pytz

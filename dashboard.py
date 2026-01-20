@@ -555,46 +555,54 @@ if conn:
                         st.markdown("---")
 
         with tab2:
-            st.markdown("### 💼 Your Active Wagers")
-            my_bets = df_pending[df_pending['user_bet'] == True].copy()
+            @st.fragment(run_every=60)
+            def render_active_portfolio(df_source):
+                st.markdown("### 💼 Your Active Wagers")
+                st.caption("🟢 Live Updates: This section auto-refreshes every 60 seconds")
+                
+                my_bets = df_source[df_source['user_bet'] == True].copy()
 
-            if my_bets.empty:
-                st.info("📭 No active bets in your portfolio")
-            else:
-                sport_keys = my_bets['sport'].unique()
-                live_games, debug_logs = fetch_live_games(sport_keys)
+                if my_bets.empty:
+                    st.info("📭 No active bets in your portfolio")
+                else:
+                    sport_keys = my_bets['sport'].unique()
+                    # FETCH LATEST SCORES inside the fragment
+                    live_games, debug_logs = fetch_live_games(sport_keys)
 
-                with st.expander("🔍 Live Score Debug", expanded=False):
-                    for l in debug_logs:
-                        st.text(l)
-                    st.write(f"Found {len(live_games)} live games")
+                    with st.expander("🔍 Live Score Debug", expanded=False):
+                        for l in debug_logs:
+                            st.text(l)
+                        st.write(f"Updated: {datetime.now().strftime('%H:%M:%S')} | Games: {len(live_games)}")
 
-                def get_score(row):
-                    event = row['Event'].replace(' @ ', ' vs ')
-                    teams = event.split(' vs ')
-                    if len(teams) < 2:
+                    def get_score(row):
+                        event = row['Event'].replace(' @ ', ' vs ')
+                        teams = event.split(' vs ')
+                        if len(teams) < 2:
+                            return "🕒 Upcoming"
+
+                        t1, t2 = teams[0], teams[1]
+
+                        for g in live_games:
+                            h, a = g['home'], g['away']
+                            t1_match = (t1 in h or h in t1) or (t1 in a or a in t1)
+                            t2_match = (t2 in h or h in t2) or (t2 in a or a in t2)
+
+                            if t1_match and t2_match:
+                                return g['score']
+
                         return "🕒 Upcoming"
 
-                    t1, t2 = teams[0], teams[1]
+                    my_bets['Live Score'] = my_bets.apply(get_score, axis=1)
 
-                    for g in live_games:
-                        h, a = g['home'], g['away']
-                        t1_match = (t1 in h or h in t1) or (t1 in a or a in t1)
-                        t2_match = (t2 in h or h in t2) or (t2 in a or a in t2)
-
-                        if t1_match and t2_match:
-                            return g['score']
-
-                    return "🕒 Upcoming"
-
-                my_bets['Live Score'] = my_bets.apply(get_score, axis=1)
-
-                st.dataframe(
-                    my_bets[['Date', 'Kickoff', 'Sport', 'Event', 'Selection', 'Live Score', 'Dec_Odds', 'Stake']],
-                    use_container_width=True,
-                    hide_index=True,
-                    height=400
-                )
+                    st.dataframe(
+                        my_bets[['Date', 'Kickoff', 'Sport', 'Event', 'Selection', 'Live Score', 'Dec_Odds', 'Stake']],
+                        use_container_width=True,
+                        hide_index=True,
+                        height=400
+                    )
+            
+            # Call the fragment
+            render_active_portfolio(df_pending)
 
         with tab3:
             st.markdown("### 📈 Bankroll Tracker")

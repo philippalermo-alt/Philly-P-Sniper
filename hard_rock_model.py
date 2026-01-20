@@ -102,11 +102,9 @@ def run_sniper():
                 # Fetch exotic markets for select sports
                 if sport_key in ['NBA', 'NFL', 'NCAAB', 'NHL']:
                     try:
-                        markets_to_fetch = Config.EXOTIC_MARKETS
-                        if sport_key == 'NHL' and nhl_player_stats:
-                             markets_to_fetch += f",{Config.PROP_MARKETS}"
-
-                        url = f"https://api.the-odds-api.com/v4/sports/{league}/odds/?apiKey={Config.ODDS_API_KEY}&regions=us,us2&markets={markets_to_fetch}"
+                        # Bulk Fetch Exotics (Half markets)
+                        # Do NOT include props here as it breaks the bulk endpoint
+                        url = f"https://api.the-odds-api.com/v4/sports/{league}/odds/?apiKey={Config.ODDS_API_KEY}&regions=us,us2&markets={Config.EXOTIC_MARKETS}"
                         res_ex = requests.get(url, timeout=15).json()
                         if isinstance(res_ex, list):
                             for mx in res_ex:
@@ -115,17 +113,22 @@ def run_sniper():
                                         mx, ratings, calibration, cur, all_opps, target_sport, 
                                         seen_matches, sharp_data, multipliers=multipliers
                                     )
-                                    # NHL Props Processing
-                                    if sport_key == 'NHL' and nhl_player_stats:
-                                        process_nhl_props(
-                                            mx, mx, nhl_player_stats, calibration, cur, all_opps, seen_matches
-                                        )
+
+                        # Explicitly Fetch NHL Props via Event Endpoint (Required)
+                        if sport_key == 'NHL' and nhl_player_stats:
+                            prop_url = f"https://api.the-odds-api.com/v4/sports/{league}/events/{m['id']}/odds?apiKey={Config.ODDS_API_KEY}&regions=us,us2&markets={Config.PROP_MARKETS}"
+                            prop_res = requests.get(prop_url, timeout=10).json()
+                            if 'bookmakers' in prop_res:
+                                process_nhl_props(
+                                    prop_res, prop_res, nhl_player_stats, calibration, cur, all_opps, seen_matches
+                                )
 
                     except Exception as e:
-                        log("WARN", f"Exotic/Prop fetch failed for {league} (Bulk): {e}")
+                        log("WARN", f"Exotic/Prop fetch failed for {league}: {e}")
+                        # Fallback for Exotics logic...
                         try:
-                            # Fallback: Fetch per event using the FULL market list (including props)
-                            url = f"https://api.the-odds-api.com/v4/sports/{league}/events/{m['id']}/odds?apiKey={Config.ODDS_API_KEY}&regions=us,us2&markets={markets_to_fetch}"
+                            # Fetch Exotics per event if bulk failed
+                            url = f"https://api.the-odds-api.com/v4/sports/{league}/events/{m['id']}/odds?apiKey={Config.ODDS_API_KEY}&regions=us,us2&markets={Config.EXOTIC_MARKETS}"
                             deep = requests.get(url, timeout=10).json()
 
                             if 'id' in deep:
@@ -134,11 +137,6 @@ def run_sniper():
                                     target_sport, seen_matches, sharp_data, is_soccer=False,
                                     multipliers=multipliers
                                 )
-                                # FIXED: Process NHL Props in fallback too
-                                if sport_key == 'NHL' and nhl_player_stats:
-                                    process_nhl_props(
-                                        deep, deep, nhl_player_stats, calibration, cur, all_opps, seen_matches
-                                    )
                         except:
                             pass
 

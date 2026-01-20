@@ -66,6 +66,12 @@ def init_db():
         if not cur.fetchone():
             cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS home_adj_em REAL")
             cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS away_adj_em REAL")
+            cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS home_adj_o REAL")
+            cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS away_adj_o REAL")
+            cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS home_adj_d REAL")
+            cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS away_adj_d REAL")
+            cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS home_tempo REAL")
+            cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS away_tempo REAL")
 
         # Create Settings Table
         cur.execute("CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY, value TEXT)")

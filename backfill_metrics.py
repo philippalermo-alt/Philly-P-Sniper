@@ -92,12 +92,27 @@ def backfill_metrics():
                 if not h_row.empty and not a_row.empty:
                     h_em = h_row.iloc[0]['AdjEM']
                     a_em = a_row.iloc[0]['AdjEM']
+                    h_o = h_row.iloc[0]['AdjO']
+                    a_o = a_row.iloc[0]['AdjO']
+                    h_d = h_row.iloc[0]['AdjD']
+                    a_d = a_row.iloc[0]['AdjD']
+                    h_t = h_row.iloc[0]['AdjT']
+                    a_t = a_row.iloc[0]['AdjT']
                     
                     cur.execute("""
                         UPDATE intelligence_log 
-                        SET home_adj_em = %s, away_adj_em = %s
+                        SET home_adj_em = %s, away_adj_em = %s,
+                            home_adj_o = %s, away_adj_o = %s,
+                            home_adj_d = %s, away_adj_d = %s,
+                            home_tempo = %s, away_tempo = %s
                         WHERE event_id = %s
-                    """, (float(h_em), float(a_em), eid))
+                    """, (
+                        float(h_em), float(a_em), 
+                        float(h_o), float(a_o),
+                        float(h_d), float(a_d),
+                        float(h_t), float(a_t),
+                        eid
+                    ))
                     updates += 1
 
             conn.commit()

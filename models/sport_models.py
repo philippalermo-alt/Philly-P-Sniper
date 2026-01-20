@@ -26,7 +26,8 @@ class NCAAB_Model(BaseModel):
     def __init__(self):
         features = [
             'implied_prob', 'true_prob', 'ticket_pct', 
-            'minutes_to_kickoff', 'kenpom_diff'
+            'minutes_to_kickoff', 'kenpom_diff',
+            'adjo_diff', 'adjd_diff', 'tempo_diff'
         ]
         super().__init__('ncaab', features, 'models/ncaab_model.pkl')
     
@@ -34,6 +35,9 @@ class NCAAB_Model(BaseModel):
         df = super().load_data()
         if not df.empty:
             df['kenpom_diff'] = df['home_adj_em'] - df['away_adj_em']
+            df['adjo_diff'] = df['home_adj_o'] - df['away_adj_o']
+            df['adjd_diff'] = df['home_adj_d'] - df['away_adj_d']
+            df['tempo_diff'] = df['home_tempo'] - df['away_tempo']
         return df
 
 class Generic_Model(BaseModel):

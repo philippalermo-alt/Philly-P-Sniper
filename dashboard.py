@@ -6,6 +6,7 @@ import requests
 from datetime import datetime
 import difflib
 from backtesting import analyze_by_edge_bucket
+from parlay_optimizer import generate_parlays
 
 # 🎨 Modern Page Configuration
 st.set_page_config(

@@ -122,9 +122,10 @@ def run_sniper():
                                         )
 
                     except Exception as e:
-                        log("WARN", f"Exotic/Prop fetch failed for {league}: {e}")
+                        log("WARN", f"Exotic/Prop fetch failed for {league} (Bulk): {e}")
                         try:
-                            url = f"https://api.the-odds-api.com/v4/sports/{league}/events/{m['id']}/odds?apiKey={Config.ODDS_API_KEY}&regions=us,us2&markets={Config.EXOTIC_MARKETS}"
+                            # Fallback: Fetch per event using the FULL market list (including props)
+                            url = f"https://api.the-odds-api.com/v4/sports/{league}/events/{m['id']}/odds?apiKey={Config.ODDS_API_KEY}&regions=us,us2&markets={markets_to_fetch}"
                             deep = requests.get(url, timeout=10).json()
 
                             if 'id' in deep:

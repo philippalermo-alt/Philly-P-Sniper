@@ -423,7 +423,7 @@ if conn:
                 return df
             df['kickoff'] = pd.to_datetime(df['kickoff']).dt.tz_localize('UTC', ambiguous='infer').dt.tz_convert('US/Eastern')
             df['Date'] = df['kickoff'].dt.strftime('%Y-%m-%d')
-            df['Kickoff'] = df['kickoff'].dt.strftime('%H:%M')
+            df['Kickoff'] = df['kickoff'].dt.strftime('%m-%d %H:%M')
             df['Sport'] = df['sport'].apply(lambda x: x.split('_')[-1].upper() if '_' in x else x)
             df['Event'] = df['teams']
             df['Selection'] = df['selection']

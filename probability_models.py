@@ -210,6 +210,7 @@ def process_nhl_props(match, props_data, player_stats, calibration, cur, all_opp
                 description = raw_desc
 
             if not point or not price or not description:
+                print(f"   ⚠️ [DEBUG-PROP] SKIPPED due to missing data. Point:{point} Price:{price} Desc:{description}")
                 continue
             
             # 1. Fuzzy Match

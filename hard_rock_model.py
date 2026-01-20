@@ -134,6 +134,11 @@ def run_sniper():
                                     target_sport, seen_matches, sharp_data, is_soccer=False,
                                     multipliers=multipliers
                                 )
+                                # FIXED: Process NHL Props in fallback too
+                                if sport_key == 'NHL' and nhl_player_stats:
+                                    process_nhl_props(
+                                        deep, deep, nhl_player_stats, calibration, cur, all_opps, seen_matches
+                                    )
                         except:
                             pass
 

@@ -11,6 +11,7 @@ from datetime import datetime, timedelta, timezone
 from config import Config
 from utils import log
 from database import get_db, init_db, get_calibration
+from notifier import send_alert, format_opportunity
 from bet_grading import settle_pending_bets
 from ratings import get_team_ratings
 from api_clients import get_action_network_data, get_soccer_predictions, get_nhl_player_stats
@@ -161,7 +162,33 @@ def run_sniper():
     if all_opps:
         pd.set_option('display.max_rows', None)
         df = pd.DataFrame(all_opps)
-
+        print("\n🦅 Found Opportunities:")
+        print(df[['Sport', 'Event', 'Selection', 'Edge', 'Stake', 'True_Prob']])
+        
+        # ALERTING SYSTEM
+        # Send notifications for high-quality bets
+        print("\n🔔 Processing Alerts...")
+        for opp in all_opps:
+            # Alert thresholds: Edge > 5% OR Sharp Score > 30 (for Parlays/Props)
+            # Since props are currently disabled, we focus on main markets.
+            edge_val = opp.get('Edge_Val', 0)
+            
+            # Use 'seen_matches' logic or DB check to avoid spamming?
+            # Ideally we check if we already alerted this ID.
+            # For now, we'll rely on the fact that the script typically runs once per window.
+            # In V2, add a specific 'alerted' column to DB.
+            
+            if edge_val >= 0.05:
+                # Fire Alert
+                try:
+                    msg = format_opportunity(opp)
+                    # We might want to persist "alert_sent" to DB here to avoid duplicates
+                    # But for now, let's keep it simple.
+                    send_alert(msg)
+                    print(f"   📨 Sent alert for {opp['Selection']}")
+                except Exception as e:
+                    print(f"   ❌ Alert failed: {e}")
+            
         # Select top 3 per sport for diversity
         final_picks = []
         for sport in df['Sport'].unique():

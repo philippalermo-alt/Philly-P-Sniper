@@ -16,6 +16,10 @@ class Config:
     FOOTBALL_API_KEY = os.getenv('FOOTBALL_API_KEY')
     ACTION_COOKIE = os.getenv('ACTION_COOKIE')
     DATABASE_URL = os.getenv('DATABASE_URL')
+    
+    # Telegram Alerts
+    TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+    TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
     # Bankroll Management
     BANKROLL = 451.16

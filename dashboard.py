@@ -4,6 +4,7 @@ import psycopg2
 import os
 import requests
 from datetime import datetime
+import difflib
 from backtesting import analyze_by_edge_bucket
 
 # 🎨 Modern Page Configuration
@@ -643,6 +644,22 @@ if conn:
                             t2_match = (t2 in h or h in t2) or (t2 in a or a in t2)
 
                             if t1_match and t2_match:
+                                return g['score']
+                            
+                            # Fallback: Fuzzy Match
+                            # If direct substring failed, check similarity ratio
+                            # Helpful for "Jackson St" vs "Jackson State"
+                            ratio_t1_h = difflib.SequenceMatcher(None, t1, h).ratio()
+                            ratio_t1_a = difflib.SequenceMatcher(None, t1, a).ratio()
+                            
+                            ratio_t2_h = difflib.SequenceMatcher(None, t2, h).ratio()
+                            ratio_t2_a = difflib.SequenceMatcher(None, t2, a).ratio()
+
+                            # Threshold 0.6 is generous but safe given we are matching *both* teams
+                            match_t1 = max(ratio_t1_h, ratio_t1_a) > 0.6
+                            match_t2 = max(ratio_t2_h, ratio_t2_a) > 0.6
+
+                            if match_t1 and match_t2:
                                 return g['score']
                         
                         # DEBUG: If no match, maybe log why?

@@ -61,11 +61,15 @@ def init_db():
             cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS away_xg REAL")
             cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS dvp_rank REAL")
 
-        # KenPom Metrics
-        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name='intelligence_log' AND column_name='home_adj_em'")
+        # KenPom Metrics (Extended)
+        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name='intelligence_log' AND column_name='home_adj_o'")
         if not cur.fetchone():
-            cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS home_adj_em REAL")
-            cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS away_adj_em REAL")
+            cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS home_adj_o REAL")
+            cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS away_adj_o REAL")
+            cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS home_adj_d REAL")
+            cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS away_adj_d REAL")
+            cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS home_tempo REAL")
+            cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS away_tempo REAL")
             cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS home_adj_o REAL")
             cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS away_adj_o REAL")
             cur.execute("ALTER TABLE intelligence_log ADD COLUMN IF NOT EXISTS home_adj_d REAL")

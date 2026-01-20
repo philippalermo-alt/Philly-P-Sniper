@@ -11,4 +11,5 @@ lxml
 html5lib
 beautifulsoup4
 twilio
-scikit-learnpython-dotenv
+scikit-learn
+python-dotenv

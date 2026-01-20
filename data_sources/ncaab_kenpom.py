@@ -9,131 +9,78 @@ class KenPomClient:
     Client for fetching NCAAB efficiency metrics from KenPom.com.
     """
     def __init__(self):
-        # Prefer browser session or login details if available
-        # Note: kenpompy usually requires a browser object (mechanicalsoup) logged in
-        self.email = os.getenv('KENPOM_EMAIL')
-        self.password = os.getenv('KENPOM_PASSWORD')
-        self.browser = None
-        
-        # If using API key (official), we might need a custom requester. 
-        # But 'kenpompy' is a scraper.
-        # User has KENPOM_API_KEY in config, implying OFFICIAL API use?
-        # The user asked "Can we not use any data from KenPom api for NCAA?" earlier...
-        # Wait, the prompt said "Can we not use any data from KenPom api" -> meaning "Can we USE it?" 
-        # or "Is there a way to avoid it?" -> Context: "I need to find an API... API-Football...".
-        # User later said "We are not using Docker...".
-        # Then "Can we not use any data from KenPom api for NCAA?"
-        # I interpreted as "Why aren't we using data from KenPom?".
-        # Let's support both or assume scraper if API key fails.
-        pass
-
-    def login(self):
-        if not self.email or not self.password:
-            print("⚠️ KenPom credentials (EMAIL/PASSWORD) not found. Cannot scrape.")
-            return False
-        try:
-            self.browser = login(self.email, self.password)
-            return True
-        except Exception as e:
-            print(f"❌ KenPom Login failed: {e}")
-            return False
+        self.api_key = os.getenv('KENPOM_API_KEY')
+        self.base_url = "https://kenpom.com/api.php"
 
     def get_efficiency_stats(self, season=None):
         """
-        Fetch summary efficiency stats (AdjEM, AdjO, AdjD).
+        Fetch summary efficiency stats (AdjEM, AdjO, AdjD, AdjT) via Official API.
         """
-        if not self.browser:
-            if not self.login():
-                print("⚠️ Standard login failed. Attempting Cloudscraper fallback...")
-                return self._scrape_via_cloudscraper(season)
-        
-        try:
-            # Default to current season if None
-            df = get_efficiency(self.browser, season=season)
-            
-            # Handle MultiIndex headers (common with pd.read_html on KenPom)
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.droplevel(0)
-            
-            # Handle specific column structure seen in logs
-            # Available: ['Team', 'Conference', 'Tempo-Adj', ... 'Off. Efficiency-Adj', ... 'Def. Efficiency-Adj', ...]
-            rename_map = {
-                'Off. Efficiency-Adj': 'AdjO',
-                'Def. Efficiency-Adj': 'AdjD',
-                'Tempo-Adj': 'AdjT'
-            }
-            df = df.rename(columns=rename_map)
-
-            # Calculate AdjEM if missing (AdjO - AdjD)
-            if 'AdjEM' not in df.columns and 'AdjO' in df.columns and 'AdjD' in df.columns:
-                df['AdjEM'] = df['AdjO'] - df['AdjD']
-
-            # Filter for required columns
-            required = ['Team', 'AdjEM', 'AdjO', 'AdjD', 'AdjT']
-            missing = [c for c in required if c not in df.columns]
-            
-            if missing:
-                print(f"⚠️ Missing columns in KenPom data: {missing}. Available: {df.columns.tolist()}")
-                raise Exception(f"Missing columns: {missing}")
-
-            return df[required]
-        except Exception as e:
-            print(f"❌ Error fetching KenPom stats (kenpompy): {e}")
-            
-        # Fallback to Cloudscraper
-        print("⚠️ Attempting Cloudscraper fallback...")
-        return self._scrape_via_cloudscraper(season)
-
-    def _scrape_via_cloudscraper(self, season=None):
-        try:
-            import cloudscraper
-            scraper = cloudscraper.create_scraper()
-            
-            # Login
-            login_url = "https://kenpom.com/handlers/login_handler.php"
-            payload = {
-                "email": self.email,
-                "password": self.password,
-                "submit": "Login"
-            }
-            res = scraper.post(login_url, data=payload)
-            
-            # Fetch Homepage (Summary Stats)
-            url = "https://kenpom.com/index.php"
-            if season:
-                url += f"?y={season}"
-                
-            res = scraper.get(url)
-            if res.status_code != 200:
-                print(f"❌ Cloudscraper Error: {res.status_code}")
-                return pd.DataFrame()
-
-            # Parse Table
-            # Pandas read_html returns a list of dfs
-            dfs = pd.read_html(res.text)
-            for df in dfs:
-                # Look for the main table
-                if 'AdjEM' in df.columns or ('AdjEM', 'AdjEM') in df.columns:
-                    # Clean up multi-index headers if present
-                    if isinstance(df.columns, pd.MultiIndex):
-                        df.columns = df.columns.droplevel(0)
-                    
-                    # Ensure columns exist
-                    cols = ['Team', 'AdjEM', 'AdjO', 'AdjD', 'AdjT']
-                    # Some might be slightly different named or indexed
-                    # Rename if necessary or strict select
-                    # KenPom columns: Rank, Team, Conf, W-L, AdjEM, AdjO, AdjD, AdjT, Luck, ...
-                    # Check if 'AdjT' exists (Tempo)
-                    if 'AdjT' not in df.columns and 'Tempo' in df.columns:
-                        df['AdjT'] = df['Tempo'] # mapping
-                        
-                    return df[cols]
-            
-            print("❌ No efficiency table found in Cloudscraper response.")
+        if not self.api_key:
+            print("⚠️ KENPOM_API_KEY not found. Cannot fetch data.")
             return pd.DataFrame()
 
+        try:
+            import requests
+            
+            # Default to current year logic if needed, or hardcode/pass from arg
+            # season year is the ending year (e.g., 2025)
+            year = season if season else 2025
+            
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Accept": "application/json"
+            }
+            params = {
+                "endpoint": "ratings",
+                "y": year
+            }
+            
+            response = requests.get(self.base_url, headers=headers, params=params)
+            
+            if response.status_code != 200:
+                print(f"❌ KenPom API Error: {response.status_code} - {response.text}")
+                return pd.DataFrame()
+
+            data = response.json()
+            
+            # API returns a list of dictionaries? Or a dict with keys?
+            # Docs say "Response Format: JSON" and lists fields. Likely a list of objects.
+            
+            if not data:
+                print("❌ KenPom API returned empty data.")
+                return pd.DataFrame()
+                
+            df = pd.DataFrame(data)
+            
+            # Column Mappings based on API Docs
+            # TeamName -> Team
+            # AdjEM -> AdjEM
+            # AdjOE -> AdjO
+            # AdjDE -> AdjD
+            # AdjTempo -> AdjT
+            
+            rename_map = {
+                'TeamName': 'Team',
+                'AdjOE': 'AdjO',
+                'AdjDE': 'AdjD',
+                'AdjTempo': 'AdjT'
+            }
+            df = df.rename(columns=rename_map)
+            
+            # Ensure required columns exist
+            required = ['Team', 'AdjEM', 'AdjO', 'AdjD', 'AdjT']
+            
+            # Filter
+            existing = [c for c in required if c in df.columns]
+            if len(existing) < len(required):
+                print(f"⚠️ Missing columns in API data. Found: {existing}")
+                return pd.DataFrame()
+            
+            return df[required]
+
         except Exception as e:
-            print(f"❌ Cloudscraper Fallback Failed: {e}")
+            print(f"❌ Error fetching KenPom API stats: {e}")
             import traceback
             traceback.print_exc()
             return pd.DataFrame()

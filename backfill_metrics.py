@@ -29,9 +29,11 @@ def backfill_metrics():
     kp_client = KenPomClient()
     
     # Cache for KenPom (season stats are constant-ish)
-    kp_stats = pd.DataFrame()
-    if not kp_client.get_efficiency_stats().empty:
-        kp_stats = kp_client.get_efficiency_stats()
+    kp_stats = kp_client.get_efficiency_stats()
+    if not kp_stats.empty:
+        print(f"✅ Fetched {len(kp_stats)} teams from KenPom Official API.")
+    else:
+        print("⚠️ KenPom API returned no data. Skipping NCAAB updates.")
 
     updates = 0
     

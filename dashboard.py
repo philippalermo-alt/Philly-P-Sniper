@@ -905,11 +905,11 @@ if conn:
                 else:
                     st.info("No graded history available.")
 
-                    st.caption("💡 This shows how your bets perform based on the calculated edge. Higher edge bets should ideally show better ROI.")
-                else:
-                    st.info("📊 Not enough data for edge analysis")
+                st.caption("💡 This shows how your bets perform based on the calculated edge. Higher edge bets should ideally show better ROI.")
             else:
-                st.info("📊 No settled bets to analyze yet")
+                 st.info("📊 Not enough data for edge analysis")
+        else:
+             st.info("📊 No settled bets to analyze yet")
 
         with tab4:
             st.markdown("### 📋 Export to Spreadsheet")

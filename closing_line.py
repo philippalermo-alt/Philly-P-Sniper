@@ -28,13 +28,14 @@ def fetch_closing_odds():
     cur = conn.cursor()
 
     try:
-        # Get pending bets with kickoff in the next 24 hours
-        # We want to keep updating the closing line until the game starts
+        # OPTIMIZATION: Only fetch if kickoff is IMMINENT (Next 70 mins)
+        # This prevents wasting API credits checking lines 6 hours away.
+        # Assumes Hourly Scheduler.
         cur.execute("""
             SELECT event_id, sport, teams, selection, odds, kickoff
             FROM intelligence_log
             WHERE outcome = 'PENDING'
-            AND kickoff BETWEEN NOW() AND NOW() + INTERVAL '24 hours'
+            AND kickoff BETWEEN NOW() AND NOW() + INTERVAL '70 minutes'
         """)
 
         pending = cur.fetchall()

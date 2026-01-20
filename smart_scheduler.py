@@ -32,22 +32,27 @@ def main():
         
     print(f"🕒 Checker running at {now.strftime('%Y-%m-%d %H:%M:%S %Z')}")
     print(f"📅 Day: {now.strftime('%A')} | Hour: {current_hour}")
+
+    # ALWAYS RUN: Maintenance Tasks (Lightweight)
+    # 1. CLV Check (Only hits API if game starts in next 60 mins)
+    print("📉 checking Closing Lines...")
+    fetch_closing_odds()
     
+    # 2. Settlement (Only hits ESPN if games finished)
+    print("🏒 checking Settlement...")
+    settle_props()
+    
+    # CONDITIONAL RUN: Sniper (Heavy API usage)
     if should_run:
-        print("✅ Schedule Match! Execution starting...")
+        print("✅ Schedule Match! Running Sniper Module...")
         try:
-            print("📉 Fetching Closing Odds (CLV)...")
-            fetch_closing_odds()
-            
             run_sniper()
-            print("🏒 Running Prop Settlement...")
-            settle_props()
-            print("🚀 Job completed successfully.")
+            print("🚀 Sniper Job completed.")
         except Exception as e:
             print(f"❌ Job failed: {e}")
     else:
-        print("💤 No schedule match. Skipping execution.")
-        print("ℹ️  Schedule: Mon-Fri (7, 17), Sat-Sun (7, 12, 17) EST")
+        print("💤 OFF-PEAK: Skipping Sniper (waiting for 7am/5pm EST).")
+        print("ℹ️  Maintenance tasks completed.")
 
 if __name__ == "__main__":
     main()

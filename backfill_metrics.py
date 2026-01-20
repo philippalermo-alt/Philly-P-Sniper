@@ -85,19 +85,29 @@ def backfill_metrics():
 
             # --- NCAAB ---
             if 'ncaab' in sport.lower() and not kp_stats.empty:
-                # Fuzzy match names in kp_stats
-                h_row = kp_stats[kp_stats['Team'].str.contains(home, case=False)]
-                a_row = kp_stats[kp_stats['Team'].str.contains(away, case=False)]
+                # Robust Matching Logic
+                # DB: "Houston Cougars", KP: "Houston"
+                # DB: "Saint Joseph's Hawks", KP: "Saint Joseph's"
                 
-                if not h_row.empty and not a_row.empty:
-                    h_em = h_row.iloc[0]['AdjEM']
-                    a_em = a_row.iloc[0]['AdjEM']
-                    h_o = h_row.iloc[0]['AdjO']
-                    a_o = a_row.iloc[0]['AdjO']
-                    h_d = h_row.iloc[0]['AdjD']
-                    a_d = a_row.iloc[0]['AdjD']
-                    h_t = h_row.iloc[0]['AdjT']
-                    a_t = a_row.iloc[0]['AdjT']
+                def find_team(db_name, kp_df):
+                    # 1. Exact containment (KP name inside DB name)
+                    matches = kp_df[kp_df['Team'].apply(lambda x: x in db_name or db_name in x)]
+                    if not matches.empty:
+                        return matches.iloc[0]
+                    return None
+
+                h_row = find_team(home, kp_stats)
+                a_row = find_team(away, kp_stats)
+                
+                if h_row is not None and a_row is not None:
+                    h_em = h_row['AdjEM']
+                    a_em = a_row['AdjEM']
+                    h_o = h_row['AdjO']
+                    a_o = a_row['AdjO']
+                    h_d = h_row['AdjD']
+                    a_d = a_row['AdjD']
+                    h_t = h_row['AdjT']
+                    a_t = a_row['AdjT']
                     
                     cur.execute("""
                         UPDATE intelligence_log 

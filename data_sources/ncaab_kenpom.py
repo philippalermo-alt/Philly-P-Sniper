@@ -53,7 +53,64 @@ class KenPomClient:
             # We care about 'Team' and 'AdjEM'
             return df[['Team', 'AdjEM', 'AdjO', 'AdjD', 'AdjT']]
         except Exception as e:
-            print(f"❌ Error fetching KenPom stats: {e}")
+            print(f"❌ Error fetching KenPom stats (kenpompy): {e}")
+            
+        # Fallback to Cloudscraper
+        print("⚠️ Attempting Cloudscraper fallback...")
+        return self._scrape_via_cloudscraper(season)
+
+    def _scrape_via_cloudscraper(self, season=None):
+        try:
+            import cloudscraper
+            scraper = cloudscraper.create_scraper()
+            
+            # Login
+            login_url = "https://kenpom.com/handlers/login_handler.php"
+            payload = {
+                "email": self.email,
+                "password": self.password,
+                "submit": "Login"
+            }
+            res = scraper.post(login_url, data=payload)
+            
+            # Fetch Homepage (Summary Stats)
+            url = "https://kenpom.com/index.php"
+            if season:
+                url += f"?y={season}"
+                
+            res = scraper.get(url)
+            if res.status_code != 200:
+                print(f"❌ Cloudscraper Error: {res.status_code}")
+                return pd.DataFrame()
+
+            # Parse Table
+            # Pandas read_html returns a list of dfs
+            dfs = pd.read_html(res.text)
+            for df in dfs:
+                # Look for the main table
+                if 'AdjEM' in df.columns or ('AdjEM', 'AdjEM') in df.columns:
+                    # Clean up multi-index headers if present
+                    if isinstance(df.columns, pd.MultiIndex):
+                        df.columns = df.columns.droplevel(0)
+                    
+                    # Ensure columns exist
+                    cols = ['Team', 'AdjEM', 'AdjO', 'AdjD', 'AdjT']
+                    # Some might be slightly different named or indexed
+                    # Rename if necessary or strict select
+                    # KenPom columns: Rank, Team, Conf, W-L, AdjEM, AdjO, AdjD, AdjT, Luck, ...
+                    # Check if 'AdjT' exists (Tempo)
+                    if 'AdjT' not in df.columns and 'Tempo' in df.columns:
+                        df['AdjT'] = df['Tempo'] # mapping
+                        
+                    return df[cols]
+            
+            print("❌ No efficiency table found in Cloudscraper response.")
+            return pd.DataFrame()
+
+        except Exception as e:
+            print(f"❌ Cloudscraper Fallback Failed: {e}")
+            import traceback
+            traceback.print_exc()
             return pd.DataFrame()
 
 if __name__ == "__main__":

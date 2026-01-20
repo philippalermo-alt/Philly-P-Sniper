@@ -248,8 +248,6 @@ def process_nhl_props(match, props_data, player_stats, calibration, cur, all_opp
                 stake = max(0.10, calculate_kelly_stake(max(0.01, edge), price) * 0.5) if edge > 0 else 0.00
                 
                 opp = {
-                
-                opp = {
                     'Date': mdt.strftime('%Y-%m-%d'),
                     'Kickoff': match['commence_time'],
                     'Sport': 'NHL',

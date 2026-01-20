@@ -44,7 +44,8 @@ class KenPomClient:
         """
         if not self.browser:
             if not self.login():
-                return pd.DataFrame()
+                print("⚠️ Standard login failed. Attempting Cloudscraper fallback...")
+                return self._scrape_via_cloudscraper(season)
         
         try:
             # Default to current season if None

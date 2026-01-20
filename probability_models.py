@@ -189,18 +189,22 @@ def process_nhl_props(match, props_data, player_stats, calibration, cur, all_opp
 
     for market in bookie['markets']:
         # LOG MARKET
-        print(f"   ℹ️ [DEBUG-PROP] Checking market: {market['key']}")
+        print(f"   ℹ️ [DEBUG-PROP] Checking market: {market['key']}", flush=True)
         if market['key'] != 'player_shots_on_goal':
             continue
 
-        for outcome in market['outcomes']:
+        outcomes = market.get('outcomes', [])
+        print(f"   ℹ️ [DEBUG-PROP] Outcome Count: {len(outcomes)}", flush=True)
+
+        for outcome in outcomes:
             # Robust Name Matching
-            # Odds API sometimes puts player name in 'description' and 'Over'/'Under' in 'name'
             raw_name = outcome.get('name', '')
             raw_desc = outcome.get('description', '')
+            price = outcome.get('price')
+            point = outcome.get('point')
             
-            # LOG OUTCOME
-            print(f"   ℹ️ [DEBUG-PROP] Processing: {raw_name} | {raw_desc}")
+            # LOG OUTCOME - Debugging flow
+            print(f"   ℹ️ [DEBUG-PROP] Processing: {raw_name} | {raw_desc} | Pt:{point}", flush=True)
 
             if raw_name in ['Over', 'Under'] and raw_desc:
                 player_name_odds = raw_desc
@@ -210,18 +214,16 @@ def process_nhl_props(match, props_data, player_stats, calibration, cur, all_opp
                 description = raw_desc
 
             if not point or not price or not description:
-                print(f"   ⚠️ [DEBUG-PROP] SKIPPED due to missing data. Point:{point} Price:{price} Desc:{description}")
+                print(f"   ⚠️ [DEBUG-PROP] SKIPPED due to missing data. Point:{point} Price:{price} Desc:{description}", flush=True)
                 continue
             
             # 1. Fuzzy Match
             best_match = difflib.get_close_matches(player_name_odds, player_stats.keys(), n=1, cutoff=0.85)
             if not best_match:
-                # LOG FAIL
-                print(f"   ❌ [DEBUG-PROP] No name match for: {player_name_odds}")
+                print(f"   ❌ [DEBUG-PROP] No name match for: {player_name_odds}", flush=True)
                 continue
             
-            # LOG SUCCESS
-            print(f"   ✅ [DEBUG-PROP] Matched: {player_name_odds} -> {best_match[0]}")
+            print(f"   ✅ [DEBUG-PROP] Matched: {player_name_odds} -> {best_match[0]}", flush=True)
                 
             p_stats = player_stats[best_match[0]]
             

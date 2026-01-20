@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Config:
     """
@@ -37,6 +40,7 @@ class Config:
     # Markets
     MAIN_MARKETS = 'h2h,spreads,totals'
     EXOTIC_MARKETS = 'h2h_h1,spreads_h1,totals_h1'
+    PROP_MARKETS = 'player_shots_on_goal'
 
     # Sport-Specific Standard Deviations
     NBA_MARGIN_STD = 11.0

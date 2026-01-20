@@ -13,8 +13,8 @@ from utils import log
 from database import get_db, init_db, get_calibration
 from bet_grading import settle_pending_bets
 from ratings import get_team_ratings
-from api_clients import get_action_network_data, get_soccer_predictions
-from probability_models import process_markets
+from api_clients import get_action_network_data, get_soccer_predictions, get_nhl_player_stats
+from probability_models import process_markets, process_nhl_props
 from closing_line import fetch_closing_odds
 from smart_staking import get_performance_multipliers, print_multiplier_report
 
@@ -44,6 +44,10 @@ def run_sniper():
 
     # Fetch public betting splits
     sharp_data = get_action_network_data()
+
+    # Pre-fetch NHL Player Stats (since user has paid API)
+    # We load this once to avoid re-fetching per game
+    nhl_player_stats = get_nhl_player_stats()
 
     # Get database connection
     conn = get_db()
@@ -96,20 +100,41 @@ def run_sniper():
                 )
 
                 # Fetch exotic markets for select sports
-                if sport_key in ['NBA', 'NFL', 'NCAAB']:
+                if sport_key in ['NBA', 'NFL', 'NCAAB', 'NHL']:
                     try:
-                        url = f"https://api.the-odds-api.com/v4/sports/{league}/events/{m['id']}/odds?apiKey={Config.ODDS_API_KEY}&regions=us,us2&markets={Config.EXOTIC_MARKETS}"
-                        deep = requests.get(url, timeout=10).json()
+                        markets_to_fetch = Config.EXOTIC_MARKETS
+                        if sport_key == 'NHL' and nhl_player_stats:
+                             markets_to_fetch += f",{Config.PROP_MARKETS}"
 
-                        if 'id' in deep:
-                            process_markets(
-                                deep, ratings, calibration, cur, all_opps,
-                                target_sport, seen_matches, sharp_data, is_soccer=False,
-                                multipliers=multipliers
-                            )
+                        url = f"https://api.the-odds-api.com/v4/sports/{league}/odds/?apiKey={Config.ODDS_API_KEY}&regions=us,us2&markets={markets_to_fetch}"
+                        res_ex = requests.get(url, timeout=15).json()
+                        if isinstance(res_ex, list):
+                            for mx in res_ex:
+                                if mx['id'] == m['id']:
+                                    process_markets(
+                                        mx, ratings, calibration, cur, all_opps, target_sport, 
+                                        seen_matches, sharp_data, multipliers=multipliers
+                                    )
+                                    # NHL Props Processing
+                                    if sport_key == 'NHL' and nhl_player_stats:
+                                        process_nhl_props(
+                                            mx, mx, nhl_player_stats, calibration, cur, all_opps, seen_matches
+                                        )
 
-                    except:
-                        pass
+                    except Exception as e:
+                        log("WARN", f"Exotic/Prop fetch failed for {league}: {e}")
+                        try:
+                            url = f"https://api.the-odds-api.com/v4/sports/{league}/events/{m['id']}/odds?apiKey={Config.ODDS_API_KEY}&regions=us,us2&markets={Config.EXOTIC_MARKETS}"
+                            deep = requests.get(url, timeout=10).json()
+
+                            if 'id' in deep:
+                                process_markets(
+                                    deep, ratings, calibration, cur, all_opps,
+                                    target_sport, seen_matches, sharp_data, is_soccer=False,
+                                    multipliers=multipliers
+                                )
+                        except:
+                            pass
 
         except Exception as e:
             log("ERROR", f"Failed {league}: {e}")

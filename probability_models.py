@@ -151,6 +151,132 @@ def calculate_kelly_stake(edge, decimal_odds, sport=None, use_smart_staking=True
 
     return base_stake
 
+    return base_stake
+
+
+def process_nhl_props(match, props_data, player_stats, calibration, cur, all_opps, seen_matches):
+    """
+    Process NHL player props (specifically Shots on Goal).
+    """
+    now_utc = datetime.now(timezone.utc)
+    mdt = datetime.fromisoformat(match['commence_time'].replace('Z', '+00:00'))
+    if mdt < now_utc:
+        return
+
+    home, away = match['home_team'], match['away_team']
+    
+    # Iterate through Bookmakers
+    bookie = next((b for b in match.get('bookmakers', []) if b['key'] in Config.PREFERRED_BOOKS), None)
+    if not bookie:
+        return
+
+    prop_id = f"{match['id']}_props"
+    if prop_id in seen_matches:
+        return
+    seen_matches.add(prop_id)
+
+    for market in bookie['markets']:
+        if market['key'] != 'player_shots_on_goal':
+            continue
+
+        for outcome in market['outcomes']:
+            player_name_odds = outcome['name']
+            price = outcome.get('price')
+            point = outcome.get('point')
+            description = outcome.get('description') # Usually 'Over' or 'Under'
+            
+            if not point or not price or not description:
+                continue
+                
+            # Name Matching
+            # API Stats key: 'Connor McDavid', Odds key: 'Connor McDavid' -> usually matches.
+            # But sometimes 'C. McDavid'.
+            # We use fuzzy matching against the player_stats keys
+            
+            best_match = difflib.get_close_matches(player_name_odds, player_stats.keys(), n=1, cutoff=0.85)
+            if not best_match:
+                continue
+                
+            p_stats = player_stats[best_match[0]]
+            
+            # Simple Projection Model
+            # Project SOG = Average Shots/Game
+            avg_sog = p_stats.get('avg_shots', 0)
+            if avg_sog == 0:
+                continue
+                
+            # Poisson Probability
+            # Probability of getting > point (if Over) or < point (if Under)
+            # given mean = avg_sog
+            
+            # stats.poisson.cdf(k, mu) = prob of <= k events
+            # Over X.5 -> Prob(>= X+1) = 1 - cdf(X, mu) -> actually 1 - cdf(floor(point), mu)
+            # Under X.5 -> Prob(<= X) = cdf(floor(point), mu)
+            
+            mu = avg_sog
+            line = point
+            
+            if description == 'Over':
+                # P(X > line) = 1 - P(X <= line)
+                # Since lines are usually x.5, floor(line) gives the integer threshold
+                # e.g. Over 2.5 -> P(X >= 3) -> 1 - P(X <= 2)
+                prob = 1 - stats.poisson.cdf(int(line), mu)
+                sel = f"{player_name_odds} Over {line} SOG"
+            else: # Under
+                # P(X < line) -> P(X <= line)
+                # e.g. Under 2.5 -> P(X <= 2)
+                prob = stats.poisson.cdf(int(line), mu)
+                sel = f"{player_name_odds} Under {line} SOG"
+                
+            # Edge Calculation
+            # Conservative calibration for props
+            true_prob = prob * calibration
+            true_prob = min(true_prob, 0.85) # Cap max confidence
+            
+            implied_prob = 1 / price
+            # Standard Kelly formulation
+            edge = (true_prob * price) - 1
+            
+            # Require higher edge for props due to variance
+            if edge >= 0.04: # 4% min edge
+                stake = calculate_kelly_stake(edge, price) * 0.5 # 50% stake for props
+                
+                opp = {
+                    'Date': mdt.strftime('%Y-%m-%d'),
+                    'Kickoff': match['commence_time'],
+                    'Sport': 'NHL',
+                    'Event': f"{away} @ {home}",
+                    'Selection': sel,
+                    'True_Prob': true_prob,
+                    'Target': 1/true_prob if true_prob else 0,
+                    'Dec_Odds': price,
+                    'Edge_Val': edge,
+                    'Edge': f"{edge*100:.1f}%",
+                    'Stake': f"${stake:.2f}"
+                }
+                all_opps.append(opp)
+                
+                if cur:
+                    try:
+                        unique_id = f"{match['id']}_{sel.replace(' ', '_')}"
+                        sql = """
+                            INSERT INTO intelligence_log
+                            (event_id, timestamp, kickoff, sport, teams, selection, odds, true_prob, edge, stake, trigger_type, closing_odds, ticket_pct, money_pct, sharp_score)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                            ON CONFLICT (event_id) DO UPDATE SET
+                                odds=EXCLUDED.odds, true_prob=EXCLUDED.true_prob, edge=EXCLUDED.edge,
+                                stake=EXCLUDED.stake, selection=EXCLUDED.selection, timestamp=EXCLUDED.timestamp;
+                        """
+                        params = (
+                            unique_id, datetime.now(), opp['Kickoff'], 'NHL', opp['Event'],
+                            opp['Selection'], float(price), float(true_prob), float(edge), float(stake), 'model_prop', float(price),
+                            None, None, 0
+                        )
+                        safe_execute(cur, sql, params)
+                    except Exception as e:
+                        print(f"❌ [DB ERROR] Failed to save {opp['Selection']}: {e}")
+
+
 def process_markets(match, ratings, calibration, cur, all_opps, target_sport, seen_matches, sharp_data, is_soccer=False, predictions=None, multipliers=None):
     """
     Process betting markets for a match and identify valuable opportunities.

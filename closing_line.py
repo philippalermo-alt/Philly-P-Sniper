@@ -28,13 +28,13 @@ def fetch_closing_odds():
     cur = conn.cursor()
 
     try:
-        # Get pending bets with kickoff in the next 2 hours that don't have closing odds yet
+        # Get pending bets with kickoff in the next 24 hours
+        # We want to keep updating the closing line until the game starts
         cur.execute("""
             SELECT event_id, sport, teams, selection, odds, kickoff
             FROM intelligence_log
             WHERE outcome = 'PENDING'
-            AND kickoff BETWEEN NOW() AND NOW() + INTERVAL '2 hours'
-            AND (closing_odds IS NULL OR closing_odds = odds)
+            AND kickoff BETWEEN NOW() AND NOW() + INTERVAL '24 hours'
         """)
 
         pending = cur.fetchall()
@@ -74,11 +74,11 @@ def fetch_closing_odds():
                 # Find the matching selection
                 closing_odds = find_matching_odds(res, selection, teams)
 
-                if closing_odds and closing_odds != opening_odds:
-                    # Calculate CLV
+                if closing_odds:
+                    # Calculate CLV (Current)
                     clv = calculate_clv(opening_odds, closing_odds)
 
-                    # Update database
+                    # Always update to the latest line we see
                     safe_execute(
                         cur,
                         "UPDATE intelligence_log SET closing_odds = %s WHERE event_id = %s",
@@ -253,3 +253,9 @@ def get_clv_stats(sport=None, days=30):
     finally:
         cur.close()
         conn.close()
+
+if __name__ == "__main__":
+    # Ensure config is loaded
+    from dotenv import load_dotenv
+    load_dotenv()
+    fetch_closing_odds()

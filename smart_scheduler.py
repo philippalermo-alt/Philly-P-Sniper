@@ -2,8 +2,8 @@ import os
 import pytz
 from datetime import datetime
 from hard_rock_model import run_sniper
-
 from settle_props import settle_props
+from closing_line import fetch_closing_odds
 
 def main():
     # Set timezone to US/Eastern
@@ -36,6 +36,9 @@ def main():
     if should_run:
         print("✅ Schedule Match! Execution starting...")
         try:
+            print("📉 Fetching Closing Odds (CLV)...")
+            fetch_closing_odds()
+            
             run_sniper()
             print("🏒 Running Prop Settlement...")
             settle_props()

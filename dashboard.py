@@ -5,7 +5,7 @@ import os
 import requests
 from datetime import datetime
 import difflib
-from backtesting import analyze_by_edge_bucket
+from backtesting import analyze_by_edge_bucket, analyze_clv
 from parlay_optimizer import generate_parlays
 
 # 🎨 Modern Page Configuration
@@ -905,6 +905,23 @@ if conn:
             else:
                 st.info("📊 No settled bets to analyze yet")
 
+            # CLV ANALYSIS (New v276)
+            st.markdown("---")
+            st.markdown("### 📉 Closing Line Value (CLV)")
+            
+            if not df_settled.empty:
+                clv_stats = analyze_clv(df_settled)
+                if clv_stats and clv_stats.get('total_with_clv', 0) > 0:
+                    c1, c2, c3, c4 = st.columns(4)
+                    c1.metric("Beat CLV %", f"{clv_stats['positive_clv_pct']}%")
+                    c2.metric("Avg CLV", f"{clv_stats['avg_clv']:.2f}%")
+                    c3.metric("ROI (Beat Close)", f"{clv_stats['positive_clv_roi']}%")
+                    c4.metric("ROI (Missed Close)", f"{clv_stats['negative_clv_roi']}%")
+                    
+                    st.caption(f"Based on {clv_stats['total_with_clv']} bets where closing odds were captured.")
+                else:
+                    st.info("ℹ️ CLV data is populating... (Requires games to finish)")
+            
             # ALL GRADED BETS (New v274) - Moved to bottom of tab
             st.markdown("---")
             with st.expander("📜 Full Betting History (All Graded Bets)", expanded=False):

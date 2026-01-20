@@ -29,7 +29,11 @@ class BaseModel:
         SELECT 
             sport, odds, true_prob, ticket_pct, 
             EXTRACT(EPOCH FROM (kickoff - timestamp))/60 as minutes_to_kickoff,
-            home_xg, away_xg, dvp_rank, home_adj_em, away_adj_em,
+            home_xg, away_xg, dvp_rank, 
+            home_adj_em, away_adj_em,
+            home_adj_o, away_adj_o,
+            home_adj_d, away_adj_d,
+            home_tempo, away_tempo,
             outcome
         FROM intelligence_log
         WHERE outcome IN ('WON', 'LOST')

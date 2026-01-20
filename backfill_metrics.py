@@ -13,7 +13,7 @@ def backfill_metrics():
     # 1. Fetch eligible bets (Settled, missing metrics)
     # We target rows where 'outcome' is settled but 'dvp_rank' or 'home_xg' is NULL or 0
     query = """
-    SELECT event_id, sport, teams, kickoff, home_xg, dvp_rank, home_adj_em
+    SELECT event_id, sport, teams, kickoff, home_xg, dvp_rank, home_adj_em, home_adj_o
     FROM intelligence_log
     WHERE outcome IN ('WON', 'LOST', 'PUSH')
     """
@@ -44,7 +44,7 @@ def backfill_metrics():
         # Check if already done (simple check)
         if row['dvp_rank'] and row['dvp_rank'] > 0: continue
         if row['home_xg'] and row['home_xg'] > 0: continue
-        if row['home_adj_em'] and row['home_adj_em'] > 0: continue
+        if row['home_adj_o'] and row['home_adj_o'] > 0: continue
 
         print(f"🔄 Processing {eid} ({sport})...")
         

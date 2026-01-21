@@ -8,11 +8,15 @@ from smart_staking import calculate_smart_stake, get_performance_multipliers
 
 import time
 from data_sources.ncaab_kenpom import KenPomClient
+from models.sport_models import NCAAB_Model
 
 # KenPom Cache
 _kp_client = KenPomClient()
 _kp_cache = None
 _kp_last_update = 0
+
+# V2 Model Instance
+_ncaab_model_v2 = NCAAB_Model()
 
 def get_kenpom_stats(team_name):
     """Exclude strict filtering, fuzzy match against KenPom DF."""
@@ -787,6 +791,62 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
                 m_val, t_val, sharp_score_val = (None, None, 0)
                 if sharp_market and sharp_side:
                     m_val, t_val, sharp_score_val = get_sharp_split(sharp_market, sharp_side)
+
+                # --- NCAAB V2 MODEL OVERRIDE ---
+                if sport == 'NCAAB' and mp is not None:
+                    try:
+                        # Construct Features for V2
+                        # features = ['implied_prob', 'true_prob', 'ticket_pct', 'minutes_to_kickoff', 
+                        #             'kenpom_diff', 'adjo_diff', 'adjd_diff', 'tempo_diff']
+                        
+                        kp_diff = float(kp_home.get('AdjEM', 0)) - float(kp_away.get('AdjEM', 0))
+                        adjo_diff = float(kp_home.get('AdjO', 0)) - float(kp_away.get('AdjO', 0))
+                        adjd_diff = float(kp_home.get('AdjD', 0)) - float(kp_away.get('AdjD', 0))
+                        tempo_diff = float(kp_home.get('AdjT', 0)) - float(kp_away.get('AdjT', 0))
+                        
+                        # Invert for Away team bets?
+                        # The model was trained on "Home - Away" diffs relative to the Outcome (Win/Loss).
+                        # Using 'target' = 1 if outcome='WON'.
+                        # But wait, the model predicts probability of WINNING the bet?
+                        # The training data ('target') is based on 'outcome' of the bet.
+                        # So if the bet is "Away ML", the features should be from Away perspective?
+                        # Actually, looking at base_model.py, it loads `true_prob` (heuristic) and `implied_prob`.
+                        # The features `home_adj_em` etc are static per game.
+                        # The model learns the relationship between (Legacy Prob + Game Stats) -> Win.
+                        # However, for Away bets, the 'true_prob' (heuristic) accounts for being Away.
+                        # The static stats (Home - Away) should remain Home - Away, because the model
+                        # learns that if Home is much better (Positive Diff) and we bet Home (High True Prob), we win.
+                        # If Home is much better (Positive Diff) and we bet Away (Low True Prob), we lose.
+                        # So we pass the Raw Diffs as is.
+                        
+                        mins_to_kick = (mdt - now_utc).total_seconds() / 60
+                        
+                        input_data = {
+                            'implied_prob': 1/price,
+                            'true_prob': mp,
+                            'ticket_pct': float(t_val) if t_val else 50.0,
+                            'minutes_to_kickoff': mins_to_kick,
+                            'kenpom_diff': kp_diff,
+                            'adjo_diff': adjo_diff, 
+                            'adjd_diff': adjd_diff, 
+                            'tempo_diff': tempo_diff
+                        }
+                        
+                        # If bet is on AWAY team, does the model know?
+                        # The model doesn't explicitly know "Side".
+                        # But 'true_prob' contains the side info (it's low for underdog, high for favorite).
+                        # So the interaction between 'true_prob' and 'kenpom_diff' captures it.
+                        
+                        v2_prob = _ncaab_model_v2.predict(input_data)
+                        
+                        # Log significant deviations
+                        if abs(v2_prob - mp) > 0.10:
+                            print(f"   🏀 [V2 ADJUST] {sel}: {mp:.3f} -> {v2_prob:.3f}")
+                            
+                        mp = v2_prob
+                        
+                    except Exception as e:
+                        print(f"   ⚠️ V2 Inference Failed: {e}")
 
                 # Criteria: Value Bet OR Sharp Signal
                 is_value = (Config.MIN_EDGE <= edge < Config.MAX_EDGE)

@@ -323,16 +323,17 @@ def fetch_espn_scores(sport_keys, specific_date=None):
         'MLB': ['baseball/mlb'],
         'soccer_epl': ['soccer/eng.1'],
         'SOCCER': [
-            'soccer/eng.1',          # EPL
-            'soccer/eng.2',          # Championship
-            'soccer/uefa.champions', # UCL
-            'soccer/uefa.europa',    # Europa
-            'soccer/esp.1',          # La Liga
-            'soccer/ger.1',          # Bundesliga
-            'soccer/ita.1',          # Serie A
-            'soccer/fra.1',          # Ligue 1
-            'soccer/usa.1',          # MLS
-            'soccer/fifa.friendly'   # Friendlies
+            'soccer/eng.1',
+            'soccer/esp.1',
+            'soccer/ger.1',
+            'soccer/ita.1',
+            'soccer/fra.1',
+            'soccer/ned.1',
+            'soccer/por.1',
+            'soccer/uefa.champions',
+            'soccer/uefa.europa',
+            'soccer/usa.1',
+            'soccer/fifa.friendly'
         ],
         'CHAMPIONS': ['soccer/uefa.champions'],
         'LALIGA': ['soccer/esp.1'],

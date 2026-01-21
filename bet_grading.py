@@ -24,7 +24,13 @@ def normalize_name(name):
         "massachusetts": "umass",
         "central michigan": "c michigan", # ESPN sometimes does this
         "western michigan": "w michigan",
-        "eastern michigan": "e michigan"
+        "eastern michigan": "e michigan",
+        'ole': 'mississippi',
+        'miss': 'mississippi',
+        'nc': 'north carolina',
+        'usc': 'southern california',
+        'st': 'state',
+        'se': 'southeast'
     }
     for k, v in replacements.items():
         if k in n:

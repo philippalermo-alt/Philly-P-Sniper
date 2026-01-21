@@ -1,3 +1,4 @@
+
 """
 Philly P Sniper - Automated Sports Betting Intelligence System
 
@@ -6,15 +7,17 @@ Main orchestrator that coordinates all modules to identify profitable betting op
 
 import requests
 import pandas as pd
+import joblib
+import os
 from datetime import datetime, timedelta, timezone
 
 from config import Config
-from utils import log
+from utils import log, match_team
 from database import get_db, init_db, get_calibration
 from notifier import send_alert, format_opportunity
 from bet_grading import settle_pending_bets
 from ratings import get_team_ratings
-from api_clients import get_action_network_data, get_soccer_predictions, get_nhl_player_stats
+from api_clients import get_action_network_data, get_soccer_predictions, get_nhl_player_stats, fetch_espn_scores, get_nba_refs
 from probability_models import process_markets, process_nhl_props
 from closing_line import fetch_closing_odds
 from smart_staking import get_performance_multipliers, print_multiplier_report
@@ -28,6 +31,44 @@ def run_sniper():
 
     # Settle any pending bets that have completed
     settle_pending_bets()
+
+    # --- FATIGUE / SCHEDULE TRACKING ---
+    # Fetch scores from Yesterday and Day Before to calculate Rest Days
+    log("FATIGUE", "Building Team Schedule History (Rest Days)...")
+    history_games = []
+    
+    # Dates to check: Yesterday and 2 Days Ago 
+    utc_now = datetime.now(timezone.utc)
+    
+    dates_to_fetch = [
+        (utc_now - timedelta(days=1)).strftime('%Y%m%d'),
+        (utc_now - timedelta(days=2)).strftime('%Y%m%d')
+    ]
+    
+    all_sports = ['NBA', 'NCAAB', 'NHL', 'NFL'] 
+    
+    for d in dates_to_fetch:
+        try:
+            # We fetch all relevant sports for this date
+            g = fetch_espn_scores(all_sports, specific_date=d)
+            history_games.extend(g)
+        except Exception as e:
+            log("WARN", f"Failed to fetch history for {d}: {e}")
+
+    # Build Map: standard_name -> last_game_date_obj
+    last_played_map = {}
+    
+    for g in history_games:
+        h_team = g.get('home')
+        a_team = g.get('away')
+        g_date = datetime.fromisoformat(g['commence'].replace('Z', '+00:00'))
+        
+        if h_team:
+            last_played_map[h_team] = g_date
+        if a_team:
+            last_played_map[a_team] = g_date
+            
+    log("FATIGUE", f" tracked {len(last_played_map)} teams with recent games.")
 
     # Fetch closing odds for bets about to start (CLV tracking)
     fetch_closing_odds()
@@ -49,6 +90,21 @@ def run_sniper():
     # Pre-fetch NHL Player Stats
     nhl_player_stats = get_nhl_player_stats()
     print(f"📊 [DEBUG] Loaded {len(nhl_player_stats)} NHL Players")
+
+    # --- NBA REFS ---
+    nba_ref_assignments = get_nba_refs()
+    
+    # Build Map for Refs: TeamName -> {Chief, Ref, Umpire}
+    nba_ref_map = {}
+    for assignment in nba_ref_assignments:
+        game_title = assignment.get('Game', '')
+        if '@' in game_title:
+            try:
+                away_raw, home_raw = game_title.split('@')
+                nba_ref_map[away_raw.strip()] = assignment
+                nba_ref_map[home_raw.strip()] = assignment
+            except:
+                pass
 
     # Get database connection
     conn = get_db()
@@ -100,9 +156,258 @@ def run_sniper():
 
             log("SCAN", f"Found {len(matches)} matches")
 
+            # Load NHL Utils if needed
+            nhl_ref_model = None
+            nhl_assignments = []
+            if sport_key == 'NHL':
+                 from nhl_modeling import NHLRefModel
+                 from nhl_assignments import get_nhl_assignments
+                 nhl_ref_model = NHLRefModel()
+                 nhl_assignments = get_nhl_assignments() # Fetches web data
+
+
             # Process each match
             seen_matches = set()
+             
+            # Pre-process NHL Assignments into a Map if loaded
+            nhl_ref_map = {}
+            if sport_key == 'NHL' and nhl_assignments:
+                for assignment in nhl_assignments:
+                    game_title = assignment.get('Game', '')
+                    # Expected: "Away at Home"
+                    if ' at ' in game_title:
+                        parts = game_title.split(' at ')
+                        if len(parts) == 2:
+                            a_raw = parts[0].strip()
+                            h_raw = parts[1].strip()
+                            nhl_ref_map[a_raw] = assignment
+                            nhl_ref_map[h_raw] = assignment
+                             
             for m in matches:
+                # --- NHL REFS ---
+                ref_impact = 0.0
+                if sport_key == 'NHL' and nhl_ref_model and nhl_ref_map:
+                     h_team = m.get('home_team')
+                     a_team = m.get('away_team')
+                     
+                     matched_refs = []
+                     
+                     # Try to find team in our map using fuzzy match
+                     # 1. Direct lookup
+                     # 2. match_team lookup
+                     
+                     found_assign = None
+                     
+                     # Try Home
+                     if h_team in nhl_ref_map:
+                         found_assign = nhl_ref_map[h_team]
+                     else:
+                         # Fuzzy
+                         match_h = match_team(h_team, nhl_ref_map.keys())
+                         if match_h:
+                             found_assign = nhl_ref_map[match_h]
+                             
+                     if not found_assign:
+                         # Try Away
+                         if a_team in nhl_ref_map:
+                             found_assign = nhl_ref_map[a_team]
+                         else:
+                             match_a = match_team(a_team, nhl_ref_map.keys())
+                             if match_a:
+                                 found_assign = nhl_ref_map[match_a]
+                                 
+                     if found_assign:
+                         matched_refs = found_assign.get('Officials', [])
+                             
+                     if matched_refs:
+                         ref_impact = nhl_ref_model.get_game_impact(h_team, a_team, matched_refs)
+                         log("NHL_REF", f"{h_team} vs {a_team}: Found Refs {matched_refs}. Impact: {ref_impact:+.3f}")
+                         
+                     m['ref_impact'] = ref_impact
+                     m['refs'] = matched_refs
+
+                # --- FATIGUE (Rest Days) ---
+                m['home_rest'] = 3 # default
+                m['away_rest'] = 3
+                 
+                h_name_odds = m.get('home_team')
+                a_name_odds = m.get('away_team')
+                 
+                espn_h = match_team(h_name_odds, last_played_map.keys())
+                mdt = datetime.fromisoformat(m['commence_time'].replace('Z', '+00:00'))
+                if espn_h:
+                    last_dt = last_played_map[espn_h]
+                    delta = mdt - last_dt
+                    m['home_rest'] = max(0, delta.days)
+
+                espn_a = match_team(a_name_odds, last_played_map.keys())
+                if espn_a:
+                    last_dt = last_played_map[espn_a]
+                    delta = mdt - last_dt
+                    m['away_rest'] = max(0, delta.days)
+
+                # --- NBA REFS ---
+                if target_sport == 'NBA':
+                    found_ref = None
+                    
+                    # Try home team first
+                    matched_key_h = match_team(h_name_odds, nba_ref_map.keys())
+                    if matched_key_h:
+                        found_ref = nba_ref_map[matched_key_h]
+                    
+                    # Try away team if not found
+                    if not found_ref:
+                        matched_key_a = match_team(a_name_odds, nba_ref_map.keys())
+                        if matched_key_a:
+                            found_ref = nba_ref_map[matched_key_a]
+                            
+                    if found_ref:
+                        m['ref_1'] = found_ref.get('Crew Chief')
+                        m['ref_3'] = found_ref.get('Umpire')
+                        
+                # --- SOCCER LINEUP IMPACT (Phase 7) ---
+                if is_soccer:
+                     # For now, only fetch if game starts within 1 hour or is live
+                     mdt = datetime.fromisoformat(m['commence_time'].replace('Z', '+00:00'))
+                     now = datetime.now(timezone.utc)
+                     # Check if game is within 70 mins (lineups usually out 60 mins prior)
+                     seconds_until = (mdt - now).total_seconds()
+                     
+                     if 0 <= seconds_until <= 4200: # 70 mins
+                         if 'soccer_client' not in locals():
+                             from soccer_client import SoccerClient
+                             soccer_client = SoccerClient()
+                             
+                         # We need Fixture ID. The Odds API doesn't give API-Football Fixture ID.
+                         # Challenge: We can't fetch lineups without ID.
+                         # Solution: We must use Mapping (OddsAPI Team -> API-Football Fixture).
+                         # Too complex for this block.
+                         # Fallback: We skip this for V1 unless we have a bridge.
+                         pass
+                     
+                     # Actually, `soccer_client` needs a mapping logic like `news_client`.
+                     # Let's check matching logic in `process_markets` later.
+                     # For now, initialize placeholder.
+                     m['lineup_impact'] = 0.0
+
+                # --- NEWS SENTIMENT IMPACT (New) ---
+                # Check for negative news and apply penalty
+                if 'news_map' not in locals():
+                    from news_client import NewsClient
+                    nc_instance = NewsClient()
+                    all_news = nc_instance.get_all_news()
+                    news_map = {}
+                    for n in all_news:
+                         # Simple map by team ID if available, otherwise skip for now 
+                         # (V2: Text Match Team Name)
+                         if n.get('team_id'):
+                             tid = str(n.get('team_id'))
+                             if tid not in news_map: news_map[tid] = []
+                             tid = str(n.get('team_id'))
+                             if tid not in news_map: news_map[tid] = []
+                             news_map[tid].append(n)
+                             
+                m['news_impact'] = 0.0
+                
+                # Logic: Search news for Home/Away team names logic
+                # For V1: Check if unique team identifier matches any news item
+                
+                def get_team_sentiment(team_name, news_list):
+                    impact = 0.0
+                    if not team_name: return 0.0
+                    
+                    # Tokenize: "Golden State Warriors" -> ["Golden", "State", "Warriors"]
+                    tokens = [t.lower() for t in team_name.split() if len(t) > 3]
+                    
+                    for n in news_list:
+                        headline = n.get('headline', '').lower()
+                        desc = n.get('description', '').lower()
+                        full = f"{headline} {desc}"
+                        
+                        # Check if ANY token is in the text
+                        if any(token in full for token in tokens):
+                            # Found news for this team
+                            # Check sentiment
+                            # Use weight from News Client (Star vs Role Player)
+                            # Default to 0 if not present
+                            val = n.get('impact_value', 0.0)
+                            
+                            # Fallback if news_client returned None
+                            if val == 0.0:
+                                score = n.get('sentiment_score', 0)
+                                if score < 0: val = -0.025
+                                elif score > 0: val = 0.01
+
+                            impact += val
+                    
+                    # Cap impact to avoid overreaction
+                    return max(-0.10, min(0.05, impact))
+
+                # Flatten all news for search since we don't have ID map
+                flat_news = [item for sublist in news_map.values() for item in sublist]
+                
+                h_impact = get_team_sentiment(h_name_odds, flat_news)
+                a_impact = get_team_sentiment(a_name_odds, flat_news)
+                
+                # Net Impact for Home Team
+                # If Home has bad news (-), News Impact is negative.
+                # If Away has bad news (-), News Impact is positive for Home.
+                m['news_impact'] = h_impact - a_impact
+
+
+                        
+                # --- REF IMPACT MODEL ---
+                # Load Stats if not loaded
+                if 'ref_stats_map' not in locals():
+                    ref_stats_map = {}
+                    try:
+                        if os.path.exists("nba_ref_stats_2025_26.csv"):
+                            rdf = pd.read_csv("nba_ref_stats_2025_26.csv")
+                            for _, row in rdf.iterrows():
+                                name = str(row.get('REFEREE', '')).strip()
+                                if name:
+                                    ref_stats_map[name] = {
+                                        'hw': float(row.get('HOME TEAM WIN%', 0.5)),
+                                        'fpg': float(row.get('CALLED FOULS PER GAME', 40.0)),
+                                        'hfp': float(row.get('FOUL% AGAINST HOME TEAMS', 0.5))
+                                    }
+                    except Exception as e:
+                        print(f"⚠️ Failed to load ref stats: {e}")
+
+                # Load Model if not loaded
+                if 'ref_model' not in locals():
+                    ref_model = None
+                    try:
+                        if os.path.exists("models/ref_impact_model.pkl"):
+                            ref_model = joblib.load("models/ref_impact_model.pkl")
+                    except Exception as e:
+                        print(f"⚠️ Failed to load ref model: {e}")
+
+                # Calculate Crew Averages
+                crew_stats = {'hw': [], 'fpg': [], 'hfp': []}
+                cols = ['ref_1', 'ref_2', 'ref_3']
+                for c in cols:
+                    r_name = m.get(c)
+                    if r_name and r_name in ref_stats_map:
+                        s = ref_stats_map[r_name]
+                        crew_stats['hw'].append(s['hw'])
+                        crew_stats['fpg'].append(s['fpg'])
+                        crew_stats['hfp'].append(s['hfp'])
+                
+                if len(crew_stats['hw']) > 0 and ref_model:
+                    avg_hw = sum(crew_stats['hw']) / len(crew_stats['hw'])
+                    avg_fpg = sum(crew_stats['fpg']) / len(crew_stats['fpg'])
+                    avg_hfp = sum(crew_stats['hfp']) / len(crew_stats['hfp'])
+                    
+                    # Predict
+                    features = [[avg_hw, avg_fpg, avg_hfp]]
+                    try:
+                        ref_prob = ref_model.predict_proba(features)[0][1]
+                        m['ref_impact_prob'] = ref_prob
+                        m['ref_edge'] = ref_prob - 0.50 # Deviation from neutral
+                    except:
+                        pass
+
                 process_markets(
                     m, ratings, calibration, cur, all_opps, target_sport,
                     seen_matches, sharp_data, is_soccer=('soccer' in league),
@@ -113,7 +418,6 @@ def run_sniper():
                 if sport_key in ['NBA', 'NFL', 'NCAAB', 'NHL'] or 'soccer' in league:
                     try:
                         # Bulk Fetch Exotics (Half markets)
-                        # Do NOT include props here as it breaks the bulk endpoint
                         url = f"https://api.the-odds-api.com/v4/sports/{league}/odds/?apiKey={Config.ODDS_API_KEY}&regions=us,us2&markets={Config.EXOTIC_MARKETS}"
                         res_ex = requests.get(url, timeout=15).json()
                         if isinstance(res_ex, list):
@@ -123,24 +427,6 @@ def run_sniper():
                                         mx, ratings, calibration, cur, all_opps, target_sport, 
                                         seen_matches, sharp_data, multipliers=multipliers
                                     )
-
-                        # Explicitly Fetch NHL Props via Event Endpoint (Required)
-                        # DISABLED (User Request - Save API Tokens): Stop fetching props entirely.
-                        if sport_key == 'NHL' and nhl_player_stats and False:
-                            prop_url = f"https://api.the-odds-api.com/v4/sports/{league}/events/{m['id']}/odds?apiKey={Config.ODDS_API_KEY}&regions=us,us2&markets={Config.PROP_MARKETS}"
-                            prop_res = requests.get(prop_url, timeout=10).json()
-                            
-                            # DEBUG RESPONSE
-                            if 'bookmakers' not in prop_res:
-                                print(f"   ⚠️ [DEBUG] Props missing for {m['id']}. Resp: {list(prop_res.keys())}")
-                            
-                            if 'bookmakers' in prop_res:
-                                # DISABLED (User Request v280): Settlement logic needs tuning. Architecture preserved.
-                                # process_nhl_props(
-                                #    prop_res, prop_res, nhl_player_stats, calibration, cur, all_opps, seen_matches
-                                # )
-                                pass
-
                     except Exception as e:
                         log("WARN", f"Exotic/Prop fetch failed for {league}: {e}")
                         # Fallback for Exotics logic...
@@ -176,13 +462,8 @@ def run_sniper():
         print(df[['Sport', 'Event', 'Selection', 'Edge', 'Stake', 'True_Prob']])
         
         # ALERTING SYSTEM
-        # Send notifications for high-quality bets
         print("\n🔔 Processing Alerts...")
         for opp in all_opps:
-            # Alert thresholds (User Request vFinal):
-            # 1. Edge between 1% and 20% (Reasonable range)
-            # 2. Sharp Score >= 25 (User explicit request)
-            
             edge_val = opp.get('Edge_Val', 0)
             
             # Explicit check: Edge >= 1% AND Edge <= 20%
@@ -190,19 +471,17 @@ def run_sniper():
                  # Check Sharp Score (Must be >= 25)
                  sharp_score = opp.get('Sharp_Score', 0)
                  
-                 # Ensure strict type safety for sharp_score
                  try:
                      s_score = float(sharp_score)
                  except:
                      s_score = 0
 
                  if s_score >= 25:
-                     # Fire Alert
-                    try:
+                     try:
                         msg = format_opportunity(opp)
                         send_alert(msg)
                         print(f"   📨 Sent alert for {opp['Selection']}")
-                    except Exception as e:
+                     except Exception as e:
                         print(f"   ❌ Alert failed: {e}")
         final_picks = []
         for sport in df['Sport'].unique():
@@ -226,23 +505,6 @@ def run_sniper():
         print(top_15[cols].to_string(index=False))
 
         print(all_bets[cols].to_string(index=False))
-
-    # --- API USAGE REPORT ---
-    # We captured usage from headers during the run
-    if 'remaining_requests' in locals() or 'remaining_requests' in globals():
-        # It might be in the loop context, let's track it globally or pass it out
-        # Simpler: We didn't track it in the loop variable scope above.
-        # Let's add a crude estimator or just print if we have the variable.
-        pass
-    
-    # Better approach: The user wants to know usage. 
-    # Since I didn't add the tracking variable in the loop in this edit (I am editing the end of the file),
-    # I should have added it to the loop first. 
-    # But I can add a final check call just to get the headers or rely on the previous logic modification.
-    
-    # Let's actually modify the loop in a separate tool call to tracking it properly.
-    # For now, I will just add the print placeholder until I edit the loop.
-    pass
 
 if __name__ == "__main__":
     run_sniper()

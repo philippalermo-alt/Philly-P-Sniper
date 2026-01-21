@@ -85,12 +85,20 @@ def grade_bet(selection, home_team, away_team, home_score, away_score):
         return 'WON' if margin == 0 else 'LOST'
 
     # 3. Spreads
-    if ('+' in selection or '-' in selection) and '(' not in selection:
+    # Allow '(' for team names like 'Loyola (Chi)', but ensure it's not a Parlay wrapper if strictly checking
+    # But grade_bet is called for specific legs too.
+    if ('+' in selection or '-' in selection) and "Parlay" not in selection:
         try:
             # Parse "Team +X.5"
+            # Handle potential suffix like " (-110)" if present, though usually sanitized before
             parts = selection.rsplit(' ', 1)
             raw_team, spread_str = parts[0].strip(), parts[1]
-            spread = float(spread_str)
+            try:
+                spread = float(spread_str)
+            except ValueError:
+                # Retry if spread is inside parens or something weird?
+                # Assume standard format for now
+                return 'PENDING'
 
             pick_is_home = fuzzy_match(raw_team, home_team)
             pick_is_away = fuzzy_match(raw_team, away_team)
@@ -112,7 +120,9 @@ def grade_bet(selection, home_team, away_team, home_score, away_score):
     # 4. Over/Under
     if "Over" in selection or "Under" in selection:
         try:
-            val = float(selection.split()[-1])
+            # Clean selection: remove "Goals", "Points", "Runs"
+            clean_sel = selection.lower().replace(" goals", "").replace(" points", "").replace(" runs", "")
+            val = float(clean_sel.split()[-1])
             total = home_score + away_score
             if "Over" in selection: return 'WON' if total > val else 'LOST'
             if "Under" in selection: return 'WON' if total < val else 'LOST'

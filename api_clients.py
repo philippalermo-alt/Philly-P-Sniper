@@ -370,6 +370,10 @@ def fetch_espn_scores(sport_keys, specific_date=None):
                 try:
                     url = f"https://site.api.espn.com/apis/site/v2/sports/{espn_path}/scoreboard?dates={date_str}"
                     
+                    # Special handling for NCAAB to get all Div I games (groups=50)
+                    if 'mens-college-basketball' in espn_path:
+                        url += "&groups=50&limit=1000"
+                    
                     # Use User-Agent to avoid generic bot blocking
                     headers = {
                         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'

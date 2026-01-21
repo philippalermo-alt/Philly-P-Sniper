@@ -121,6 +121,7 @@ def run_sniper():
     for league in Config.LEAGUES:
         sport_key = league.split('_')[-1].upper()
         target_sport = 'NBA' if 'nba' in league else 'NCAAB' if 'ncaab' in league else 'NFL' if 'nfl' in league else 'NHL'
+        is_soccer = 'soccer' in league
 
         # Get calibration factor based on historical performance
         calibration = get_calibration(target_sport)

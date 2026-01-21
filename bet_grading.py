@@ -288,7 +288,7 @@ def settle_pending_bets():
                          except Exception as e:
                              log("ERROR", f"Grading calc error {event_id}: {e}")
                      else:
-                        pass # Game found but not final
+                        log("DEBUG", f"Matched game {matched_game['shortName']} (ID: {matched_game['id']}) but status not Final. Status: {matched_game['status']}, Complete: {matched_game.get('is_complete')}")
 
              # UPDATE DB if Graded
              if outcome in ['WON', 'LOST', 'PUSH']:

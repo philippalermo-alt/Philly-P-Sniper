@@ -6,6 +6,38 @@ from utils import log, _num
 from database import safe_execute
 from smart_staking import calculate_smart_stake, get_performance_multipliers
 
+import time
+from data_sources.ncaab_kenpom import KenPomClient
+
+# KenPom Cache
+_kp_client = KenPomClient()
+_kp_cache = None
+_kp_last_update = 0
+
+def get_kenpom_stats(team_name):
+    """Exclude strict filtering, fuzzy match against KenPom DF."""
+    global _kp_cache, _kp_last_update
+    
+    if _kp_cache is None or (time.time() - _kp_last_update > 86400): # 24h cache
+        try:
+             df = _kp_client.get_efficiency_stats()
+             if not df.empty:
+                 _kp_cache = df
+                 _kp_last_update = time.time()
+        except:
+             pass
+    
+    if _kp_cache is None: return None
+    
+    # 1. Exact/Containment
+    # DB: "Houston Cougars", KP: "Houston"
+    matches = _kp_cache[_kp_cache['Team'].apply(lambda x: x in team_name or team_name in x)]
+    if not matches.empty:
+         return matches.iloc[0].to_dict()
+         
+    # 2. Fuzzy? (Optional, maybe later)
+    return None
+
 # One-time debug counters for calculate_match_stats TypeErrors
 _calc_stats_typeerror_count = 0
 _calc_stats_typeerror_max = 5
@@ -357,16 +389,48 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
         money_majority_score = max(0, min(1, (m_val - 50) / 20))
         return int(round(100 * (0.55 * gap_score + 0.25 * minority_score + 0.20 * money_majority_score)))
 
-    match_key = f"{away} @ {home}"
+    
+    # Robust Matching for Sharp Data
     matched_key = None
-    m_match = difflib.get_close_matches(match_key, sharp_data.keys(), n=1, cutoff=0.6) if sharp_data else []
-    if m_match:
-        matched_key = m_match[0]
+    if sharp_data:
+        from utils import normalize_team_name
+        n_home = normalize_team_name(home)
+        n_away = normalize_team_name(away)
+        
+        # 1. Containment Search
+        # sharp_data keys are already normalized in api_clients.py: "norm_away @ norm_home"
+        for sk in sharp_data.keys():
+            try:
+                s_away, s_home = sk.split(' @ ')
+            except:
+                continue
+                
+            # Check overlap
+            match_h = (s_home in n_home) or (n_home in s_home)
+            match_a = (s_away in n_away) or (n_away in s_away)
+            
+            if match_h and match_a:
+                matched_key = sk
+                break
+                
+        # 2. Fallback to difflib on normalized strings
+        if not matched_key:
+            search_key = f"{n_away} @ {n_home}"
+            m_match = difflib.get_close_matches(search_key, sharp_data.keys(), n=1, cutoff=0.55)
+            if m_match:
+                matched_key = m_match[0]
 
     def get_sharp_split(market_key, side_key):
         if not matched_key:
             return None, None, 0
-        split = sharp_data.get(matched_key, {}).get(market_key, {}).get(side_key)
+            
+        from utils import normalize_team_name
+        # Normalize side key if it's a team name (not Over/Under/Draw)
+        lookup_side = side_key
+        if market_key in ['spread', 'moneyline'] and side_key not in ['Over', 'Under', 'Draw']:
+            lookup_side = normalize_team_name(side_key)
+            
+        split = sharp_data.get(matched_key, {}).get(market_key, {}).get(lookup_side)
         if not split:
             return None, None, 0
         m_pct = split.get("money")
@@ -401,11 +465,19 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
                         price = o.get('price')
                         if not price: continue
 
+                        # Get Lineup Impact (Phase 7)
+                        # defined as Net Home Advantage (e.g. +0.05 means Home is 5% better due to lineups)
+                        # SCALING: Raw Impact is xG (e.g. 0.85). We must scale this to Probability.
+                        # Heuristic: 1.0 xG diff ~= 20% Win Prob diff.
+                        LINEUP_SCALE_FACTOR = 0.20
+                        raw_impact = match.get('lineup_impact', 0.0)
+                        l_impact = raw_impact * LINEUP_SCALE_FACTOR
+
                         if name == home:
-                            mp = pred['home_win']
+                            mp = pred['home_win'] + l_impact
                             sel = f"{home} ML"
                         elif name == away:
-                            mp = pred['away_win']
+                            mp = pred['away_win'] - l_impact
                             sel = f"{away} ML"
                         elif 'Draw' in name or 'Tie' in name:
                             mp = pred['draw']
@@ -564,12 +636,13 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
                         unique_id = f"{match['id']}_{best_opp['Selection'].replace(' ', '_')}"
                         sql = """
                             INSERT INTO intelligence_log
-                            (event_id, timestamp, kickoff, sport, teams, selection, odds, true_prob, edge, stake, trigger_type, closing_odds, ticket_pct, money_pct, sharp_score)
-                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                            (event_id, timestamp, kickoff, sport, teams, selection, odds, true_prob, edge, stake, trigger_type, closing_odds, ticket_pct, money_pct, sharp_score, home_rest, away_rest)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                             ON CONFLICT (event_id) DO UPDATE SET
                                 odds=EXCLUDED.odds, true_prob=EXCLUDED.true_prob, edge=EXCLUDED.edge,
                                 stake=EXCLUDED.stake, selection=EXCLUDED.selection, timestamp=EXCLUDED.timestamp,
-                                closing_odds=EXCLUDED.closing_odds, ticket_pct=EXCLUDED.ticket_pct, money_pct=EXCLUDED.money_pct, sharp_score=EXCLUDED.sharp_score;
+                                closing_odds=EXCLUDED.closing_odds, ticket_pct=EXCLUDED.ticket_pct, money_pct=EXCLUDED.money_pct, sharp_score=EXCLUDED.sharp_score,
+                                home_rest=EXCLUDED.home_rest, away_rest=EXCLUDED.away_rest;
                         """
 
                         # Values already calculated above
@@ -579,7 +652,8 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
                             unique_id, datetime.now(), best_opp['Kickoff'], 'SOCCER', best_opp['Event'], 
                             best_opp['Selection'], float(best_opp['Dec_Odds']), float(best_opp['True_Prob']), 
                             float(best_opp['Edge_Val']), float(best_opp['Stake'].replace('$','')), 'model', float(best_opp['Dec_Odds']),
-                            None, None, int(sharp_score_val)
+                            None, None, int(sharp_score_val),
+                            match.get('home_rest'), match.get('away_rest')
                         )
 
                         safe_execute(cur, sql, params)
@@ -592,6 +666,47 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
     exp_margin, exp_total, margin_std, sport = calculate_match_stats(home, away, ratings, target_sport)
     if exp_margin is None:
         return
+        
+    # KenPom Stats for DB (NCAAB Only)
+    kp_home, kp_away = {}, {}
+    if sport == 'NCAAB':
+        h_stats = get_kenpom_stats(home)
+        if h_stats: kp_home = h_stats
+        
+        a_stats = get_kenpom_stats(away)
+        if a_stats: kp_away = a_stats
+        
+    # --- NEWS IMPACT ---
+    # Injected from hard_rock_model.py
+    # If not present, default to 0.0
+    news_impact = match.get('news_impact', 0.0)
+    
+    # If News Impact is negative (Home Team has bad news), we should shift the MARGIN against them.
+    # Impact is currently defined as probability penalty in hard_rock_model logic, 
+    # but applying it to the MARGIN is mathematically cleaner for Spreads & ML simultaneously.
+    # A 2.5% win prob shift approx equals 1.0 - 1.5 points in NBA.
+    # Let's apply it directly to `exp_margin`.
+    
+    if news_impact != 0:
+        # news_impact of -0.025 (prob) roughly maps to -1.5 points.
+        # Let's scale it: 50 points per 1.0 prob (rough heuristic) implies -1.25 pts.
+        # Simplified: If impact is negative, reduce home margin.
+        
+        # NOTE: hard_rock_model currently sets it to 0.0, so this is future-proof logic.
+        # V2 will populate 'news_impact' with float values.
+        
+        # Heuristic: 1% Prob = 0.5 points
+        # If news_impact is -0.05 (-5%), margin shift should be -2.5 points.
+        
+        if sport in ['NBA', 'NFL', 'NCAAB']:
+             margin_shift = news_impact * 50.0 
+             exp_margin += margin_shift
+             print(f"   📰 News Impact Applied (Spread): {news_impact:.3f} -> Margin Shift: {margin_shift:.2f} pts")
+        elif sport == 'NHL':
+             # For NHL, do NOT shift margin by 2.5 goals!
+             # We will apply the impact directly to the Win Probability (mp) below.
+             pass
+
 
     for m in bookie['markets']:
         key = m['key']
@@ -636,37 +751,60 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
                     sel = f"{lbl} Under {point}".strip()
                     mp = stats.norm.cdf((point - eff_t) / eff_s)
 
+            # Apply NHL News Impact (Probability Shift)
+            if mp and sport == 'NHL' and news_impact != 0 and 'h2h' in key:
+                 # Logic: news_impact is a +/- Win Prob value from Home perspective.
+                 # If Home has bad news (negative impact), Home MP decreases.
+                 # If Home has bad news, Away MP increases.
+                 
+                 if name == home:
+                     mp += news_impact
+                     print(f"   🏒 NHL News Impact Applied: {news_impact:+.3f} to {home} ML")
+                 elif name == away:
+                     mp -= news_impact # Inverse impact
+                     print(f"   🏒 NHL News Impact Inverse: {-news_impact:+.3f} to {away} ML")
+
             if mp:
                 mp *= calibration
                 mp = min(mp, Config.MAX_PROBABILITY)
                 tp = (Config.MARKET_WEIGHT_US * (1/price)) + ((1 - Config.MARKET_WEIGHT_US) * mp)
                 edge = ((tp * price) - 1) * (0.75 if sport == 'NHL' else 1.0)
 
-                if Config.MIN_EDGE <= edge < Config.MAX_EDGE:
+
+                # Calculate Sharp Score FIRST
+                sharp_market = None
+                sharp_side = None
+                if 'spreads' in key:
+                    sharp_market = "spread"
+                    sharp_side = name
+                elif 'h2h' in key:
+                    sharp_market = "moneyline"
+                    sharp_side = "Draw" if ('draw' in str(name).lower() or 'tie' in str(name).lower()) else name
+                elif 'totals' in key:
+                    sharp_market = "total"
+                    sharp_side = "Over" if str(name).lower() == "over" else "Under"
+
+                m_val, t_val, sharp_score_val = (None, None, 0)
+                if sharp_market and sharp_side:
+                    m_val, t_val, sharp_score_val = get_sharp_split(sharp_market, sharp_side)
+
+                # Criteria: Value Bet OR Sharp Signal
+                is_value = (Config.MIN_EDGE <= edge < Config.MAX_EDGE)
+                is_sharp = (sharp_score_val >= Config.SHARP_SIGNAL_THRESHOLD)
+
+                if is_value or is_sharp:
                     stake = calculate_kelly_stake(edge, price, sport=sport, multipliers=multipliers)
                     
-                    # Calculate Sharp Score BEFORE creating object
-                    sharp_market = None
-                    sharp_side = None
-                    if 'spreads' in key:
-                        sharp_market = "spread"
-                        sharp_side = name
-                    elif 'h2h' in key:
-                        sharp_market = "moneyline"
-                        sharp_side = "Draw" if ('draw' in str(name).lower() or 'tie' in str(name).lower()) else name
-                    elif 'totals' in key:
-                        sharp_market = "total"
-                        sharp_side = "Over" if str(name).lower() == "over" else "Under"
-
-                    m_val, t_val, sharp_score_val = (None, None, 0)
-                    if sharp_market and sharp_side:
-                        m_val, t_val, sharp_score_val = get_sharp_split(sharp_market, sharp_side)
+                    # If it's purely a sharp signal with negative edge, stake might be 0.
+                    # Currently we accept that (Stake $0.00 acts as a "Watch" signal)
+                    
+                    trig_type = 'model' if is_value else 'sharp_signal'
 
                     opp = {
                         'Date': mdt.strftime('%Y-%m-%d'), 'Kickoff': match['commence_time'], 'Sport': sport, 'Event': f"{away} @ {home}",
                         'Selection': sel, 'True_Prob': tp, 'Target': 1/tp if tp else 0, 'Dec_Odds': price,
                         'Edge_Val': edge, 'Edge': f"{edge*100:.1f}%", 'Stake': f"${stake:.2f}",
-                        'Sharp_Score': sharp_score_val # Added for alerts
+                        'Sharp_Score': sharp_score_val 
                     }
                     all_opps.append(opp)
                     if cur:
@@ -674,19 +812,32 @@ def process_markets(match, ratings, calibration, cur, all_opps, target_sport, se
                             unique_id = f"{match['id']}_{sel.replace(' ', '_')}"
                             sql = """
                                 INSERT INTO intelligence_log
-                                (event_id, timestamp, kickoff, sport, teams, selection, odds, true_prob, edge, stake, trigger_type, closing_odds, ticket_pct, money_pct, sharp_score)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                                (event_id, timestamp, kickoff, sport, teams, selection, odds, true_prob, edge, stake, trigger_type, closing_odds, ticket_pct, money_pct, sharp_score, home_rest, away_rest, ref_1, ref_2, ref_3, 
+                                home_adj_em, away_adj_em, home_adj_o, away_adj_o, home_adj_d, away_adj_d, home_tempo, away_tempo)
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                                 ON CONFLICT (event_id) DO UPDATE SET
                                     odds=EXCLUDED.odds, true_prob=EXCLUDED.true_prob, edge=EXCLUDED.edge,
                                     stake=EXCLUDED.stake, selection=EXCLUDED.selection, timestamp=EXCLUDED.timestamp,
-                                    closing_odds=EXCLUDED.closing_odds, ticket_pct=EXCLUDED.ticket_pct, money_pct=EXCLUDED.money_pct, sharp_score=EXCLUDED.sharp_score;
+                                    closing_odds=EXCLUDED.closing_odds, ticket_pct=EXCLUDED.ticket_pct, money_pct=EXCLUDED.money_pct, sharp_score=EXCLUDED.sharp_score,
+                                    home_rest=EXCLUDED.home_rest, away_rest=EXCLUDED.away_rest,
+                                    ref_1=EXCLUDED.ref_1, ref_2=EXCLUDED.ref_2, ref_3=EXCLUDED.ref_3,
+                                    home_adj_em=EXCLUDED.home_adj_em, away_adj_em=EXCLUDED.away_adj_em,
+                                    home_adj_o=EXCLUDED.home_adj_o, away_adj_o=EXCLUDED.away_adj_o,
+                                    home_adj_d=EXCLUDED.home_adj_d, away_adj_d=EXCLUDED.away_adj_d,
+                                    home_tempo=EXCLUDED.home_tempo, away_tempo=EXCLUDED.away_tempo;
                             """
                             params = (
                                 unique_id, datetime.now(), opp['Kickoff'], sport, opp['Event'],
-                                opp['Selection'], float(price), float(tp), float(edge), float(stake), 'model', float(price),
+                                opp['Selection'], float(price), float(tp), float(edge), float(stake), trig_type, float(price),
                                 int(t_val) if t_val is not None else None,
                                 int(m_val) if m_val is not None else None,
-                                int(sharp_score_val)
+                                int(sharp_score_val),
+                                match.get('home_rest'), match.get('away_rest'),
+                                match.get('ref_1'), match.get('ref_2'), match.get('ref_3'),
+                                float(kp_home.get('AdjEM', 0)), float(kp_away.get('AdjEM', 0)),
+                                float(kp_home.get('AdjO', 0)), float(kp_away.get('AdjO', 0)),
+                                float(kp_home.get('AdjD', 0)), float(kp_away.get('AdjD', 0)),
+                                float(kp_home.get('AdjT', 0)), float(kp_away.get('AdjT', 0))
                             )
                             safe_execute(cur, sql, params)
                         except Exception as e:

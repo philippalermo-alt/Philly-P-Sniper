@@ -334,6 +334,7 @@ def fetch_espn_scores(sport_keys, specific_date=None):
             'soccer/uefa.europa',
             'soccer/eng.fa',
             'soccer/eng.cup',
+            'soccer/eng.2',
             'soccer/usa.1',
             'soccer/fifa.friendly'
         ],

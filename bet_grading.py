@@ -77,7 +77,7 @@ def fuzzy_match(team1, team2):
 # ---------------------------
 # Grading Logic
 # ---------------------------
-def grade_bet(selection, home_team, away_team, home_score, away_score):
+def grade_bet(selection, home_team, away_team, home_score, away_score, sport=None):
     """Grades a single leg wager."""
     
     margin = home_score - away_score
@@ -96,7 +96,11 @@ def grade_bet(selection, home_team, away_team, home_score, away_score):
 
         if margin > 0 and pick_is_home: return 'WON'
         if margin < 0 and pick_is_away: return 'WON'
-        if margin == 0: return 'PUSH'
+        if margin == 0:
+            # SOCCER RULES: Draw on ML is LOSS (unless DNB, which would be explicit)
+            if sport == 'SOCCER' or sport == 'soccer':
+                return 'LOST'
+            return 'PUSH'
         return 'LOST'
 
     # 2. Soccer Draws
@@ -307,7 +311,7 @@ def settle_pending_bets():
                      if matched_game.get('is_complete') or "Final" in matched_game['status']:
                          try:
                              outcome = grade_bet(selection, matched_game['home'], matched_game['away'], 
-                                                 matched_game['home_score'], matched_game['away_score'])
+                                                 matched_game['home_score'], matched_game['away_score'], sport=sport)
                              if outcome == 'PENDING':
                                  log("DEBUG", f"Bet {event_id} ({selection}) Matched but Graded PENDING. (Game: {matched_game['shortName']}, Score: {matched_game['home_score']}-{matched_game['away_score']})")
                          except Exception as e:

@@ -202,13 +202,29 @@ def settle_pending_bets():
     try:
         cur = conn.cursor()
         
-        # 1. Fetch live/recent scores from ESPN
-        # We want a broad net here.
+        # 1. Fetch live/recent scores from ESPN (Today + Yesterday)
         keys = ['NBA', 'NCAAB', 'NHL', 'NFL', 'SOCCER'] 
         live_games = []
+        
         try:
             from api_clients import fetch_espn_scores
-            live_games = fetch_espn_scores(keys)
+            from datetime import datetime, timedelta
+            import pytz
+            
+            tz = pytz.timezone('US/Eastern')
+            now_et = datetime.now(tz)
+            
+            # Fetch Today and Yesterday to ensure we catch late finishes
+            dates_to_fetch = [
+                now_et.strftime('%Y%m%d'), 
+                (now_et - timedelta(days=1)).strftime('%Y%m%d')
+            ]
+            
+            for d in dates_to_fetch:
+                log("GRADING", f"Fetching scores for date: {d}")
+                g_day = fetch_espn_scores(keys, specific_date=d)
+                live_games.extend(g_day)
+                
         except Exception as e:
             log("ERROR", f"Failed to fetch scores: {e}")
             return

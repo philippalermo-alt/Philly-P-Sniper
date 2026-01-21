@@ -221,9 +221,11 @@ def settle_pending_bets():
             ]
             
             for d in dates_to_fetch:
-                log("GRADING", f"Fetching scores for date: {d}")
+                og(f"Fetching scores for date: {d}")
                 g_day = fetch_espn_scores(keys, specific_date=d)
                 live_games.extend(g_day)
+                
+            log("GRADING", f"Fetched {len(live_games)} games total.")
                 
         except Exception as e:
             log("ERROR", f"Failed to fetch scores: {e}")
@@ -238,6 +240,8 @@ def settle_pending_bets():
         # Re-query all pending bets
         cur.execute("SELECT event_id, sport, selection, teams FROM intelligence_log WHERE outcome = 'PENDING' AND kickoff < NOW()")
         pending_detailed = cur.fetchall()
+        
+        log("GRADING", f"Checking {len(pending_detailed)} pending bets against {len(live_games)} games.")
 
         for event_id, sport, selection, teams_str in pending_detailed:
              
@@ -246,6 +250,8 @@ def settle_pending_bets():
              # --- PARLAY LOGIC ---
              if sport == 'PARLAY' or 'Parlay' in selection:
                  outcome = grade_parlay(selection, live_games)
+                 if outcome == 'PENDING':
+                     pass # log("DEBUG", f"Parlay {event_id} still pending.")
                  
              # --- STANDARD LOGIC ---
              else:
@@ -267,8 +273,12 @@ def settle_pending_bets():
                          try:
                              outcome = grade_bet(selection, matched_game['home'], matched_game['away'], 
                                                  matched_game['home_score'], matched_game['away_score'])
+                             if outcome == 'PENDING':
+                                 log("DEBUG", f"Bet {event_id} ({selection}) Matched but Graded PENDING. (Game: {matched_game['shortName']}, Score: {matched_game['home_score']}-{matched_game['away_score']})")
                          except Exception as e:
                              log("ERROR", f"Grading calc error {event_id}: {e}")
+                     else:
+                        pass # Game found but not final
 
              # UPDATE DB if Graded
              if outcome in ['WON', 'LOST', 'PUSH']:

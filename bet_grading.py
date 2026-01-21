@@ -41,6 +41,9 @@ def normalize_name(name):
         'paris saint germain': 'paris saint-germain',
         'olympiakos': 'olympiacos',
         'piraeus': 'olympiacos',
+        'ajax': 'ajax amsterdam',
+        'copenhagen': 'københavn',
+        'f.c.': 'fc',
     }
     for k, v in replacements.items():
         if k in n:

@@ -153,10 +153,13 @@ def settle_pending_bets():
 
         graded = 0
         
+        # Re-query with teams column included before looping live games
+        cur.execute("SELECT event_id, sport, selection, teams FROM intelligence_log WHERE outcome = 'PENDING' AND kickoff < NOW()")
+        pending_detailed = cur.fetchall()
+
         # Grading Logic
         for game in live_games:
             # We only grade if game is "Completed" (Final)
-            # ESPN Status: "Final", "Final/OT", "Scheduled", "Live", etc.
             if not game.get('is_complete') and "Final" not in game['status']:
                 continue
 
@@ -165,45 +168,39 @@ def settle_pending_bets():
             h_score = game['home_score']
             a_score = game['away_score']
             
-            # Match Pending Bets to this Game
-            for event_id, sport, selection in pending:
-                # Name Matching
-                # DB stores "Home vs Away" usually.
-                # Simplest check: do BOTH names appear in the DB "teams" column?
-                # Actually `pending` tuple above is: (event_id, sport, selection)
-                # We need the 'teams' column to match robustly!
-                # Let's fetch 'teams' in the query above.
-                pass 
-                
-        # Re-query with teams column included
-        cur.execute("SELECT event_id, sport, selection, teams FROM intelligence_log WHERE outcome = 'PENDING' AND kickoff < NOW()")
-        pending_detailed = cur.fetchall()
-        
-        for event_id, sport, selection, teams_str in pending_detailed:
-             # Match logic: Checks if ESPN names are loosely in DB names
-             # DB: "Philadelphia 76ers vs Boston Celtics"
-             # ESPN: "76ers" vs "Celtics" (often shorter)
-             
-             # Clean match check
-             match_found = False
-             
-             # Case 1: Loose containment
-             if home in teams_str and away in teams_str:
-                 match_found = True
-             # Case 2: Reverse
-             elif away in teams_str and home in teams_str:
-                 match_found = True
+            # Use 'sport' from game dict; fallback to None if not present
+            g_sport = game.get('sport')
+
+            # Check ALL pending bets against THIS game
+            for event_id, ps_sport, selection, teams_str in pending_detailed:
                  
-             if match_found:
-                 # Grade it
-                 try:
-                     outcome = grade_bet(selection, home, away, h_score, a_score, period_scores=None)
-                     if outcome and outcome != 'PENDING':
-                         safe_execute(cur, "UPDATE intelligence_log SET outcome = %s WHERE event_id = %s", (outcome, event_id))
-                         graded += 1
-                         log("GRADING", f"✅ Graded {event_id}: {selection} -> {outcome}")
-                 except Exception as e:
-                     log("ERROR", f"Grading error {event_id}: {e}")
+                 # Optimization: specific sport check if reliable
+                 # if g_sport and ps_sport not in g_sport: continue
+                 
+                 # Match logic: Checks if ESPN names are loosely in DB names
+                 # DB: "Philadelphia 76ers vs Boston Celtics"
+                 # ESPN: "76ers" vs "Celtics" (often shorter)
+                 
+                 # Clean match check
+                 match_found = False
+                 
+                 # Case 1: Loose containment
+                 if home in teams_str and away in teams_str:
+                     match_found = True
+                 # Case 2: Reverse
+                 elif away in teams_str and home in teams_str:
+                     match_found = True
+                     
+                 if match_found:
+                     # Grade it
+                     try:
+                         outcome = grade_bet(selection, home, away, h_score, a_score, period_scores=None)
+                         if outcome and outcome != 'PENDING':
+                             safe_execute(cur, "UPDATE intelligence_log SET outcome = %s WHERE event_id = %s", (outcome, event_id))
+                             graded += 1
+                             log("GRADING", f"✅ Graded {event_id}: {selection} -> {outcome}")
+                     except Exception as e:
+                         log("ERROR", f"Grading error {event_id}: {e}")
 
         conn.commit()
 

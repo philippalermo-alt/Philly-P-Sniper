@@ -30,7 +30,13 @@ def normalize_name(name):
         'nc': 'north carolina',
         'usc': 'southern california',
         'st': 'state',
-        'se': 'southeast'
+        'se': 'southeast',
+        'montréal': 'montreal',
+        'bodø': 'bodo',
+        'man city': 'manchester city',
+        'inter milan': 'internazionale',
+        'los angeles clippers': 'la clippers',
+        'tenn-martin': 'ut martin',
     }
     for k, v in replacements.items():
         if k in n:

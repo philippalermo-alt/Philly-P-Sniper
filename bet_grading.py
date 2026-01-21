@@ -37,6 +37,10 @@ def normalize_name(name):
         'inter milan': 'internazionale',
         'los angeles clippers': 'la clippers',
         'tenn-martin': 'ut martin',
+        'sporting lisbon': 'sporting cp',
+        'paris saint germain': 'paris saint-germain',
+        'olympiakos': 'olympiacos',
+        'piraeus': 'olympiacos',
     }
     for k, v in replacements.items():
         if k in n:

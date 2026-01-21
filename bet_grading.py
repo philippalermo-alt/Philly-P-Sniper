@@ -221,7 +221,7 @@ def settle_pending_bets():
             ]
             
             for d in dates_to_fetch:
-                og(f"Fetching scores for date: {d}")
+                log("GRADING", f"Fetching scores for date: {d}")
                 g_day = fetch_espn_scores(keys, specific_date=d)
                 live_games.extend(g_day)
                 

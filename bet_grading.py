@@ -254,6 +254,7 @@ def settle_pending_bets():
         log("GRADING", f"Checking {len(pending_detailed)} pending bets against {len(live_games)} games.")
 
         for event_id, sport, selection, teams_str in pending_detailed:
+             log("DEBUG", f"Pending: {selection} | Teams: {teams_str}")
              
              outcome = 'PENDING'
              

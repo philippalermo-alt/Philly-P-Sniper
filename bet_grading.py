@@ -268,6 +268,11 @@ def settle_pending_bets():
                  # Find the specific game for this bet
                  matched_game = None
                  for g in live_games:
+                     # DEBUG for Toledo
+                     if "Toledo" in teams_str and "Toledo" in g['away']:
+                          log("DEBUG", f"Checking Toledo: DB '{teams_str}' vs ESPN '{g['away']}'/'{g['home']}'")
+                          log("DEBUG", f"Fuzzy Home: {fuzzy_match(g['home'], teams_str)}, Fuzzy Away: {fuzzy_match(g['away'], teams_str)}")
+                     
                      # Check direct team match
                      if fuzzy_match(g['home'], teams_str) and fuzzy_match(g['away'], teams_str):
                          matched_game = g

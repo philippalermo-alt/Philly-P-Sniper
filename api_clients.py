@@ -105,7 +105,10 @@ def get_action_network_data():
                 if not home_name or not away_name:
                     continue
 
-                matchup_key = f"{away_name} @ {home_name}"
+                from utils import normalize_team_name
+                norm_h = normalize_team_name(home_name)
+                norm_a = normalize_team_name(away_name)
+                matchup_key = f"{norm_a} @ {norm_h}"
 
                 markets = g.get('markets', {})
                 if not markets:
@@ -129,7 +132,9 @@ def get_action_network_data():
                     bi = outcome.get('bet_info', {}) or {}
                     money_pct = normalize_pct((bi.get('money', {}) or {}).get('percent'))
                     ticket_pct = normalize_pct((bi.get('tickets', {}) or {}).get('percent'))
-                    put_split(matchup_key, "spread", team_name, money_pct, ticket_pct)
+                    
+                    from utils import normalize_team_name
+                    put_split(matchup_key, "spread", normalize_team_name(team_name), money_pct, ticket_pct)
 
                 # Moneyline (team sides; draw/tie sometimes present)
                 for outcome in picked_event.get('moneyline', []) or []:
@@ -139,7 +144,8 @@ def get_action_network_data():
                     if out_name and ("draw" in out_name.lower() or "tie" in out_name.lower()):
                         side_key = "Draw"
                     else:
-                        side_key = team_name
+                        from utils import normalize_team_name
+                        side_key = normalize_team_name(team_name)
                     if not side_key:
                         continue
                     bi = outcome.get('bet_info', {}) or {}
@@ -285,16 +291,17 @@ def get_nhl_player_stats(season=20242025):
         log("ERROR", f"Failed to fetch NHL stats: {e}")
         return {}
 
-def fetch_espn_scores(sport_keys):
+def fetch_espn_scores(sport_keys, specific_date=None):
     """
     Fetch live scores from ESPN's public hidden API (Free).
     Used for both Dashboard Live Scores and Bet Grading.
     
     Args:
         sport_keys (list): List of sport/league keys (e.g. ['NBA', 'NFL'])
+        specific_date (str, optional): Date in 'YYYYMMDD' format. If None, checks today + yesterday.
         
     Returns:
-        list: List of game dictionaries with keys: home, away, score, commence, status, home_score, away_score, is_complete
+        list: List of game dictionaries
     """
     import pytz
     
@@ -330,12 +337,15 @@ def fetch_espn_scores(sport_keys):
 
     processed_paths = set()
 
-    # FORCE US/EASTERN DATE logic for grading relevancy
-    tz = pytz.timezone('US/Eastern')
-    now_et = datetime.now(tz)
-    
-    # Check Today and Yesterday to catch late night games finished past midnight UTC
-    dates_to_check = [now_et.strftime('%Y%m%d'), (now_et - timedelta(days=1)).strftime('%Y%m%d')]
+    if specific_date:
+        dates_to_check = [specific_date]
+    else:
+        # FORCE US/EASTERN DATE logic for grading relevancy
+        tz = pytz.timezone('US/Eastern')
+        now_et = datetime.now(tz)
+        
+        # Check Today and Yesterday to catch late night games finished past midnight UTC
+        dates_to_check = [now_et.strftime('%Y%m%d'), (now_et - timedelta(days=1)).strftime('%Y%m%d')]
 
     for date_str in dates_to_check:
         for sport_key in unique_sports:
@@ -382,6 +392,7 @@ def fetch_espn_scores(sport_keys):
                         games.append({
                             'id': event['id'],
                             'sport_key': sport_key,
+                            'sport': sport_key,
                             'home': h_name,
                             'away': a_name,
                             'home_score': h_score,
@@ -397,3 +408,77 @@ def fetch_espn_scores(sport_keys):
                 continue
                 
     return games
+
+def get_nba_refs():
+    """
+    Scrape official NBA referee assignments from official.nba.com.
+    Returns:
+        list: List of dicts {'Game': 'Team A @ Team B', 'Crew Chief': str, 'Referee': str, 'Umpire': str}
+    """
+    from bs4 import BeautifulSoup
+    
+    url = "https://official.nba.com/referee-assignments/"
+    
+    # Robust headers to mimic a real browser
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': 'https://www.google.com/'
+    }
+    
+    log("REFS", f"Fetching NBA Referee Data from {url}...")
+    
+    try:
+        res = requests.get(url, headers=headers, timeout=15)
+        if res.status_code != 200:
+            log("WARN", f"Failed to fetch refs: {res.status_code}")
+            return []
+            
+        soup = BeautifulSoup(res.text, 'html.parser')
+        
+        # Finding the main table
+        table = soup.find('table', class_='table')
+        
+        if not table:
+            log("WARN", "No table found with class='table' on ref page.")
+            return []
+            
+        assignments = []
+        
+        # Iterate Rows (skip header)
+        rows = table.find_all('tr')
+        for row in rows:
+            cols = row.find_all('td')
+            if not cols:
+                continue # Header row or empty
+                
+            # Expected columns: Game, Crew Chief, Referee, Umpire, Alternate
+            # Game is text "Team A @ Team B"
+            game_str = cols[0].get_text(strip=True)
+            
+            def clean_ref(cell):
+                text = cell.get_text(strip=True)
+                # Remove (Number) e.g. "Scott Foster (#48)" -> "Scott Foster"
+                if "(" in text:
+                    text = text.split("(")[0].strip()
+                return text
+
+            chief = clean_ref(cols[1])
+            ref = clean_ref(cols[2])
+            umpire = clean_ref(cols[3])
+            
+            if game_str and chief:
+                assignments.append({
+                    'Game': game_str,
+                    'Crew Chief': chief,
+                    'Referee': ref,
+                    'Umpire': umpire
+                })
+                
+        log("REFS", f"Found {len(assignments)} referee assignments.")
+        return assignments
+
+    except Exception as e:
+        log("ERROR", f"Error scraping refs: {e}")
+        return []

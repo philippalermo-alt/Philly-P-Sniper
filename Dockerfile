@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     git \
     curl \
+    chromium \
+    chromium-driver \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements file
@@ -26,5 +28,9 @@ COPY . .
 # Expose Streamlit port
 EXPOSE 8501
 
-# Default command (can be overridden in docker-compose)
-CMD ["streamlit", "run", "dashboard.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Copy startup script
+COPY start.sh .
+RUN chmod +x start.sh
+
+# Default command matches start.sh
+CMD ["./start.sh"]

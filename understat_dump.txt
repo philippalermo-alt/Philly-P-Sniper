@@ -1,0 +1,15 @@
+🕵️ Probing Understat URL: https://understat.com/match/28989...
+📄 HTML Length: 29063
+📄 Header Preview:
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+		<base href="https://understat.com/">
+		<title>Brighton 1 - 1 Bournemouth (January 19 2026) | EPL | 2025/2026 | xG | Understat.com</title>
+        <meta charset="UTF-8" />
+		<meta name="description" content="Brighton 1 - 1 Bournemouth. Check out detailed player statistic, goals, assists, key passes, xG, shot map, xGplot.">
+		<meta name="Keywords" content="Brighton, Bournemouth, EPL, 2025/2026, (January 19 2026), xG, expected goals, shot map">
+		<meta 
+❌ 'rosterData' substring NOT found in HTML via requests.
+❌ Could not find rosterData pattern in HTML.
+❌ Could not find matchInfo pattern in HTML.

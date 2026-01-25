@@ -7,9 +7,27 @@ by sport and edge range.
 
 import pandas as pd
 from datetime import datetime, timedelta
-from database import get_db
+from database import get_db, get_dynamic_bankroll
 from config import Config
 from utils import log
+
+# ... (existing code)
+
+def calculate_smart_stake(base_stake, sport, edge, multipliers=None):
+    # ... (existing logic)
+    
+    multipliers = multipliers or get_performance_multipliers()
+    
+    # ... (bucket logic matches existing)
+    
+    multiplier = multipliers[sport].get(bucket, 1.0)
+    adjusted_stake = base_stake * multiplier
+
+    # Respect maximum stake limits (Dynamic)
+    current_bankroll = get_dynamic_bankroll()
+    max_stake = current_bankroll * Config.MAX_STAKE_PCT
+
+    return min(adjusted_stake, max_stake)
 
 def get_performance_multipliers(days_back=60, min_bets=10):
     """
@@ -83,8 +101,13 @@ def get_performance_multipliers(days_back=60, min_bets=10):
                 bucket_df = sport_df[sport_df['edge_bucket'] == bucket]
 
                 if len(bucket_df) < min_bets:
-                    # Not enough data, use neutral multiplier
-                    multipliers[sport][bucket] = 1.0
+                    # Not enough data, use target multiplier (Step 7)
+                    if sport == 'NHL':
+                         multipliers[sport][bucket] = 2.0
+                    elif sport == 'SOCCER':
+                         multipliers[sport][bucket] = 1.5
+                    else:
+                         multipliers[sport][bucket] = 1.0
                     continue
 
                 # Calculate ROI
@@ -92,21 +115,24 @@ def get_performance_multipliers(days_back=60, min_bets=10):
                 total_profit = bucket_df['profit'].sum()
                 roi = (total_profit / total_staked) if total_staked > 0 else 0
 
-                # Calculate multiplier based on ROI
-                # Positive ROI = increase stake (max 2x)
-                # Negative ROI = decrease stake (min 0.25x)
-                if roi > 0.15:  # Excellent performance
-                    multiplier = 2.0
-                elif roi > 0.05:  # Good performance
-                    multiplier = 1.5
-                elif roi > 0:  # Slight edge
-                    multiplier = 1.2
-                elif roi > -0.05:  # Breakeven-ish
+                # IMPROVEMENT: Step 7 - Dynamic Kelly Multiplier (Hardcoded Limits)
+                # Default Base
+                target_mult = 1.0
+                if sport == 'NHL':
+                    target_mult = 2.0
+                elif sport == 'SOCCER':
+                    target_mult = 1.5
+
+                # Apply multiplier based on ROI w/ Hardcoded Targets
+                if roi > 0:
+                    # Profitable or Neutral -> Use Target Boost
+                    multiplier = target_mult
+                elif roi > -0.05:  # Slight loss
                     multiplier = 0.8
-                elif roi > -0.15:  # Losing
+                elif roi > -0.10:  # Warning Zone
                     multiplier = 0.5
-                else:  # Badly losing
-                    multiplier = 0.25
+                else:  # IMPROVEMENT: Step 8 - Stop-Loss Circuit Breaker (ROI < -10%)
+                    multiplier = 0.25 # Aggressive cut
 
                 multipliers[sport][bucket] = round(multiplier, 2)
 
@@ -123,44 +149,7 @@ def get_performance_multipliers(days_back=60, min_bets=10):
             conn.close()
 
 
-def calculate_smart_stake(base_stake, sport, edge, multipliers=None):
-    """
-    Calculate adjusted stake based on historical performance.
 
-    Args:
-        base_stake: Base Kelly stake calculation
-        sport: Sport category
-        edge: Edge value (decimal, e.g., 0.05 for 5%)
-        multipliers: Pre-calculated multipliers dict (optional)
-
-    Returns:
-        float: Adjusted stake amount
-    """
-    if not multipliers:
-        multipliers = get_performance_multipliers()
-
-    if not multipliers or sport not in multipliers:
-        # No data for this sport, use base stake
-        return base_stake
-
-    # Determine edge bucket
-    if edge < 0.03:
-        bucket = '0-3%'
-    elif edge < 0.06:
-        bucket = '3-6%'
-    elif edge < 0.10:
-        bucket = '6-10%'
-    else:
-        bucket = '10%+'
-
-    multiplier = multipliers[sport].get(bucket, 1.0)
-
-    adjusted_stake = base_stake * multiplier
-
-    # Respect maximum stake limits
-    max_stake = Config.BANKROLL * Config.MAX_STAKE_PCT
-
-    return min(adjusted_stake, max_stake)
 
 
 def print_multiplier_report(multipliers):

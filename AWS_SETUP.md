@@ -30,14 +30,38 @@ I have set up **Terraform** to automate your server creation.
     *   Type `yes` when asked.
 
 ## 🔑 Accessing the Server
-Once finished, Terraform will output your **Server IP** and the **SSH Command**.
-A file named `philly_key.pem` will be created in the `infrastructure/` folder.
+**Success!** Your server is live.
+
+**Public IP:** `100.48.72.44`
+**SSH Key:** `secrets/philly_key.pem`
 
 **To connect:**
-```bash
-cd infrastructure
-ssh -i philly_key.pem ubuntu@<IP_ADDRESS>
-```
+1.  Open Terminal.
+2.  Run this exact command:
+    ```bash
+    ssh -i secrets/philly_key.pem ubuntu@100.48.72.44
+    ```
+
+## 📦 Next Steps (Deploying the App on AWS)
+Once you are logged into the server:
+1.  **Clone the Repo**:
+    ```bash
+    git clone https://github.com/your-username/Philly-P-Sniper.git
+    cd Philly-P-Sniper
+    ```
+2.  **Setup Keys**:
+    Create a `.env` file with your API keys:
+    ```bash
+    nano .env
+    # Paste your keys here (ODDS_API_KEY, DATABASE_URL, etc.)
+    # Ctrl+O to save, Ctrl+X to exit
+    ```
+3.  **Run with Docker**:
+    ```bash
+    sudo docker-compose up -d --build
+    ```
+4.  **View Dashboard**:
+    Open `http://100.48.72.44` in your browser. (No port needed!)
 
 ## 🧹 Tearing Down (Stop Billing)
 If you want to delete everything:

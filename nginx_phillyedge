@@ -1,0 +1,20 @@
+server {
+    listen 80;
+    server_name phillypsniper.com www.phillypsniper.com;
+    return 301 https://phillyedge.ai$request_uri;
+}
+
+server {
+    listen 80;
+    server_name phillyedge.ai www.phillyedge.ai 100.48.72.44;
+
+    location / {
+        proxy_pass http://localhost:8501/;
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 86400;
+    }
+}

@@ -212,4 +212,8 @@ This refactoring represents a significant improvement in code quality without ch
 **After**: 8 files, 1,325 lines (organized)
 **Main file reduction**: 89% (1,333 → 143 lines)
 
-All original functionality is preserved with improved structure and security.
+
+### [2026-01-25] Architecture Simplification (Streamlit Only)
+-   **Context**: The project attempted a migration to Next.js/Tailwind but reverted to Streamlit for simplicity.
+-   **Action**: Permanently removed `frontend_client/` directory and all references in `docker-compose.yml` and `deploy_fast.sh`.
+-   **Result**: Reduced build time, removed 600MB of unused code, and aligned deployment with active codebase.

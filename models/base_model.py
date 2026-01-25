@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, log_loss
 import joblib
 import os
-from database import get_db
+from db.connection import get_db
 
 class BaseModel:
     """
@@ -97,7 +97,7 @@ class BaseModel:
             if os.path.exists(self.model_path):
                 self.model = joblib.load(self.model_path)
             else:
-                return 0.5 # Default neutral
+                return input_data.get('true_prob', 0.5)
 
         row = {k: input_data.get(k, 0) for k in self.features}
         X = pd.DataFrame([row])

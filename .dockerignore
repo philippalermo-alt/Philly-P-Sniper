@@ -1,7 +1,15 @@
-venv/
-__pycache__/
+backups/
+January 25 Disaster Recovery/
+deprecated/
+*.tar.gz
+*.csv
+philly-p-client.tar.gz
+philly-sniper-backend.tar.gz
+infrastructure/
 .git/
-.env
-.DS_Store
-*.pyc
-run_output.txt
+.venv/
+venv/
+node_modules/
+.next/
+__pycache__/
+*.log

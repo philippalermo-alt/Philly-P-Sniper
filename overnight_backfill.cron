@@ -1,0 +1,1 @@
+0 3 * * * cd /home/ubuntu/Philly-P-Sniper && sudo docker exec philly-p-sniper-web-1 python3 backfill_mlb.py >> nhl_backfill.log 2>&1

@@ -13,57 +13,35 @@ load_dotenv()
 import difflib
 import textwrap
 from processing.backtesting import analyze_by_edge_bucket, analyze_clv
-from processing.parlay import generate_parlays
+# from processing.parlay import generate_parlays (REMOVED)
 import re
 from db.connection import get_db, get_last_update_time, get_starting_bankroll, update_bankroll, surgical_cleanup
+from db.queries import (
+    fetch_pending_opportunities, fetch_settled_bets, fetch_distinct_sports, 
+    update_user_bet, cancel_user_bet, save_parlay
+)
 
 def check_auth(module_name="Admin"):
     """Simple authorization check."""
-    # Could check st.session_state['authenticated'] here
-    return True
+    # 1. Check if already authorized in session
+    if st.session_state.get(f'auth_{module_name}', False):
+        return True
 
-def get_sharp_badge(row):
-    """Generate HTML badge with Tiered Status + Money/Ticket splits."""
-    try:
-        val = row.get('sharp_score')
-        
-        # Robust conversion
-        try:
-            score = float(val)
-        except (ValueError, TypeError):
-            # If conversion fails (None, string, etc), treat as No Signal
-            return "<span style='color: #94A3B8; font-size: 10px; font-weight: 600; background: #1E293B; border: 1px solid #334155; padding: 1px 4px; border-radius: 4px;'>📡 NO SIGNAL</span>"
+    # 2. Render Login Form
+    with st.expander(f"🔐 Authenticate: {module_name}", expanded=True):
+        password = st.text_input("Admin Password", type="password", key=f"pw_{module_name}")
+        if st.button("Unlock", key=f"btn_unlock_{module_name}"):
+            # Check against Env
+            admin_pw = os.getenv("ADMIN_PASSWORD", "admin123") # Default only if env missing
+            if password == admin_pw:
+                st.session_state[f'auth_{module_name}'] = True
+                st.success("Unlocked.")
+                st.rerun()
+            else:
+                st.error("Invalid Password")
+    
+    return False
 
-        if pd.isna(score):
-            return "<span style='color: #94A3B8; font-size: 10px; font-weight: 600; background: #1E293B; border: 1px solid #334155; padding: 1px 4px; border-radius: 4px;'>📡 NO SIGNAL</span>"
-        
-        # Safely get Money/Ticket stats
-        try:
-            money = int(float(row.get('money_pct') or 0))
-            ticket = int(float(row.get('ticket_pct') or 0))
-        except:
-            money, ticket = 0, 0
-        
-        if score >= 70:
-             badge = "<span style='background: linear-gradient(90deg, #F59E0B, #D97706); color: black; padding: 2px 6px; border-radius: 4px; font-weight: 800; font-size: 10px; box-shadow: 0 0 5px rgba(245,158,11,0.5);'>🔥 SHARP</span>"
-        elif score >= 45:
-             badge = "<span style='background: #3B82F6; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px;'>🔵 LEAN</span>"
-        elif score >= 25:
-             badge = "<span style='background: #64748B; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 10px;'>⚪ NEUTRAL</span>"
-        else:
-             # If score is low (<25), check if we actually have data
-             if money == 0 and ticket == 0:
-                  return "<span style='color: #94A3B8; font-size: 10px; font-weight: 600; background: #1E293B; border: 1px solid #334155; padding: 1px 4px; border-radius: 4px;'>📡 NO SIGNAL</span>"
-             
-             badge = "<span style='background: #EF4444; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px;'>⛔ PUBLIC</span>"
-             
-        stats = f"<span style='color: #94A3B8; margin-left: 6px; font-size: 10px; font-family: monospace;'>💰{money}% 🎟️{ticket}%</span>"
-        
-        return f"{badge} {stats}"
-
-    except Exception as e:
-        # Last resort fallback
-        return "<span style='color: #64748B; font-size: 10px;'>...</span>"
 
 def clean_html(html_str):
     """Flatten HTML string to single line to avoid Markdown interpreting indentation as code blocks."""
@@ -233,20 +211,7 @@ def confirm_bet(event_id, odds, stake):
         return
 
     try:
-        cur = conn.cursor()
-        print(f"   ✅ [DASHBOARD] Executing UPDATE for {event_id}", flush=True)
-        
-        # Set user_bet to TRUE and update odds/stake
-        cur.execute("""
-            UPDATE intelligence_log 
-            SET user_bet = TRUE, user_odds = %s, user_stake = %s 
-            WHERE event_id = %s
-        """, (float(odds), float(stake), str(event_id)))
-        
-        rows = cur.rowcount
-        conn.commit()
-        cur.close()
-        
+        rows = update_user_bet(conn, event_id, float(odds), float(stake))
         print(f"   ✅ [DASHBOARD] Rows affected: {rows}", flush=True)
         
         if rows > 0:
@@ -257,6 +222,8 @@ def confirm_bet(event_id, odds, stake):
     except Exception as e:
         print(f"❌ [DASHBOARD] Error: {e}", flush=True)
         st.session_state['toast_msg'] = (f"❌ Error tracking bet: {e}", "error")
+    finally:
+        conn.close()
 
 # ... (skip to cancel_bet_db)
 
@@ -270,15 +237,7 @@ def cancel_bet_db(event_id):
         return
 
     try:
-        cur = conn.cursor()
-        print(f"   ❌ [DASHBOARD] Executing UPDATE for {event_id}", flush=True)
-        
-        # Set user_bet to FALSE
-        cur.execute("UPDATE intelligence_log SET user_bet = FALSE WHERE event_id = %s", (str(event_id),))
-        rows = cur.rowcount
-        conn.commit()
-        cur.close()
-        
+        rows = cancel_user_bet(conn, event_id)
         print(f"   ✅ [DASHBOARD] Rows affected: {rows}", flush=True)
         
         if rows > 0:
@@ -289,29 +248,11 @@ def cancel_bet_db(event_id):
     except Exception as e:
         print(f"❌ [DASHBOARD] Error: {e}", flush=True)
         st.session_state['toast_msg'] = (f"❌ Error cancelling bet: {e}", "error")
+    finally:
+        conn.close()
 
 
-def confirm_parlay(event_id, odds, stake, selection_text, legs_desc):
-    conn = get_db()
-    try:
-        cur = conn.cursor()
-        
-        # Check if already exists
-        cur.execute("SELECT event_id FROM intelligence_log WHERE event_id = %s", (event_id,))
-        if cur.fetchone():
-            return # Already tracked
-            
-        cur.execute("""
-            INSERT INTO intelligence_log 
-            (event_id, timestamp, kickoff, sport, teams, selection, odds, true_prob, edge, stake, user_bet, user_odds, user_stake, outcome)
-            VALUES (%s, NOW(), NOW(), 'PARLAY', 'Edge Triple', %s, %s, 0, 0, %s, TRUE, %s, %s, 'PENDING')
-        """, (event_id, selection_text, odds, stake, odds, stake))
-        
-        conn.commit()
-        cur.close()
-        st.rerun()
-    except Exception as e:
-        st.error(f"Error tracking parlay: {e}")
+# confirm_parlay function removed (Logic deprecated)
 
 # --- Data Fetching ---
 @st.cache_data(ttl=60)
@@ -402,8 +343,11 @@ with col2:
 
 st.markdown("---")
 
+
 # --- Main Database Connection ---
 conn = get_db()
+
+
 
 # --- Sidebar ---
 with st.sidebar:
@@ -452,7 +396,7 @@ with st.sidebar:
     with c2: max_edge_filter = st.number_input("Max Edge %", 0.0, 100.0, 100.0, 0.5)
 
     # --- RESTORED SPORT FILTER ---
-    all_sports = sorted(list(set(pd.read_sql("SELECT DISTINCT sport FROM intelligence_log", conn)['sport'].tolist()))) if conn else []
+    all_sports = sorted(fetch_distinct_sports(conn))
     # Clean up sport names for display
     display_sports = [s.replace('basketball_', '').replace('americanfootball_', '').replace('icehockey_', '').replace('soccer_', '').upper() for s in all_sports]
     
@@ -460,6 +404,7 @@ with st.sidebar:
 
     mobile_view = st.checkbox("📱 Mobile View", value=False)
     if st.button("🔄 Refresh Data", use_container_width=True):
+        st.cache_data.clear()
         st.rerun()
 
 
@@ -475,10 +420,14 @@ if conn:
             elif type_ == 'warning': st.warning(msg)
             del st.session_state['toast_msg']
             
-        # Fetch Data
-        df_p = pd.read_sql("SELECT * FROM intelligence_log WHERE outcome = 'PENDING' AND timestamp >= NOW() - INTERVAL '24 HOURS' ORDER BY kickoff ASC LIMIT 500", conn)
-        df_s = pd.read_sql("SELECT * FROM intelligence_log WHERE outcome IN ('WON', 'LOST', 'PUSH') ORDER BY kickoff DESC", conn)
-        conn.commit()
+        # Fetch Data (Cached to prevent DB spam on filter change)
+        @st.cache_data(ttl=30, show_spinner=False)
+        def get_cached_dashboard_data():
+             p = fetch_pending_opportunities(conn, limit=1000) # Bumped limit slightly since cached
+             s = fetch_settled_bets(conn)
+             return p, s
+
+        df_p, df_s = get_cached_dashboard_data()
 
         def clean_df(df):
             if df.empty: return df
@@ -500,6 +449,41 @@ if conn:
             df['Dec_Odds'] = df.apply(lambda row: get_val(row, 'odds'), axis=1)
             df['Edge_Val'] = pd.to_numeric(df['edge'], errors='coerce').fillna(0)
             df['Edge'] = df['Edge_Val'].apply(lambda x: f"{x*100:.1f}%")
+            
+            # --- GLOBAL TIME FILTER (ALWAYS ON) ---
+            # 1. No Past Games (Live/Started)
+            # 2. No Distant Future (> 36 Hours)
+            now_est = pd.Timestamp.now(tz='US/Eastern')
+            limit_est = now_est + pd.Timedelta(hours=36)
+            
+            # Filter Logic:
+            # Keep if (User Bet == TRUE) OR (Kickoff > Now AND Kickoff <= Limit)
+            # We want to keep User Bets visible even if started? 
+            # User said "filter out selections that are past their start time. Always, no exceptions"
+            # BUT usually Portfolio needs to show active bets.
+            # Assuming "Selections" means "Recommendations". Portfolio is "My Bets".
+            # Let's apply strict filter for Recommendations. Portfolio handles its own display.
+            
+            # Actually, `clean_df` is applied to df_p (Pending) and df_s (Settled).
+            # Settled shouldn't be filtered by time.
+            # Pending includes User Bets.
+            
+            # Let's just return the df here and apply the filter strictly on df_pending below
+            # OR map a boolean mask.
+            
+            mask_future = (df['kickoff'] > now_est) & (df['kickoff'] <= limit_est)
+            mask_user = (df.get('user_bet', False) == True)
+            
+            # STRICT RULE: Dashboard only shows FUTURE opportunities.
+            # However, for "Active Portfolio" (Tab 2), we MUST show started games that are pending result.
+            # The User said: "automatically filter out selections that are past their start time" -> usually implies the Betting Feed.
+            # "The NHL props are now on the dashboard, but they persist after start time." -> Feed.
+            
+            # Safe Approach: Filter df_pending to exclude NON-USER-BET rows that are past start time.
+            # Keep User Bets regardless of time (so they show in Portfolio).
+            
+            df = df[mask_future | mask_user].copy()
+            
             return df
 
         df_pending = clean_df(df_p)
@@ -516,24 +500,52 @@ if conn:
         st.markdown(f"<div style='text-align: center; color: #FFFFFF; font-size: 14px; font-weight: 700; margin-bottom: 20px;'>🕒 Last Updated: {last_run}</div>", unsafe_allow_html=True)
 
         # Tab Structure
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(["⚡ Live Edge Feed", "💼 Active Portfolio", "⚽ Player Prop Edges", "🛠️ Admin & Analytics", "👁️ Truth (Calibration)"])
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["⚡ Live Edge Feed", "💼 Active Portfolio", "admin_tools", "👁️ Truth (Calibration)", "📈 Performance"])
+        # Note: Renaming tabs to match user expectation: "Admin Tools" was in list.
+        # Original: ["⚡ Live Edge Feed", "💼 Active Portfolio", "⚽ Player Prop Edges", "🛠️ Admin & Analytics", "👁️ Truth (Calibration)", "📈 Performance"]
+        # Removed "Player Prop Edges" instead of Parlay? wait. 
+        # User said "Remove Parlay Builder".
+        # Let's align with what was likely intended:
+        # T1: Live Feed
+        # T2: Portfolio
+        # T3: Props? Or Admin?
+        # Let's stick to safe structure:
         
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["⚡ Live Edge Feed", "💼 Active Portfolio", "⚽ Player Props", "🛠️ Admin", "📈 Performance"])
+
         with tab1:
-            if not df_pending.empty:
-                # Common Vars
-                now_est = pd.Timestamp.now(tz='US/Eastern')
-                
-                # --- SECTION 1: TOP 15 OPPORTUNITIES ---
                 st.markdown("### ⚡ Top 15 Opportunities")
                 st.caption("Best value plays from every available sport, sorted by kickoff.")
                 
-                # Base Filter: Future Games + Not Bet + Edge 3-15% + NOT PROPS
+                # Base Filter: Future Games + Not Bet + Edge 3-15% + NOT PROPS + 36H LIMIT
                 top_pool = df_pending[
                     (df_pending['user_bet'] == False) & 
                     (df_pending['kickoff'] > now_est) &
+                    (df_pending['kickoff'] <= (now_est + pd.Timedelta(hours=36))) &
                     (df_pending['Edge_Val'] >= 0.03) & 
                     (df_pending['Edge_Val'] <= 0.15) &
-                    (~df_pending['event_id'].astype(str).str.startswith('PROP_'))
+                    (~df_pending['event_id'].astype(str).str.startswith(('PROP_', 'NHL_')))
+                ].copy()
+
+# ...
+
+                sharp_pool = df_pending[
+                    (df_pending['user_bet'] == False) & 
+                    (df_pending['kickoff'] > now_est) &
+                    (df_pending['kickoff'] <= (now_est + pd.Timedelta(hours=36))) &
+                    (pd.to_numeric(df_pending['sharp_score'], errors='coerce') >= 70)
+                ].copy()
+
+# ...
+
+
+# ...
+
+                # Filter out started games + 36H Limit
+                prop_df = df_pending[
+                    (df_pending['event_id'].astype(str).str.startswith(('PROP_', 'NHL_'))) &
+                    (df_pending['kickoff'] > now_est) &
+                    (df_pending['kickoff'] <= (now_est + pd.Timedelta(hours=36)))
                 ].copy()
                 
                 top_picks = []
@@ -564,13 +576,28 @@ if conn:
                     # Render Cards
                     t_cols = st.columns(3)
                     for idx, (_, row) in enumerate(final_top_df.iterrows()):
-                        badge = get_sharp_badge(row)
+                        # Logic for Integrated Sharp Label
+                        sharp_score = pd.to_numeric(row.get('sharp_score'), errors='coerce')
+                        sharp_suffix = ""
+                        if sharp_score >= 70:
+                                sharp_suffix = "<span style='color: #F59E0B; font-size: 10px; margin-left: 4px;'>🔥 SHARP</span>"
+                        elif sharp_score >= 45:
+                                sharp_suffix = "<span style='color: #60A5FA; font-size: 10px; margin-left: 4px;'>🔵 LEAN</span>"
+
+                        # Logic for Ticket/Money %
+                        t_pct = pd.to_numeric(row.get('ticket_pct'), errors='coerce')
+                        m_pct = pd.to_numeric(row.get('money_pct'), errors='coerce')
+                        sharp_data_line = ""
+                        if pd.notna(t_pct) and pd.notna(m_pct) and (t_pct > 0 or m_pct > 0):
+                             sharp_data_line = f"<div style='color: #FCD34D; font-size: 11px; margin-top: 4px; font-family: monospace;'>🎟️ {int(t_pct)}% | 💰 {int(m_pct)}%</div>"
+                        else:
+                             sharp_data_line = "<div style='color: #475569; font-size: 10px; margin-top: 4px;'>No Signal</div>"
+
                         with t_cols[idx % 3]:
                             st.markdown(clean_html(f"""
                             <div style='background: #1E293B; padding: 12px; border-radius: 8px; border-left: 4px solid #F59E0B; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);'>
                                 <div style='display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;'>
                                     <span style='color: #94A3B8; font-size: 11px; font-weight: 600;'>{row['Sport']} • {row['Kickoff']}</span>
-                                    {badge}
                                 </div>
                                 <div style='color: #F8FAFC; font-size: 13px; font-weight: 700; margin-bottom: 6px; line-height: 1.2;'>{row['Event']}</div>
                                 <div style='display: flex; justify-content: space-between; align-items: center; background: #334155; padding: 6px; border-radius: 6px;'>
@@ -580,12 +607,9 @@ if conn:
                                 <div style='display: flex; justify-content: space-between; margin-top: 8px; padding-top: 4px; border-top: 1px solid #334155;'>
                                     <div>
                                         <div style='color: #94A3B8; font-size: 10px;'>EDGE</div>
-                                        <div style='color: #10B981; font-weight: 700; font-size: 14px;'>{row['Edge']}</div>
+                                        <div style='color: #10B981; font-weight: 700; font-size: 14px;'>{row['Edge']} {sharp_suffix}</div>
                                     </div>
-                                    <div style='text-align: right;'>
-                                        <div style='color: #94A3B8; font-size: 10px;'>STAKE</div>
-                                        <div style='color: #F59E0B; font-weight: 700; font-size: 14px;'>{row['Stake']}</div>
-                                    </div>
+                                    {sharp_data_line}
                                 </div>
                             </div>
                             """), unsafe_allow_html=True)
@@ -614,30 +638,47 @@ if conn:
 
                 # --- SECTION 2: SHARP INTEL (Score >= 70) ---
                 st.markdown("### 🧠 Sharp Intel")
-                st.info("ℹ️ **Explainer**: These plays feature high Sharp Scores (>= 70), indicating significant 'Smart Money' action (High Money % vs Low Ticket %). They may not fit our statistical model's edge criteria, but the market is moving heavily on them.")
+                st.info("ℹ️ **Explainer**: These plays feature high Sharp Scores (>= 70).")
                 
                 sharp_pool = df_pending[
-                    (df_pending['user_bet'] == False) & 
-                    (df_pending['kickoff'] > now_est) &
-                    (pd.to_numeric(df_pending['sharp_score'], errors='coerce') >= 70)
-                ].copy()
+                        (df_pending['user_bet'] == False) & 
+                        (df_pending['kickoff'] > now_est) &
+                        (pd.to_numeric(df_pending['sharp_score'], errors='coerce') >= 70)
+                    ].copy()
                 
+    
                 if not sharp_pool.empty:
                     sharp_pool = sharp_pool.sort_values('kickoff', ascending=True)
-                    # s_cols = st.columns(3) <--- REMOVED COLUMNS
                     for idx, (_, row) in enumerate(sharp_pool.iterrows()):
-                         badge = get_sharp_badge(row)
-                         # with s_cols[idx % 3]: <--- REMOVED CONTEXT MANAGER
+                         
+                         # Integrated Label
+                         sharp_suffix = "<span style='color: #F59E0B; font-size: 10px; margin-left: 4px;'>🔥 SHARP</span>"
+                         
+                         # Logic for Ticket/Money %
+                         t_pct = pd.to_numeric(row.get('ticket_pct'), errors='coerce')
+                         m_pct = pd.to_numeric(row.get('money_pct'), errors='coerce')
+                         sharp_data_line = ""
+                         if pd.notna(t_pct) and pd.notna(m_pct) and (t_pct > 0 or m_pct > 0):
+                             sharp_data_line = f"<div style='color: #FCD34D; font-size: 11px; margin-top: 4px; font-family: monospace;'>🎟️ {int(t_pct)}% | 💰 {int(m_pct)}%</div>"
+                         else:
+                             sharp_data_line = "<div style='color: #475569; font-size: 10px; margin-top: 4px;'>No Signal</div>"
+
                          st.markdown(clean_html(f"""
                             <div style='background: #1E293B; padding: 12px; border-radius: 8px; border-left: 4px solid #60A5FA; margin-bottom: 12px; opacity: 0.9;'>
                                 <div style='display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;'>
                                     <span style='color: #94A3B8; font-size: 11px; font-weight: 600;'>{row['Sport']} • {row['Kickoff']}</span>
-                                    {badge}
                                 </div>
                                 <div style='color: #F8FAFC; font-size: 13px; font-weight: 700; margin-bottom: 6px; line-height: 1.2;'>{row['Event']}</div>
                                 <div style='display: flex; justify-content: space-between; align-items: center; background: #334155; padding: 6px; border-radius: 6px;'>
                                     <div style='color: #60A5FA; font-weight: 700; font-size: 14px;'>{row['Selection']}</div>
                                     <div style='color: #F8FAFC; font-size: 13px;'>@{row['Dec_Odds']:.2f}</div>
+                                </div>
+                                <div style='display: flex; justify-content: space-between; margin-top: 8px; padding-top: 4px; border-top: 1px solid #334155;'>
+                                    <div>
+                                        <div style='color: #94A3B8; font-size: 10px;'>EDGE</div>
+                                        <div style='color: #10B981; font-weight: 700; font-size: 14px;'>{row['Edge']} {sharp_suffix}</div>
+                                    </div>
+                                    {sharp_data_line}
                                 </div>
                             </div>
                             """), unsafe_allow_html=True)
@@ -666,7 +707,7 @@ if conn:
                     (df_pending['kickoff'] > now_est) &
                     (df_pending['Edge_Val'] >= (min_edge_filter / 100.0)) &
                     (df_pending['Edge_Val'] <= (max_edge_filter / 100.0)) &
-                    (~df_pending['event_id'].astype(str).str.startswith('PROP_')) &
+                    (~df_pending['event_id'].astype(str).str.startswith(('PROP_', 'NHL_'))) &
                     (~df_pending['event_id'].isin(displayed_ids))
                 ].copy()
 
@@ -674,13 +715,28 @@ if conn:
                     general_pool = general_pool.sort_values('kickoff', ascending=True)
                     g_cols = st.columns(2) # 2 per row
                     for idx, (_, row) in enumerate(general_pool.iterrows()):
-                        badge = get_sharp_badge(row)
+                        # Logic for Integrated Sharp Label
+                        sharp_score = pd.to_numeric(row.get('sharp_score'), errors='coerce')
+                        sharp_suffix = ""
+                        if sharp_score >= 70:
+                             sharp_suffix = "<span style='color: #F59E0B; font-size: 10px; margin-left: 4px;'>🔥 SHARP</span>"
+                        elif sharp_score >= 45:
+                             sharp_suffix = "<span style='color: #60A5FA; font-size: 10px; margin-left: 4px;'>🔵 LEAN</span>"
+
+                        # Logic for Ticket/Money %
+                        t_pct = pd.to_numeric(row.get('ticket_pct'), errors='coerce')
+                        m_pct = pd.to_numeric(row.get('money_pct'), errors='coerce')
+                        sharp_data_line = ""
+                        if pd.notna(t_pct) and pd.notna(m_pct) and (t_pct > 0 or m_pct > 0):
+                             sharp_data_line = f"<div style='color: #FCD34D; font-size: 11px; margin-top: 4px; font-family: monospace;'>🎟️ {int(t_pct)}% | 💰 {int(m_pct)}%</div>"
+                        else:
+                             sharp_data_line = "<div style='color: #475569; font-size: 10px; margin-top: 4px;'>No Signal</div>"
+
                         with g_cols[idx % 2]:
                             st.markdown(clean_html(f"""
                             <div style='background: #1E293B; padding: 12px; border-radius: 8px; border-left: 4px solid #10B981; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);'>
                                 <div style='display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;'>
                                     <span style='color: #94A3B8; font-size: 11px; font-weight: 600;'>{row['Sport']} • {row['Kickoff']}</span>
-                                    {badge}
                                 </div>
                                 <div style='color: #F8FAFC; font-size: 13px; font-weight: 700; margin-bottom: 6px; line-height: 1.2;'>{row['Event']}</div>
                                 <div style='display: flex; justify-content: space-between; align-items: center; background: #334155; padding: 6px; border-radius: 6px;'>
@@ -690,12 +746,9 @@ if conn:
                                 <div style='display: flex; justify-content: space-between; margin-top: 8px; padding-top: 4px; border-top: 1px solid #334155;'>
                                     <div>
                                         <div style='color: #94A3B8; font-size: 10px;'>EDGE</div>
-                                        <div style='color: #10B981; font-weight: 700; font-size: 14px;'>{row['Edge']}</div>
+                                        <div style='color: #10B981; font-weight: 700; font-size: 14px;'>{row['Edge']} {sharp_suffix}</div>
                                     </div>
-                                    <div style='text-align: right;'>
-                                        <div style='color: #94A3B8; font-size: 10px;'>STAKE</div>
-                                        <div style='color: #F59E0B; font-weight: 700; font-size: 14px;'>{row['Stake']}</div>
-                                    </div>
+                                    {sharp_data_line}
                                 </div>
                             </div>
                             """), unsafe_allow_html=True)
@@ -717,10 +770,10 @@ if conn:
 
                                 if st.button("Confirm", key=f"g_btn_{row['event_id']}", use_container_width=True):
                                     confirm_bet(row['event_id'], u_odds, u_stake)
+                    else:
+                        st.caption("No other value plays detected.")
                 else:
-                    st.caption("No other value plays detected.")
-            else:
-                st.info("📭 No pending games found.")
+                    st.info("📭 No pending games found.")
 
         # --- TAB 2: PORTFOLIO ---
         with tab2:
@@ -779,7 +832,7 @@ if conn:
             # Prop Cards
             # Filter out started games
             prop_df = df_pending[
-                (df_pending['event_id'].astype(str).str.startswith('PROP_')) &
+                (df_pending['event_id'].astype(str).str.startswith(('PROP_', 'NHL_'))) &
                 (df_pending['kickoff'] > now_est)
             ].copy()
             if not prop_df.empty:
@@ -796,13 +849,28 @@ if conn:
 
                 pcols = st.columns(3)
                 for i, (_, row) in enumerate(prop_df.iterrows()):
-                    badge = get_sharp_badge(row) # Use badge logic even if sparse for props
+                    # Logic for Integrated Sharp Label
+                    sharp_score = pd.to_numeric(row.get('sharp_score'), errors='coerce')
+                    sharp_suffix = ""
+                    if sharp_score >= 70:
+                            sharp_suffix = "<span style='color: #F59E0B; font-size: 10px; margin-left: 4px;'>🔥 SHARP</span>"
+                    elif sharp_score >= 45:
+                            sharp_suffix = "<span style='color: #60A5FA; font-size: 10px; margin-left: 4px;'>🔵 LEAN</span>"
+
+                    # Logic for Ticket/Money %
+                    t_pct = pd.to_numeric(row.get('ticket_pct'), errors='coerce')
+                    m_pct = pd.to_numeric(row.get('money_pct'), errors='coerce')
+                    sharp_data_line = ""
+                    if pd.notna(t_pct) and pd.notna(m_pct) and (t_pct > 0 or m_pct > 0):
+                            sharp_data_line = f"<div style='color: #FCD34D; font-size: 11px; margin-top: 4px; font-family: monospace;'>🎟️ {int(t_pct)}% | 💰 {int(m_pct)}%</div>"
+                    else:
+                            sharp_data_line = "<div style='color: #475569; font-size: 10px; margin-top: 4px;'>No Signal</div>"
+
                     with pcols[i % 3]:
                         st.markdown(clean_html(f"""
                         <div style='background: #1E293B; padding: 12px; border-radius: 8px; border-left: 4px solid #3B82F6; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);'>
                             <div style='display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;'>
                                 <span style='color: #94A3B8; font-size: 11px; font-weight: 600;'>{row['Sport']} • {row['Kickoff']}</span>
-                                {badge}
                             </div>
                             <div style='color: #F8FAFC; font-size: 13px; font-weight: 700; margin-bottom: 6px; line-height: 1.2;'>{row['Event']}</div>
                             <div style='display: flex; justify-content: space-between; align-items: center; background: #334155; padding: 6px; border-radius: 6px;'>
@@ -812,12 +880,9 @@ if conn:
                             <div style='display: flex; justify-content: space-between; margin-top: 8px; padding-top: 4px; border-top: 1px solid #334155;'>
                                 <div>
                                     <div style='color: #94A3B8; font-size: 10px;'>EDGE</div>
-                                    <div style='color: #10B981; font-weight: 700; font-size: 14px;'>{row['Edge']}</div>
+                                    <div style='color: #10B981; font-weight: 700; font-size: 14px;'>{row['Edge']} {sharp_suffix}</div>
                                 </div>
-                                <div style='text-align: right;'>
-                                    <div style='color: #94A3B8; font-size: 10px;'>STAKE</div>
-                                    <div style='color: #F59E0B; font-weight: 700; font-size: 14px;'>{row['Stake']}</div>
-                                </div>
+                                <!-- STAKE REMOVED -->
                             </div>
                         </div>
                         """), unsafe_allow_html=True)
@@ -891,20 +956,22 @@ if conn:
                         SELECT c.bucket, i.outcome 
                         FROM calibration_log c 
                         JOIN intelligence_log i ON c.event_id = i.event_id 
-                        WHERE i.outcome IN ('WIN', 'LOSS')
+                        WHERE i.outcome IN ('WON', 'LOST')
                     """, conn)
                     
                     if not c_df.empty:
-                        c_df['is_win'] = c_df['outcome'].apply(lambda x: 1 if x == 'WIN' else 0)
+                        c_df['is_win'] = c_df['outcome'].apply(lambda x: 1 if x == 'WON' else 0)
                         
-                        stats = c_df.groupby('bucket')['is_win'].agg(['count', 'mean']).reset_index()
-                        stats.columns = ['Bucket', 'Bets', 'WinRate']
-                        stats['WinRate%'] = (stats['WinRate'] * 100).round(1)
+                        stats = c_df.groupby('bucket')['is_win'].agg(['count', 'sum', 'mean']).reset_index()
+                        stats.columns = ['Bucket', 'Bets', 'Wins', 'WinRate']
+                        stats['Win%'] = (stats['WinRate'] * 100).round(1)
+                        stats['Win%'] = stats['Win%'].apply(lambda x: f"{x}%")
                         
-                        st.dataframe(stats, hide_index=True)
+                        # Display Clarity
+                        st.dataframe(stats[['Bucket', 'Bets', 'Wins', 'Win%']], hide_index=True, use_container_width=True)
                         
                         stats['Expected'] = stats['Bucket'].apply(lambda x: float(x.split('-')[0]) + 2.5)
-                        chart_data = stats[['Expected', 'WinRate%']].set_index('Expected')
+                        chart_data = stats[['Expected', 'WinRate']].set_index('Expected')
                         st.line_chart(chart_data)
                         
                         st.success(f"Tracking {len(c_df)} settled predictions.")
@@ -919,6 +986,253 @@ if conn:
                     st.error(f"Error loading calibration data: {e}")
                 finally:
                     conn.close()
+
+        # --- TAB 6: PERFORMANCE ---
+        with tab6:
+            # Custom CSS for Financial Terminal Look
+            st.markdown("""
+            <style>
+                /* KPI Card Styling */
+                .fin-card {
+                    background: #0F172A;
+                    border: 1px solid #1E293B;
+                    border-left: 4px solid #3B82F6;
+                    border-radius: 8px;
+                    padding: 16px 20px;
+                    margin-bottom: 12px;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                }
+                .fin-label {
+                    color: #94A3B8;
+                    font-size: 11px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                    font-weight: 600;
+                }
+                .fin-value {
+                    color: #F8FAFC;
+                    font-size: 24px;
+                    font-weight: 700;
+                    margin-top: 6px;
+                    font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+                }
+                
+                /* Filter Styling */
+                div[data-testid="stRadio"] > label {
+                    display: none;
+                }
+                div[role="radiogroup"] {
+                    background-color: #1E293B;
+                    padding: 4px;
+                    border-radius: 8px;
+                    border: 1px solid #334155;
+                }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            # Header + Controls
+            c_head1, c_head2 = st.columns([3, 1])
+            with c_head1:
+                st.markdown("### 📈 Performance Analysis")
+            with c_head2:
+                # Native "Pills" Look via Radio
+                time_filter = st.radio(
+                    "Timeframe", 
+                    ["All Time", "30D", "7D"], 
+                    horizontal=True,
+                    label_visibility="collapsed"
+                )
+
+            if not df_settled.empty:
+                perf_df = df_settled.copy()
+                
+                # --- DATA FILTERING ---
+                now = pd.Timestamp.now(tz='US/Eastern')
+                if time_filter == "7D":
+                    cutoff = now - pd.Timedelta(days=7)
+                    perf_df = perf_df[perf_df['kickoff'] >= cutoff]
+                elif time_filter == "30D":
+                    cutoff = now - pd.Timedelta(days=30)
+                    perf_df = perf_df[perf_df['kickoff'] >= cutoff]
+                
+                if perf_df.empty:
+                    st.warning(f"No settled bets in {time_filter}.")
+                else:
+                    # --- CALCULATION ENGINE ---
+                    def calc_pnl(row):
+                        outcome = str(row['outcome']).upper()
+                        try: 
+                            stake = float(row['Stake_Val'])
+                            odds = float(row['Dec_Odds'])
+                        except: return 0.0
+
+                        if outcome == 'WON': return stake * (odds - 1)
+                        elif outcome == 'LOST': return -stake
+                        return 0.0
+                        
+                    perf_df['Profit'] = perf_df.apply(calc_pnl, axis=1)
+
+                    # --- SPORT MAPPER ---
+                    def map_sport_icon(s):
+                        s = str(s).upper()
+                        if 'NBA' in s or 'NCAAB' in s: return f"🏀 {s}"
+                        if 'NHL' in s: return f"🏒 {s}"
+                        if 'NFL' in s or 'CFL' in s: return f"🏈 {s}"
+                        if 'MLB' in s: return f"⚾ {s}"
+                        if 'SOCCER' in s or 'LIGA' in s or 'EPL' in s: return f"⚽ {s}"
+                        if 'TENNIS' in s: return f"🎾 {s}"
+                        if 'UFC' in s or 'MMA' in s: return f"🥊 {s}"
+                        return f"🏅 {s}"
+
+                    perf_df['Sport_Display'] = perf_df['Sport'].apply(map_sport_icon)
+
+                    # --- METRICS SECTION ---
+                    total_profit = perf_df['Profit'].sum()
+                    total_stake = perf_df['Stake_Val'].sum()
+                    roi = (total_profit / total_stake * 100) if total_stake > 0 else 0.0
+                    
+                    # Layout: Metrics
+                    k1, k2, k3, k4 = st.columns(4)
+                    
+                    p_color = "#10B981" if total_profit >= 0 else "#EF4444"
+                    r_color = "#10B981" if roi >= 0 else "#EF4444"
+
+                    with k1:
+                        st.markdown(f"""
+                        <div class="fin-card">
+                            <div class="fin-label">Total Profit</div>
+                            <div class="fin-value" style="color: {p_color}">${total_profit:,.2f}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    with k2:
+                        st.markdown(f"""
+                        <div class="fin-card">
+                            <div class="fin-label">Total Volume</div>
+                            <div class="fin-value">${total_stake:,.0f}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    with k3:
+                        st.markdown(f"""
+                        <div class="fin-card">
+                            <div class="fin-label">ROI</div>
+                            <div class="fin-value" style="color: {r_color}">{roi:.1f}%</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    with k4:
+                        st.markdown(f"""
+                        <div class="fin-card">
+                            <div class="fin-label">Total Bets</div>
+                            <div class="fin-value">{len(perf_df)}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    
+                    st.markdown("---")
+                    
+                    # --- TABLE ENGINE ---
+                    sport_stats = perf_df.groupby('Sport_Display').agg({
+                        'Profit': 'sum',
+                        'Stake_Val': 'sum',
+                        'outcome': 'count',
+                        'Dec_Odds': 'mean'
+                    }).reset_index()
+
+                    sport_stats['ROI'] = (sport_stats['Profit'] / sport_stats['Stake_Val']).fillna(0)
+                    sport_stats['AvgOdds'] = sport_stats['Dec_Odds']
+                    
+                    # Sort by Profit (Waterfall Logic)
+                    sport_stats = sport_stats.sort_values('Profit', ascending=False)
+                    
+                    # --- PANDAS STYLER (Bloomberg Polish) ---
+                    display_df = sport_stats[['Sport_Display', 'outcome', 'Stake_Val', 'Profit', 'ROI', 'AvgOdds']].copy()
+                    
+                    def color_profit_text(val):
+                        if val > 0: return 'color: #34D399'
+                        if val < 0: return 'color: #F87171'
+                        return 'color: #94A3B8'
+
+                    styler = display_df.style\
+                        .background_gradient(subset=['ROI'], cmap='RdYlGn', vmin=-1.5, vmax=1.5, text_color_threshold=0.5)\
+                        .applymap(color_profit_text, subset=['Profit'])\
+                        .format({
+                            'Profit': "${:,.2f}",
+                            'ROI': "{:.1%}",
+                            'AvgOdds': "{:.2f}",
+                            'Stake_Val': "${:,.0f}"
+                        })\
+                        .set_properties(**{
+                            'background-color': '#1E293B',
+                            'color': '#F8FAFC',
+                            'border-color': '#334155'
+                        })\
+                        .set_table_styles([
+                            {'selector': 'th', 'props': [('background-color', '#0F172A'), ('color', '#94A3B8'), ('font-weight', 'bold'), ('border-bottom', '1px solid #334155')]},
+                            {'selector': 'tr:hover', 'props': [('background-color', '#334155')]}
+                        ])
+                    
+                    # Inject Custom Headers Styles (Pandas Styler Hooks are limited in Streamlit, but we try)
+                    # Note: st.dataframe inherits theme. We focus on column config.
+
+                    st.dataframe(
+                        styler,
+                        column_config={
+                            "Sport_Display": st.column_config.TextColumn("Sport", width=None),
+                            "outcome": st.column_config.NumberColumn("Bets", format="%d"),
+                            "Stake_Val": st.column_config.ProgressColumn(
+                                "Volume", 
+                                format="$%.0f", 
+                                min_value=0, 
+                                max_value=float(sport_stats['Stake_Val'].max())
+                            ),
+                            "Profit": "Profit ($)",
+                            "ROI": "ROI (%)",
+                            "AvgOdds": "Avg Odds"
+                        },
+                        hide_index=True,
+                        use_container_width=True,
+                        height=400
+                    )
+
+                    # --- CHART: WATERFALL (Altair) ---
+                    import altair as alt
+                    st.subheader("Profit Distribution")
+                    
+                    base = alt.Chart(sport_stats).encode(
+                        x=alt.X('Sport_Display', sort=None, axis=alt.Axis(labels=True, title=None, labelAngle=-45, grid=False, labelColor='#94A3B8')), 
+                        y=alt.Y('Profit', axis=None), 
+                    )
+                    
+                    bars = base.mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4).encode(
+                        color=alt.condition(
+                            alt.datum.Profit > 0,
+                            alt.value('#34D399'), 
+                            alt.value('#F87171')
+                        ),
+                        tooltip=['Sport_Display', 'outcome', alt.Tooltip('Profit', format='$.2f'), alt.Tooltip('ROI', format='.1%')]
+                    )
+                    
+                    text = base.mark_text(
+                        align='center',
+                        baseline='bottom',
+                        dy=-5 
+                    ).encode(
+                        text=alt.Text('Profit', format='$.0f'),
+                        color=alt.value('#E2E8F0')
+                    )
+                    
+                    # Dark Mode Chart Config
+                    chart = (bars + text).configure_axis(
+                        grid=False, 
+                        domain=False
+                    ).configure_view(
+                        strokeOpacity=0
+                    ).properties(
+                        background='transparent'
+                    )
+                    
+                    st.altair_chart(chart, use_container_width=True)
+
+            else:
+                st.info("No settled bets to analyze yet.")
 
     except Exception as e:
         st.error(f"Dashboard Error: {e}")

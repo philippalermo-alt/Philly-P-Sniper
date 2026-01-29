@@ -18,43 +18,37 @@ fi
 echo "🚀 [QC Check] Starting Local Build Strategy (ARM64 -> AMD64 Cross-Compile)..."
 echo "⚠️  This takes longer (~10 mins) but guarantees the server won't crash."
 
+# Generate Immutable Tag
+TAG=$(date +%Y%m%d%H%M%S)
+echo "🏷️  Deployment Tag: $TAG"
+
 # 1. Build API Image (AMD64)
 echo "📦 Building API Image (linux/amd64)..."
-docker buildx build --platform linux/amd64 -t philly-api:latest -f Dockerfile . --load
-
-# 2. Build Client Image (AMD64)
-# Note: frontend_client DOES NOT EXIST in file list.
-# Based on file list, philly-p-client.tar.gz exists, implying a pre-built image or source somewhere?
-# Wait, let's check if 'frontend_client' dir exists in list_dir output?
-# It does NOT appear in list_dir output from step 239.
-# It seems the frontend might be in a different repo or I missed it?
-# Actually, I see 'philly-p-client.tar.gz' (70MB) in file list.
-# But I don't see a 'frontend_client' directory.
-# I should just comment out the client build if source is missing, OR check if 'client' exists?
-# The error was on backend_api.
-# Let's fix Backend first.
-
+docker buildx build --platform linux/amd64 -t philly-api:$TAG -f Dockerfile . --load
 
 echo "✅ Build Complete. Saving images to compressed tarball..."
-# Save both images to one file and pipe through gzip
-docker save philly-api:latest | gzip > philly_v2_images.tar.gz
+# Save image with immutable tag
+docker save philly-api:$TAG | gzip > philly_v2_images.tar.gz
 
 echo "📤 Transferring Images to AWS (Size: $(du -h philly_v2_images.tar.gz | cut -f1))..."
 scp -i $KEY philly_v2_images.tar.gz $USER@$HOST:~/Philly-P-Sniper/
 
 echo "📤 Transferring updated config/code (Lightweight Sync)..."
 rsync -avz -e "ssh -i $KEY" --exclude 'node_modules' --exclude '.next' --exclude '__pycache__' \
-    --exclude '.git' --exclude 'philly_v2_images.tar.gz' \
+    --exclude '.git' --exclude 'philly_v2_images.tar.gz' --exclude 'backups' \
     ./ $USER@$HOST:~/Philly-P-Sniper/
 
 echo "🔄 Deploying on Server..."
-ssh -i $KEY $USER@$HOST << 'EOF'
+ssh -i $KEY $USER@$HOST << EOF
     set -e
     cd ~/Philly-P-Sniper
 
     echo "📥 Loading Docker Images..."
     gunzip -c philly_v2_images.tar.gz | sudo docker load
-
+    
+    # Tag as latest for convenience on server (optional, or just use specific tag in compose)
+    # But strictly, let's use the specific tag.
+    
     echo "🛑 Stopping old containers..."
     sudo docker-compose down
 
@@ -62,9 +56,7 @@ ssh -i $KEY $USER@$HOST << 'EOF'
     cat > docker-compose.override.yml <<EOL
 services:
   api:
-    build: 
-      context: .
-    image: philly-api:latest
+    image: philly-api:$TAG
     pull_policy: never
 EOL
     

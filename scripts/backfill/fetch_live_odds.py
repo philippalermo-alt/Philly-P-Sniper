@@ -15,6 +15,9 @@ def get_live_odds():
     
     print(f"📡 Fetching Live Odds for {sport_key}...")
     try:
+        from datetime import datetime, timezone 
+        # API returns UTC ISO8601
+        
         res = requests.get(url, params=params)
         data = res.json()
         
@@ -24,7 +27,17 @@ def get_live_odds():
         for event in data:
             home = event['home_team']
             away = event['away_team']
+            commence = event['commence_time']
             
+            # FILTER: Skip Started
+            try:
+                dt_commence = datetime.strptime(commence, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+                if dt_commence < datetime.now(timezone.utc):
+                    # print(f"Skipping Started: {home} vs {away}") 
+                    continue
+            except:
+                pass
+
             if target_game in home or target_game in away:
                 print(f"✅ Found Match: {home} vs {away}")
                 found = True

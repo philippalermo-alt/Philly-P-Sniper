@@ -10,11 +10,13 @@ def _fetch_single_espn_path(espn_path, date_str):
     Helper for parallel ESPN fetch.
     Returns list of formatted games or empty list.
     """
-    url = f"https://site.api.espn.com/apis/site/v2/sports/{espn_path}/scoreboard?dates={date_str}"
+    u = f"https://site.api.espn.com/apis/site/v2/sports/{espn_path}/scoreboard?dates={date_str}&limit=1000"
     
-    # Special handling for NCAAB to get all Div I games (groups=50)
+    # Special handling for NCAAB to get all Div I games (groups=50) -> Removed to get ALL games
     if 'mens-college-basketball' in espn_path:
-        url += "&groups=50&limit=1000"
+        u += "&groups=50" 
+
+    url = u
     
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -94,7 +96,9 @@ def fetch_espn_scores(sport_keys, specific_date=None):
         dates_to_check = [
             now_et.strftime('%Y%m%d'), 
             (now_et - timedelta(days=1)).strftime('%Y%m%d'),
-            (now_et - timedelta(days=2)).strftime('%Y%m%d')
+            (now_et - timedelta(days=2)).strftime('%Y%m%d'),
+            (now_et - timedelta(days=3)).strftime('%Y%m%d'),
+            (now_et - timedelta(days=4)).strftime('%Y%m%d')
         ]
 
     # 1. Build Task List (Deduplicated)
@@ -167,6 +171,10 @@ def fetch_espn_scores(sport_keys, specific_date=None):
                 neutral_site = comp.get('neutralSite', False)
                 notes = [n.get('headline') for n in event.get('notes', []) if n.get('headline')]
                 
+                # Linescores (Period Scores)
+                h_linescores = [float(x.get('value', 0)) for x in home_comp.get('linescores', [])]
+                a_linescores = [float(x.get('value', 0)) for x in away_comp.get('linescores', [])]
+                
                 # Odds
                 odds_info = {}
                 if 'odds' in comp and comp['odds']:
@@ -187,6 +195,8 @@ def fetch_espn_scores(sport_keys, specific_date=None):
                     'away': a_name,
                     'home_score': h_score,
                     'away_score': a_score,
+                    'home_linescores': h_linescores,
+                    'away_linescores': a_linescores,
                     'status': status_detail,
                     'is_complete': is_complete,
                     'score_text': f"{status_detail}: {a_name} {a_score} - {h_name} {h_score}",

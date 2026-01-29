@@ -9,22 +9,40 @@ import os
 
 from ncaab_h1_features import H1_FeatureEngine
 
+# Reproducibility (Phase 3.2)
+SEED = 42
+np.random.seed(SEED)
+
 class H1_ModelTrainer:
-    def __init__(self, games_path='data/historical_games.json'):
+    def __init__(self, games_path='ncaab_h1_model/data/historical_games.json'):
         """Initialize trainer with historical game data."""
         with open(games_path, 'r') as f:
             self.games = json.load(f)
 
         self.feature_engine = H1_FeatureEngine()
         self.model = None
+        
+        # Explicit Feature Names (Phase 3.1 Hardening)
+        self.FEATURE_NAMES = [
+            'home_h1_avg', 'away_h1_avg', 'home_h1_ratio', 'away_h1_ratio',
+            'home_h1_std', 'away_h1_std', 'home_consistency', 'away_consistency',
+            'home_tempo', 'away_tempo', 'avg_h1_ratio', 'h1_ratio_diff',
+            'combined_std', 'avg_consistency', 'consistency_diff',
+            'avg_tempo', 'tempo_diff', 'pace_multiplier', 'experience_weight',
+            'pace_adjusted_total', 'home_adj_o', 'home_adj_d',
+            'away_adj_o', 'away_adj_d', 'avg_efficiency_mismatch'
+        ]
 
     def prepare_training_data(self):
-        """Convert historical games into feature matrix + targets."""
+        """Convert historical games into feature DataFrame + targets."""
         X_list = []
         y_list = []
         metadata_list = []
         
         print("Preparing training data (Target: Residuals)...")
+        
+        # --- PHASE 1.1 FIX: Sort by Date ---
+        self.games.sort(key=lambda x: x.get('date', '19000101'))
 
         for game in self.games:
             # Get features for this matchup
@@ -33,7 +51,7 @@ class H1_ModelTrainer:
                 game['away_team']
             )
 
-            # Extract feature vector
+            # Extract feature vector using explicit mapping (matches self.FEATURE_NAMES)
             feature_vector = [
                 features['home_h1_avg'],
                 features['away_h1_avg'],
@@ -65,7 +83,6 @@ class H1_ModelTrainer:
             X_list.append(feature_vector)
             
             # MODEL 3.0 TARGET: Train on residuals (Actual - Baseline)
-            # Baseline is pace_adjusted_total
             baseline = features['pace_adjusted_total']
             actual = game['h1_total']
             residual = actual - baseline
@@ -74,6 +91,7 @@ class H1_ModelTrainer:
             
             metadata_list.append({
                 'game_id': game['game_id'],
+                'date': game.get('date', 'Unknown'),
                 'home_team': game['home_team'],
                 'away_team': game['away_team'],
                 'actual_h1': actual,
@@ -81,10 +99,11 @@ class H1_ModelTrainer:
                 'residual': residual
             })
 
-        X = np.array(X_list)
+        # Convert to DataFrame (Phase 3.1)
+        X = pd.DataFrame(X_list, columns=self.FEATURE_NAMES)
         y = np.array(y_list)
 
-        print(f"✓ Prepared {len(X)} training examples")
+        print(f"✓ Prepared {len(X)} training examples (Sorted by Date)")
 
         return X, y, metadata_list
 
@@ -92,9 +111,25 @@ class H1_ModelTrainer:
         """Train XGBoost model on residuals."""
         X, y, metadata = self.prepare_training_data()
 
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42
-        )
+        # --- PHASE 1.1 FIX: Temporal Split ---
+        split_idx = int(len(X) * 0.8)
+        
+        X_train = X.iloc[:split_idx] # DataFrame slice
+        X_test = X.iloc[split_idx:]
+        y_train = y[:split_idx]
+        y_test = y[split_idx:]
+        
+        # Verify Leakage
+        train_dates = [m['date'] for m in metadata[:split_idx]]
+        test_dates = [m['date'] for m in metadata[split_idx:]]
+        
+        if train_dates and test_dates:
+            train_max = max(train_dates)
+            test_min = min(test_dates)
+            if train_max > test_min:
+                print(f"⚠️ Warning: Temporal Overlap in NCAAB. TrainMax: {train_max}, TestMin: {test_min}")
+            else:
+                print(f"✅ Temporal Split Verified: Train End {train_max} <= Test Start {test_min}")
 
         print(f"\n🚀 Training XGBoost Model 3.0...")
         
@@ -102,14 +137,14 @@ class H1_ModelTrainer:
         model = xgb.XGBRegressor(
             n_estimators=1000,
             learning_rate=0.015,
-            max_depth=4,           # Increased from 3
-            min_child_weight=10,   # Added to reduce noise
-            subsample=0.8,         # Explicitly set
+            max_depth=4,
+            min_child_weight=10,
+            subsample=0.8,
             colsample_bytree=0.7,
             reg_alpha=0.5,
             reg_lambda=2.0,
-            early_stopping_rounds=50, # Added early stopping
-            random_state=42,
+            early_stopping_rounds=50,
+            random_state=SEED, # Enforce Reproducibility
             n_jobs=-1
         )
 
@@ -125,11 +160,9 @@ class H1_ModelTrainer:
         # Evaluate (Reconstruct Total Predictions)
         # Pred = Baseline + Predicted_Residual
         
-        # X matrix columns (hardcoded index for pace_adjusted_total)
-        BASELINE_IDX = 19 
-        
-        train_baseline = X_train[:, BASELINE_IDX]
-        test_baseline = X_test[:, BASELINE_IDX]
+        # Phase 3.1: SAFE COLUMN ACCESS (No Hardcoded Indices)
+        train_baseline = X_train['pace_adjusted_total'].values
+        test_baseline = X_test['pace_adjusted_total'].values
         
         train_pred_resid = model.predict(X_train)
         test_pred_resid = model.predict(X_test)

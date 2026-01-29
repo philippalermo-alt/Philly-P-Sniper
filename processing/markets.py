@@ -1,11 +1,12 @@
 import difflib
+import time
 from datetime import datetime, timezone
 from scipy import stats
 from config.settings import Config
 from utils.logging import log
 from utils.team_names import match_team
 from utils.math import _num
-from core.probability import logit_scale
+from core.probability import logit_scale, normalize_probabilities
 import numpy as np
 from db.connection import get_dynamic_bankroll
 # ... 
@@ -18,7 +19,8 @@ from utils.team_names import normalize_team_name
 from models.sport_models import NCAAB_Model
 
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
+from dataclasses import dataclass, field
 from datetime import datetime
 
 @dataclass
@@ -62,6 +64,7 @@ class Opportunity:
     away_adj_d: float = 0
     home_tempo: float = 0
     away_tempo: float = 0
+    metadata: Dict[str, Any] = field(default_factory=dict)
     
     def to_db_params(self) -> tuple:
         """Convert to database insert parameters."""
@@ -133,7 +136,8 @@ def create_opportunity(event_id, timestamp, kickoff, sport, teams, selection, od
         Event=teams,
         Selection=selection,
         Bucket=bucket,
-        op_type=kwargs.get('op_type', 'INSERT')
+        op_type=kwargs.get('op_type', 'INSERT'),
+        metadata=kwargs.get('metadata', {})
     )
 
 # KenPom Cache
@@ -159,24 +163,20 @@ def get_kenpom_stats(team_name):
     
     if _kp_cache is None: return None
     
-    # 1. Exact/Containment
-    # DB: "Houston Cougars", KP: "Houston"
-    matches = _kp_cache[_kp_cache['Team'].apply(lambda x: x in team_name or team_name in x)]
-    if not matches.empty:
-         return matches.iloc[0].to_dict()
-         
-    # 2. Fuzzy Fallback
-    import difflib
-    all_kp_teams = _kp_cache['Team'].tolist()
-    closest_match = difflib.get_close_matches(team_name, all_kp_teams, n=1, cutoff=0.6)
+    kp_teams = _kp_cache['Team'].tolist()
     
-    if closest_match:
-        # Return matched row
-        match_name = closest_match[0]
-        row = _kp_cache[_kp_cache['Team'] == match_name]
-        if not row.empty:
-            # print(f"   🎓 [MATCH] Fuzzy: {team_name} -> {match_name}") 
-            return row.iloc[0].to_dict()
+    # 1. Exact Match via Indexing (Best Performance)
+    row = _kp_cache[_kp_cache['Team'] == team_name]
+    if not row.empty:
+        return row.iloc[0].to_dict()
+        
+    # 2. Robust Matcher (Centralized)
+    from utils.team_names import robust_match_team
+    match_name = robust_match_team(team_name, kp_teams, threshold=0.85)
+    
+    if match_name:
+         # print(f"   ✨ [KP MATCH] Robust: {team_name} -> {match_name}") 
+         return _kp_cache[_kp_cache['Team'] == match_name].iloc[0].to_dict()
 
     return None
 
@@ -250,22 +250,10 @@ def calculate_match_stats(home, away, ratings, target_sport, is_neutral=False):
             return margin, total, Config.NFL_MARGIN_STD, sport
 
         if sport == 'NHL':
-            vals = [
-                home_r.get('league_avg_goals'), home_r.get('attack'), home_r.get('defense'),
-                away_r.get('attack'), away_r.get('defense')
-            ]
-            if any(v is None for v in vals): return None, None, None, None
-            
-            avg_goals = float(vals[0])
-            home_att = float(vals[1])
-            home_def = float(vals[2])
-            away_att = float(vals[3])
-            away_def = float(vals[4])
-            
-            home_exp = home_att * away_def * avg_goals
-            away_exp = away_att * home_def * avg_goals
-            home_exp += 0.2
-            return (home_exp - away_exp), (home_exp + away_exp), Config.NHL_MARGIN_STD, sport
+            # DEPRECATED: Legacy NHL Model Retired (2026-01-27)
+            # Live inference must come from V2 Model via 'predictions' argument in process_match.
+            log("WARN", "NHL_TOTALS_LEGACY_ACTIVE (BLOCKED)")
+            return None, None, None, None
 
         # NBA / NCAAB Logic
         vals = [
@@ -329,18 +317,18 @@ def process_nhl_props(match, props_data, player_stats, calibration, seen_matches
     now_utc = datetime.now(timezone.utc)
     mdt = datetime.fromisoformat(match['commence_time'].replace('Z', '+00:00'))
     if mdt < now_utc:
-        return
+        return []
 
     home, away = match['home_team'], match['away_team']
     
     # Iterate through Bookmakers
     bookie = next((b for b in match.get('bookmakers', []) if b['key'] in Config.PREFERRED_BOOKS), None)
     if not bookie:
-        return
+        return []
 
     prop_id = f"{match['id']}_props"
     if prop_id in seen_matches:
-        return
+        return []
     seen_matches.add(prop_id)
 
     # DEBUG: Log available bookies
@@ -350,7 +338,7 @@ def process_nhl_props(match, props_data, player_stats, calibration, seen_matches
     bookie = next((b for b in match.get('bookmakers', []) if b['key'] in Config.PREFERRED_BOOKS), None)
     if not bookie:
         print(f"   ⚠️ [DEBUG-PROP] No preferred bookie found. (Preferred: {Config.PREFERRED_BOOKS})")
-        return
+        return []
     
     # Trace selected bookie
     print(f"   ✅ [DEBUG-PROP] Using Bookie: {bookie['key']}")
@@ -451,7 +439,7 @@ def process_nhl_props(match, props_data, player_stats, calibration, seen_matches
                 
                 current_type = get_market_type(sel)
                 for r in existing_match_bets:
-                   eid, esel, eedge, esp = r
+                   eid, esel, eedge, esp, eteams = r
                    if player_name_odds in esel:
                        etype = get_market_type(esel)
                        if etype == current_type and esel != sel:
@@ -484,7 +472,28 @@ def process_nhl_props(match, props_data, player_stats, calibration, seen_matches
 
 from processing.systems import check_pro_systems
 
-def process_match(match, ratings, calibration, target_sport, seen_matches, sharp_data, existing_bets_map=None, is_soccer=False, predictions=None, multipliers=None) -> List[Opportunity]:
+def _get_market_category(selection: str) -> str:
+    """
+    Categorize selection for deduplication.
+    - Totals: 'Over', 'Under'
+    - Sides: 'ML' (Moneyline)
+    - Spread: Everything else (e.g. 'Duke -5', 'Duke +3')
+    """
+    sel_lower = selection.lower()
+    
+    # 1. Totals
+    if 'over' in sel_lower or 'under' in sel_lower:
+        return 'TOTAL'
+        
+    # 2. Moneyline
+    # Our system appends " ML" to moneyline selections.
+    if ' ml' in sel_lower or 'moneyline' in sel_lower:
+        return 'ML'
+        
+    # 3. Spread (Default for remaining side bets)
+    return 'SPREAD'
+
+def process_match(match, ratings, calibration, target_sport, seen_matches, sharp_data, existing_bets_map=None, is_soccer=False, predictions=None, multipliers=None, seen_bet_signatures=None) -> List[Opportunity]:
     """
     Process betting markets for a match and identify valuable opportunities.
 
@@ -509,11 +518,12 @@ def process_match(match, ratings, calibration, target_sport, seen_matches, sharp
     if mdt < now_utc:
         return []
 
+    home, away = match['home_team'], match['away_team']
+    
     bookie = next((b for b in match.get('bookmakers', []) if b['key'] in Config.PREFERRED_BOOKS), None)
     if not bookie:
         return []
 
-    home, away = match['home_team'], match['away_team']
     match_id = f"{home} vs {away}"
     if match_id in seen_matches:
         return []
@@ -545,7 +555,8 @@ def process_match(match, ratings, calibration, target_sport, seen_matches, sharp
         # 2. Fallback to difflib on normalized strings
         if not matched_key:
             search_key = f"{n_away} @ {n_home}"
-            m_match = difflib.get_close_matches(search_key, sharp_data.keys(), n=1, cutoff=0.55)
+            # Strict cutoff (0.85) prevents "Kings @ Detroit" matching "Kings @ Columbus"
+            m_match = difflib.get_close_matches(search_key, sharp_data.keys(), n=1, cutoff=0.85)
             if m_match:
                 matched_key = m_match[0]
 
@@ -598,17 +609,21 @@ def process_match(match, ratings, calibration, target_sport, seen_matches, sharp
 
         if pred:
             soccer_match_opps = []
+            seen_total_points = set()
+            print(f"   🐛 [DEBUG-MARKETS] {match_id} | Selected Bookie: {bookie['key']} | Markets: {[m['key'] for m in bookie['markets']]}")
             for m in bookie['markets']:
+                # --- COHERENCE REFACTOR: Normalize H2H Probabilities ---
                 if m['key'] == 'h2h':
+                    # 1. Gather Outcomes
+                    outcomes_data = []
+                    prob_map = {}
+                    
                     for o in m.get('outcomes', []):
                         name = o['name']
                         price = o.get('price')
                         if not price: continue
 
                         # Get Lineup Impact (Phase 7)
-                        # defined as Net Home Advantage (e.g. +0.05 means Home is 5% better due to lineups)
-                        # SCALING: Raw Impact is xG (e.g. 0.85). We must scale this to Probability.
-                        # Heuristic: 1.0 xG diff ~= 20% Win Prob diff.
                         LINEUP_SCALE_FACTOR = 0.20
                         raw_impact = match.get('lineup_impact', 0.0)
                         l_impact = raw_impact * LINEUP_SCALE_FACTOR
@@ -616,45 +631,56 @@ def process_match(match, ratings, calibration, target_sport, seen_matches, sharp
                         if name == home:
                             mp = pred['home_win'] + l_impact
                             sel = f"{home} ML"
+                            key = 'Home'
                         elif name == away:
                             mp = pred['away_win'] - l_impact
                             sel = f"{away} ML"
+                            key = 'Away'
                         elif 'Draw' in name or 'Tie' in name:
                             mp = pred['draw']
                             sel = "Draw ML"
+                            key = 'Draw'
                         else:
                             continue
 
+                        # Apply Scaling individually first (sharpen/flatten)
                         mp = logit_scale(mp, calibration)
-                        mp = min(mp, Config.MAX_PROBABILITY)
+                        prob_map[key] = max(mp, 0.001) # Avoid zero
+                        
+                        outcomes_data.append({
+                            'sel': sel,
+                            'price': price,
+                            'key': key,
+                            'name': name
+                        })
 
-                        # SAFETY FIX: Kelly Criterion now uses MODEL Probability (mp) directly
-                        # We calculate 'true_edge' based on our model's conviction vs price.
-                        # tp (Target Prob) is still calculated for reference but NOT used for edge.
+                    # 2. Normalize Together (Enforce Sum=1.0)
+                    norm_probs = normalize_probabilities(prob_map)
+                    
+                    # 3. Assess Edge
+                    for outcome in outcomes_data:
+                        key = outcome['key']
+                        price = outcome['price']
+                        sel = outcome['sel']
                         
-                        tp = (Config.MARKET_WEIGHT_SOCCER * (1 / price)) + ((1 - Config.MARKET_WEIGHT_SOCCER) * mp)
-                        
-                        # OLD (Dangerous): edge = (tp * price) - 1
-                        # NEW (Safe): edge = mp - (1.0 / price) if price > 0 else 0
-                        edge = mp - (1.0 / price) if price > 0 else 0
+                        true_prob = norm_probs.get(key, 0)
+                        true_prob = min(true_prob, Config.MAX_PROBABILITY)
 
+                        # Calculating 'Target Prob' for display reference only
+                        tp = (Config.MARKET_WEIGHT_SOCCER * (1 / price)) + ((1 - Config.MARKET_WEIGHT_SOCCER) * true_prob)
+
+                        # SAFETY FIX: Edge calculated on PURE normalized model prob
+                        edge = true_prob - (1.0 / price) if price > 0 else 0
                         
-                        # IMPROVEMENT: Step 3 - Stale Line Detector (Max Edge 12%)
-                        if edge >= 0.0: # Check positive edge
-                             
-                            # IMPROVEMENT: Step 11 - Soccer "Draw Edge"
-                            # If Draw and Odds > 3.10, we classify as 'DrawHigh' for staking
+                        # IMPROVEMENT: Step 3 - Stale Line Detector
+                        if edge >= 0.0:
                             bucket_tag = "Standard"
                             if "Draw" in sel and price > 3.10:
                                 bucket_tag = "DrawHigh"
-                                # Allow slightly lower edge for these high-value draws?
-                                # Let's keep min edge but ensure they are flagged.
-                            
-                            if (edge >= Config.MIN_EDGE or (bucket_tag == "DrawHigh" and edge >= 0.015)) and edge < 0.12:
+
+                            # RELAXED: Cap raised to 35% for UCL/Volatile Markets
+                            if (edge >= Config.MIN_EDGE or (bucket_tag == "DrawHigh" and edge >= 0.015)) and edge < 0.35:
                                 stake = calculate_kelly_stake(edge, price)
-                                
-                                # Boost Stake for DrawHigh (Optional, or just let Kelly handle it)
-                                # Kelly naturally handles high odds (lower stake).
                                 
                                 soccer_match_opps.append(Opportunity(
                                     event_id=f"{match['id']}_{sel}",
@@ -669,7 +695,6 @@ def process_match(match, ratings, calibration, target_sport, seen_matches, sharp
                                     stake=stake,
                                     trigger_type='model',
                                     sharp_score=0,
-                                    # Helpers for legacy compatibility
                                     unique_id=f"{match['id']}_{sel}",
                                     Dec_Odds=price,
                                     True_Prob=tp,
@@ -681,11 +706,9 @@ def process_match(match, ratings, calibration, target_sport, seen_matches, sharp
                                     Bucket=bucket_tag
                                 ))
 
-                elif m['key'] == 'totals':
+                elif m['key'] in ['totals', 'alternate_totals']:
                     # Parse goal stats for totals
-                    # print(f"   🐛 [DEBUG] Processing Totals for {mk}. Pred: {pred}")
-                    
-                        # Logic 1: Direct Model Output (V6)
+                    # Logic 1: Direct Model Output (V6)
                     use_model_prob = False
                     implied_lambda = None
                     
@@ -695,76 +718,116 @@ def process_match(match, ratings, calibration, target_sport, seen_matches, sharp
                         
                         # --- STEP 12: ALT TOTALS UNLOCK ---
                         # Numerical solver: Find lambda where P(X >= 3) = p_over_25
-                        # P(X >= 3) = 1 - CDF(2, lambda)
-                        # We iterate to find optimal lambda (Simple binary search or lookup)
-                        # Range for Goals: 0.5 to 6.0
                         low, high = 0.5, 6.0
-                        for _ in range(10): # 10 iterations is plenty for 2 decimal precision
+                        for _ in range(10): 
                             mid = (low + high) / 2
-                            # Calculate P(Over 2.5) given mid
                             p_test = 1 - stats.poisson.cdf(2, mid)
                             if p_test < p_over_25:
-                                low = mid # Need higher lambda
+                                low = mid 
                             else:
                                 high = mid
                         implied_lambda = (low + high) / 2
-                        # print(f"   🔓 [DEBUG-FIX] V6 Prob {p_over_25:.2f} -> Implied Goals: {implied_lambda:.2f}")
 
                     # Logic 2: Poisson Fallback (V5/Legacy)
                     if not use_model_prob:
                         if 'home_goals' in pred and 'away_goals' in pred:
                              implied_lambda = pred['home_goals'] + pred['away_goals']
                         else:
-                             # Missing goals data
                              continue
                     
+                    # --- COHERENCE REFACTOR: Group by Point ---
+                    # 1. Group outcomes by point (e.g. 2.5) because Over/Under are coupled
+                    outcomes_by_point = {}
                     for o in m.get('outcomes', []):
-                        name = o['name'] # Over / Under
-                        price = o.get('price')
-                        point = o.get('point') # e.g. 2.5
-                        if not price or not point: continue
+                         point = o.get('point')
+                         if not point: continue
+                         if point not in outcomes_by_point:
+                             outcomes_by_point[point] = []
+                         outcomes_by_point[point].append(o)
                         
-                        prob = 0.0
-                        is_direct = False
-                        
-                        # Use V6 direct prob for 2.5 line only to preserve exact model output
-                        if use_model_prob and abs(point - 2.5) < 0.1:
-                            if name == 'Over':
-                                prob = pred['prob_over']
-                            else:
-                                prob = 1.0 - pred['prob_over']
-                            is_direct = True
-                        else:
-                            # Use Implied Lambda for everything else (1.5, 3.5, etc)
-                            # This fixes the "Zero Totals" bug for alt lines
-                            if implied_lambda:
-                                if name == 'Over':
-                                    # P(X > point) = 1 - CDF(floor(point), lambda)
-                                    prob = 1 - stats.poisson.cdf(int(point), implied_lambda)
-                                else:
-                                    prob = stats.poisson.cdf(int(point), implied_lambda)
-                            else:
-                                continue
+                    # 2. Process each line group
+                    for point, outcomes in outcomes_by_point.items():
+                        if point in seen_total_points:
+                            continue
+                        seen_total_points.add(point)
 
-                        # Calibration (Only apply to Poisson, V6 is already calibrated)
-                        if not is_direct:
-                            prob = logit_scale(prob, calibration)
+                        # We expect Over and Under. If one missing, we can still process but can't normalize properly against peer.
+                        # Actually we can invoke the model for both sides and normalize our own numbers.
+                        
+                        prob_map = {} # 'Over' -> raw_prob
+                        outcomes_data = []
+                        
+                        for o in outcomes:
+                            name = o['name'] # Over / Under
+                            price = o.get('price')
+                            if not price: continue
+
+                            prob = 0.0
+                            is_direct = False
                             
-                        prob = min(prob, Config.MAX_PROBABILITY)
-                        
-                        # Market weight logic (kept for 'True_Prob' display reference only)
-                        tp = (Config.MARKET_WEIGHT_SOCCER * (1 / price)) + ((1 - Config.MARKET_WEIGHT_SOCCER) * prob)
-                        
-                        # SAFETY FIX: Edge calculated on PURE model prob
-                        edge = prob - (1.0 / price) if price > 0 else 0
+                            # Use V6 direct prob for 2.5 line only
+                            if use_model_prob and abs(point - 2.5) < 0.1:
+                                if name == 'Over':
+                                    prob = pred['prob_over']
+                                else:
+                                    prob = 1.0 - pred['prob_over']
+                                is_direct = True
+                            else:
+                                # Use Implied Lambda
+                                if implied_lambda:
+                                    if name == 'Over':
+                                        prob = 1 - stats.poisson.cdf(int(point), implied_lambda)
+                                    else:
+                                        prob = stats.poisson.cdf(int(point), implied_lambda)
+                                else:
+                                    continue
+                                    
+                            # Calibration
+                            if not is_direct:
+                                prob = logit_scale(prob, calibration)
+                            
+                            # Store raw for normalization
+                            prob_map[name] = max(prob, 0.001)
+                            
+                            outcomes_data.append({
+                                'name': name,
+                                'price': price,
+                                'sel': f"{name} {point} Goals"
+                            })
+                            
+                        # Missing side fill? If we only have Over available, we assume Under exists implicitly for math.
+                        if 'Over' in prob_map and 'Under' not in prob_map:
+                             prob_map['Under'] = 1.0 - prob_map['Over'] # Fallback
+                        elif 'Under' in prob_map and 'Over' not in prob_map:
+                             prob_map['Over'] = 1.0 - prob_map['Under']
 
+                        # 3. Normalize Together
+                        norm_probs = normalize_probabilities(prob_map)
                         
-                        print(f"   🐛 [DEBUG] {name} {point}: {prob:.2%} -> Edge: {edge:.1%}")
-                        
-                        # IMPROVEMENT: Step 3 - Stale Line Detector (Max Edge 12%)
-                        if Config.MIN_EDGE <= edge < 0.12:
-                            stake = calculate_kelly_stake(edge, price)
-                            soccer_match_opps.append(create_opportunity(f"{match['id']}_{sel}", now_utc, mdt, 'SOCCER', mk, sel, price, tp, edge, stake, bucket=bucket_tag, match=match))
+                        # 4. Assess Edge
+                        for outcome in outcomes_data:
+                            name = outcome['name']
+                            price = outcome['price']
+                            sel = outcome['sel']
+                            
+                            true_prob = norm_probs.get(name, 0)
+                            true_prob = min(true_prob, Config.MAX_PROBABILITY)
+                            
+                            tp = (Config.MARKET_WEIGHT_SOCCER * (1 / price)) + ((1 - Config.MARKET_WEIGHT_SOCCER) * true_prob)
+                            
+                            # SAFETY FIX
+                            edge = true_prob - (1.0 / price) if price > 0 else 0
+                            
+                            # print(f"   norm-debug {sel}: {true_prob:.4f} vs {1/price:.4f} -> Edge {edge:.1%}")
+                            
+                            if Config.MIN_EDGE <= edge < 0.12:
+                                stake = calculate_kelly_stake(edge, price)
+                                bucket_tag = "Standard"
+                                soccer_match_opps.append(create_opportunity(
+                                    f"{match['id']}_{sel}", now_utc, mdt, 'SOCCER', mk, sel, price, tp, edge, stake, bucket=bucket_tag, match=match
+                                ))
+
+                
 
                 elif m['key'] == 'h2h_h1':
                      # 1st Half Logic
@@ -934,8 +997,8 @@ def process_match(match, ratings, calibration, target_sport, seen_matches, sharp
                 current_type_m = get_market_type(best_opp['Selection'])
                 
                 for r in existing_match_bets:
-                    # row: (event_id, selection, edge, sport)
-                    eid_m, esel_m, existing_edge, esp = r
+                    # row: (event_id, selection, edge, sport, teams)
+                    eid_m, esel_m, existing_edge, esp, eteams_m = r
                     
                     etype_m = get_market_type(esel_m)
                     if etype_m == current_type_m and etype_m != "OTHER":
@@ -943,7 +1006,7 @@ def process_match(match, ratings, calibration, target_sport, seen_matches, sharp
                             # BARRIER: Swap if new edge > old + 0.5%
                             if best_opp['Edge_Val'] > (existing_edge + 0.005):
                                 print(f"   🔄 [SWAP] Replacing {esel_m} ({existing_edge:.1%}) -> {best_opp['Selection']} ({best_opp['Edge_Val']:.1%})")
-                                all_opps.append({
+                                opportunities.append({
                                     'op_type': 'DELETE',
                                     'event_id': eid_m
                                 })
@@ -963,9 +1026,221 @@ def process_match(match, ratings, calibration, target_sport, seen_matches, sharp
                      # Soccer usually doesn't have ref stats in this dict, but we safely get them
                      best_opp['ref_1'] = match.get('ref_1')
                      
-                     all_opps.append(best_opp)
+                     opportunities.append(best_opp)
         
-        return
+        return opportunities
+
+    # --- NBA (Phase 7) ---
+    if target_sport == 'NBA':
+        mk = f"{away} @ {home}"
+        pred = predictions.get(mk) if predictions else None
+        
+        # Fuzzy Match if not direct hit
+        if not pred and predictions:
+            for pk, pd in predictions.items():
+                if pk == mk: # Try exact first
+                    pred = pd; break
+        
+        if not pred:
+             print(f"FORENSIC: [{mk}] Model Prediction NOT Found")
+
+        
+        if pred:
+            print(f"FORENSIC: [{mk}] Model Prediction Found: {pred.get('prob_home'):.3f}/{pred.get('prob_away'):.3f}")
+            nba_opps = []
+            for m in bookie['markets']:
+                if m['key'] == 'h2h':
+                    for o in m.get('outcomes', []):
+                        name = o['name']
+                        price = o.get('price')
+                        if not price: continue
+                        
+                        mp = 0.0
+                        if name == home:
+                            mp = pred.get('prob_home', 0.5)
+                        elif name == away:
+                            mp = pred.get('prob_away', 0.5)
+                        else:
+                            continue
+                            
+                        # Guardrail: Odds Cap
+                        if price > 3.0: 
+                            print(f"FORENSIC: [{mk}] {name} REJECT: Odds {price} > 3.0")
+                            continue
+                        if price < 1.01:
+                            print(f"FORENSIC: [{mk}] {name} REJECT: Odds {price} < 1.01")
+                            continue
+                        
+                        # Edge
+                        edge = mp - (1.0 / price)
+                        
+                        # Bucket Logic
+                        bucket = "N/A"
+                        if price < 1.5: bucket = "Heavy Fav"
+                        elif price < 2.2: bucket = "Coin Flip"
+                        else: bucket = "Dog"
+                        
+                        print(f"FORENSIC: [{mk}] {name}: Odds={price}, TP={mp:.3f}, Edge={edge:.1%}, Bucket={bucket}")
+
+                        # Min Edge
+                        min_edge = 0.05
+                        if price < 1.5: min_edge = 0.02
+                        elif price < 2.2: min_edge = 0.03
+                         
+                        if edge >= min_edge:
+                            stake = calculate_kelly_stake(edge, price)
+                            
+                            if price < 1.5:
+                                print(f"FORENSIC: [{mk}] {name} REJECT: Suppressed Heavy Fav")
+                                continue # Suppressed
+
+                            # Sharp Data Lookup
+                            m_val, t_val, sharp_score_val = (None, None, 0)
+                            side_key = None
+                            if name == home: side_key = home
+                            elif name == away: side_key = away
+                            
+                            if side_key:
+                                m_val, t_val, sharp_score_val = get_sharp_split("moneyline", side_key)
+                                
+                            print(f"FORENSIC: [{mk}] {name} ACCEPT: Stake={stake} Sharp={sharp_score_val} Key={matched_key}")
+                            nba_opps.append(create_opportunity(
+                                f"{match['id']}_{name}_ML", now_utc, mdt, 'NBA', mk, f"{name} ML",
+                                price, mp, edge, stake, 
+                                trigger_type='nba_phase7', 
+                                bucket=bucket, match=match,
+                                sharp_score=sharp_score_val,
+                                ticket_pct=t_val,
+                                money_pct=m_val,
+                                metadata=pred.get('features', {})
+                            ))
+                        else:
+                            print(f"FORENSIC: [{mk}] {name} REJECT: Edge {edge:.1%} < Min {min_edge:.1%}")
+                            
+                elif m['key'] == 'totals':
+                    # NBA Totals (Phase 5 Regression)
+                    if 'prob_over' not in pred: continue
+                    
+                    prob_over = pred['prob_over']
+                    prob_under = 1.0 - prob_over
+                    expected_total = pred.get('expected_total')
+
+                    for o in m.get('outcomes', []):
+                        name = o['name']
+                        price = o.get('price')
+                        point = o.get('point')
+                        if not price or not point: continue
+                        
+                        tp = 0.0
+                        if name == 'Over':
+                            tp = prob_over
+                        elif name == 'Under':
+                            tp = prob_under
+                        else:
+                            continue
+                            
+                        # Edge
+                        edge = tp - (1.0 / price)
+                        
+                        # Threshold (Prod Rule: > 7%, no < 3%)
+                        min_edge = 0.07
+                        
+                        if edge >= min_edge:
+                            stake = calculate_kelly_stake(edge, price)
+                            bucket = "Model Total"
+                            
+                            # Sharp Data Lookup (Total)
+                            m_val, t_val, sharp_score_val = (None, None, 0)
+                            # Sharp API uses "Over" / "Under" side keys for totals
+                            m_val, t_val, sharp_score_val = get_sharp_split("total", name)
+
+                            print(f"FORENSIC: [{mk}] {name} {point} ACCEPT: Prob={tp:.3f}, Edge={edge:.1%}, Exp={expected_total:.1f} Sharp={sharp_score_val}")
+                            
+                            nba_opps.append(create_opportunity(
+                                f"{match['id']}_{name}_{point}", now_utc, mdt, 'NBA', mk, f"{name} {point}",
+                                price, tp, edge, stake, 
+                                trigger_type='nba_phase5_tot', 
+                                bucket=bucket, match=match,
+                                sharp_score=sharp_score_val,
+                                ticket_pct=t_val,
+                                money_pct=m_val,
+                                metadata={'expected_total': expected_total}
+                            ))
+                        else:
+                             print(f"FORENSIC: [{mk}] {name} {point} REJECT: Edge {edge:.1%} < {min_edge:.1%}")
+                             
+            if nba_opps:
+                opportunities.extend(nba_opps)
+
+
+    
+    # --- NEWS IMPACT (Hoisted) ---
+    news_impact = match.get('news_impact', 0.0)
+
+    # --- NHL V2 INTEGRATION (Phase 2 - 2026-01-28) ---
+    if target_sport == 'NHL':
+        mk = f"{away} @ {home}"
+        pred = predictions.get(mk) if predictions else None
+        
+        # Fuzzy Match
+        if not pred and predictions:
+            for pk, pd in predictions.items():
+                if pk == mk: 
+                    pred = pd; break
+                    
+        if pred:
+            nhl_opps = []
+            for m in bookie['markets']:
+                if m['key'] == 'h2h':
+                    for o in m.get('outcomes', []):
+                        name = o['name']
+                        price = o.get('price')
+                        if not price: continue
+                        
+                        mp = 0.0
+                        if name == home:
+                            mp = pred.get('prob_home', 0.5)
+                        elif name == away:
+                            mp = pred.get('prob_away', 0.5)
+                        else:
+                            continue
+                            
+                        # Apply News Impact directly to Probs
+                        if news_impact != 0:
+                            if name == home: mp += news_impact
+                            elif name == away: mp -= news_impact
+                        
+                        # Edge
+                        mp = logit_scale(mp, calibration)
+                        edge = (mp - (1.0 / price)) if price > 0 else 0
+                        
+                        # Min Edge: 2.5% for NHL
+                        if edge >= 0.025:
+                            stake = calculate_kelly_stake(edge, price)
+
+                            # Sharp Data Lookup
+                            m_val, t_val, sharp_score_val = (None, None, 0)
+                            side_key = None
+                            if name == home: side_key = home
+                            elif name == away: side_key = away
+                            
+                            if side_key:
+                                m_val, t_val, sharp_score_val = get_sharp_split("moneyline", side_key)
+
+                            # Create Opportunity
+                            nhl_opps.append(create_opportunity(
+                                f"{match['id']}_{name}_ML", now_utc, mdt, 'NHL', mk, f"{name} ML",
+                                price, mp, edge, stake, 
+                                trigger_type='model_nhl_v2', 
+                                bucket="Model ML", match=match,
+                                sharp_score=sharp_score_val,
+                                ticket_pct=t_val,
+                                money_pct=m_val,
+                                metadata=pred.get('features', {})
+                            ))
+                            
+            if nhl_opps:
+                opportunities.extend(nhl_opps)
 
     # --- US SPORTS ---
     # Pass neutral site flag from match metadata
@@ -975,7 +1250,7 @@ def process_match(match, ratings, calibration, target_sport, seen_matches, sharp
         home, away, ratings, target_sport, is_neutral=is_neutral
     )
     if exp_margin is None:
-        return
+        return opportunities
         
     # KenPom Stats for DB (NCAAB Only)
     kp_home, kp_away = {}, {}
@@ -1068,6 +1343,11 @@ def process_match(match, ratings, calibration, target_sport, seen_matches, sharp
                 sel = f"{name} {lbl} {point:+.1f}".strip()
                 mp = 1 - stats.norm.cdf((-point - (eff_m if name == home else -eff_m)) / eff_s)
             elif 'h2h' in key:
+                if sport == 'NBA':
+                    # FIREWALL: NBA Legacy Logic Blocked. 
+                    # V2 (Phase 7) is the Authoritative Source.
+                    continue
+
                 eff_m, eff_s = exp_margin, margin_std
                 lbl = "1H" if 'h1' in key else ""
                 if lbl:
@@ -1076,6 +1356,9 @@ def process_match(match, ratings, calibration, target_sport, seen_matches, sharp
                 sel = f"{name} {lbl} ML".strip()
                 mp = 1 - stats.norm.cdf((0 - (eff_m if name == home else -eff_m)) / eff_s)
             elif 'totals' in key:
+                if sport == 'NBA':
+                    continue # Handled by Phase 5 Regression
+                
                 eff_t = exp_total
                 std_mult = 1.8 if sport == 'NBA' else 1.9 if sport == 'NCAAB' else 1.2
                 eff_s = margin_std * std_mult
@@ -1234,26 +1517,23 @@ def process_match(match, ratings, calibration, target_sport, seen_matches, sharp
                 # Criteria: Value Bet OR Sharp Signal OR Pro System
                 
                 # IMPROVEMENT: Step 2 - NCAAB Noise Floor (Min Edge 6.0%)
+                # IMPROVEMENT: Step 2 - NCAAB Noise Floor (Min Edge 4.0%)
                 min_edge_required = Config.MIN_EDGE
                 if sport == 'NCAAB':
-                    min_edge_required = 0.06
+                    min_edge_required = 0.04
                 elif sport == 'NHL':
                     # IMPROVEMENT: Step 5 - NHL Volume Boost (Min Edge 2.5%)
                     min_edge_required = 0.025
-                    min_edge_required = 0.025
                 
-                # IMPROVEMENT: Step 6 - RLM Filter (NCAAB) - Skip if Sharp Score < 30
-                if sport == 'NCAAB' and sharp_score_val < 30:
-                    continue
+                # IMPROVEMENT: Step 6 - RLM Filter (NCAAB) - DISABLED per User Request
+                # if sport == 'NCAAB' and sharp_score_val < 30:
+                #     continue
 
                 # Phase 2: Calibration Logging (Every evaluated bet)
-                if mp and cur:
-                    # Log every prediction for calibration
-                    # Using safe_execute/inline requires import? No, call log_calibration from database
-                    # But probability_models imports database.safe_execute. Need to import log_calibration too?
-                    # Or just direct SQL here to avoid circular import if database imports probability_models (unlikely)
-                    # Let's assume log_calibration is available or use SQL.
-                    pass # Handled below
+                # Phase 2: Calibration Logging (Every evaluated bet)
+                # Removed direct DB logging here to keep function pure. 
+                # Calibration should be handled by logic or returned in Opportunity.
+                pass
                 
                 # Check for existing bets using Pre-Fetched Map
                 is_existing = False
@@ -1265,11 +1545,66 @@ def process_match(match, ratings, calibration, target_sport, seen_matches, sharp
                     # Let's try direct look up
                     existing_match_bets = existing_bets_map.get(match['id'], [])
                     
+                    new_cat = _get_market_category(sel)
+                    
                     for row_e in existing_match_bets:
-                        # row structure: (event_id, selection, edge, sport)
-                        if row_e[1] == sel:
+                        # row structure: (event_id, selection, edge, sport, teams)
+                        # row_e[1] is selection name
+                        existing_sel = row_e[1]
+                        
+                        # 1. Exact Name Match (Classic)
+                        if existing_sel == sel:
                             is_existing = True
                             break
+                            
+                        # 2. Market Category Conflict (No multiple Totals or multipled Sides)
+                        # User Rule: "Under 139.5 and Under 138.5 should not be allowed"
+                        # User Rule: "Selection engine choose a side and a total... it should still be allowed"
+                        # Implies: 1 Side + 1 Total Max per game.
+                        existing_cat = _get_market_category(existing_sel)
+                        if existing_cat == new_cat:
+                             # Conflict! 
+                             # We have an existing bet of the same type.
+                             # We must block this new one to prevent stacking/hedging.
+                             # (Unless we implemented logic to replace it if edge is higher, but deleting settled/pending bets is risky).
+                             # Safe default: First In Wins.
+                             is_existing = True
+                             # print(f"   🛡️ [DEDUP] Market Conflict: {sel} ({new_cat}) blocked by {existing_sel} ({existing_cat})")
+                             break
+                            
+                # ROBUST STABLE CHECK (Fixes MatchID instability)
+                if not is_existing and seen_bet_signatures:
+                    # Construct Signature: "{Away} @ {Home} [{Selection}]"
+                    match_teams = f"{away} @ {home}"
+                    sig = f"{match_teams} [{sel}]"
+                    
+                    # ALSO Check Market Category against Seen Signatures?
+                    # seen_bet_signatures is a Set of strings. We can't easily parse category from all of them efficiently.
+                    # Use existing check.
+                    if sig in seen_bet_signatures:
+                        is_existing = True
+                    
+                    # Optimization: If we really want to prevent Cross-Run duplicates via Signature,
+                    # we need to check if ANY seen signature for this match has the same category.
+                    # That would range scan the set. Expensive? 
+                    # Set size ~50-100 items. Scan is fine.
+                    # Only do this if we haven't found it yet.
+                    if not is_existing:
+                         new_cat = _get_market_category(sel)
+                         for s in seen_bet_signatures:
+                             # s format: "Away @ Home [Selection]"
+                             # Parse it
+                             if match_teams in s:
+                                 # This is a bet on the same game.
+                                 # Extract selection: inside []
+                                 try:
+                                     extract_sel = s.split('[')[1].rstrip(']')
+                                     if _get_market_category(extract_sel) == new_cat:
+                                         is_existing = True
+                                         # print(f"   🛡️ [DEDUP] Signature Category Conflict: {sel} blocked by {extract_sel}")
+                                         break
+                                 except:
+                                     continue
 
                 is_value = (min_edge_required <= edge < Config.MAX_EDGE)
                 is_pro = bool(triggered_systems_for_bet)

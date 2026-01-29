@@ -185,6 +185,9 @@ def get_team_ratings():
     
     combined_ratings = {}
     
+    expected_sports = {'NFL', 'NHL', 'NCAAB', 'NBA'} # ideally dynamic from Config
+    failed_sports = []
+    
     with ThreadPoolExecutor(max_workers=4) as executor:
         # Submit tasks
         futures = {
@@ -201,11 +204,17 @@ def get_team_ratings():
                 if data:
                     combined_ratings.update(data)
                     log("RATINGS", f"✅ Loaded {len(data)} {sport} ratings")
+                else:
+                    log("ERROR", f"{sport} ratings returned empty data")
+                    failed_sports.append(sport)
             except Exception as e:
                 log("ERROR", f"{sport} fetch crashed: {e}")
+                failed_sports.append(sport)
                 
-    # Cache Set
-    if combined_ratings:
+    # Cache Set ONLY if No Failures
+    if not failed_sports and combined_ratings:
         cache_set('team_ratings', combined_ratings)
+    elif failed_sports:
+        log("WARN", f"Skipping Cache Update due to failures in: {failed_sports}")
         
     return combined_ratings

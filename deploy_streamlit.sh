@@ -28,9 +28,18 @@ ssh -i $KEY $USER@$HOST << 'EOF'
     sudo docker stop philly-client || true
     sudo docker rm philly-client || true
 
-    echo "🏗️ Building Streamlit Image..."
-    # Build from root Dockerfile
-    sudo docker build -t philly-streamlit:latest .
+    echo "🧹 Cleaning up stale files..."
+    rm -f dashboard.py  # Remove root dashboard.py
+
+    echo "📂 Verifying cleanup..."
+    ls -la
+
+    echo "📂 Verifying web directory..."
+    ls -la web/ || echo "❌ web/ directory missing on remote!"
+
+    echo "🏗️ Building Streamlit Image (No Cache)..."
+    # Build from root Dockerfile with no cache to ensure all files are copied
+    sudo docker build --no-cache -t philly-streamlit:latest .
 
     echo "🚀 Starting Streamlit..."
     # Map 3000 -> 8501 so user sees same URL

@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "🛡️  Initiating Release Guard..."
+
+CHANGELOG="CHANGELOG_INTERNAL.md"
+IMAGE_TAG="philly-guard:latest"
+CONTAINER_NAME="philly-guard-run"
+PORT="8501"
+HEALTH_URL="http://localhost:${PORT}/_stcore/health"
+
+die() { echo "❌ FAIL: $*" >&2; exit 1; }
+
+# --- Dependencies ---
+command -v git >/dev/null 2>&1 || die "git not found"
+command -v docker >/dev/null 2>&1 || die "docker not found"
+command -v curl >/dev/null 2>&1 || die "curl not found"
+
+# --- Always cleanup container ---
+cleanup() {
+  docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+
+# 1) Git Dirty Check
+if [[ -n "$(git status --porcelain)" ]]; then
+  die "Git working tree is dirty. Commit changes first."
+fi
+echo "✅ Git Clean."
+
+# 2) Changelog Check (use latest rel-* tag only)
+LAST_TAG="$(git tag -l 'rel-*' --sort=-creatordate | head -n 1 || true)"
+
+if [[ -n "${LAST_TAG}" ]]; then
+  if ! git diff --name-only "${LAST_TAG}..HEAD" | grep -qx "${CHANGELOG}"; then
+    die "${CHANGELOG} not updated since last release (${LAST_TAG})."
+  fi
+  echo "✅ Changelog Updated (Since ${LAST_TAG})."
+else
+  [[ -f "${CHANGELOG}" ]] || die "${CHANGELOG} does not exist (first release)."
+  grep -qE '^## \[' "${CHANGELOG}" || die "${CHANGELOG} has no entries. Add an entry before releasing."
+  echo "✅ Changelog Exists (First Release)."
+fi
+
+# 3) Docker Proof Run (Local)
+echo "🏗️  Building Local Docker Image..."
+docker build -t "${IMAGE_TAG}" .
+
+echo "🧪 Running Container Verification (Port ${PORT})..."
+cleanup
+docker run -d -p "${PORT}:${PORT}" --name "${CONTAINER_NAME}" "${IMAGE_TAG}" >/dev/null
+
+echo "⏳ Waiting for endpoint ${HEALTH_URL} ..."
+RETRIES=25  # 25 * 2s = 50s
+for i in $(seq 1 "${RETRIES}"); do
+  sleep 2
+  HTTP_CODE="$(curl -s -o /dev/null -w "%{http_code}" "${HEALTH_URL}" || true)"
+  if [[ "${HTTP_CODE}" == "200" ]]; then
+    echo "✅ PASS: Application responded 200 OK on /_stcore/health"
+    break
+  fi
+  [[ "${i}" -eq "${RETRIES}" ]] && die "Application failed to respond within timeout. Last HTTP code: ${HTTP_CODE}"
+done
+
+# 4) Tagging (strict)
+DATE="$(date +%Y-%m-%d)"
+MAX_N=0
+for tag in $(git tag -l "rel-${DATE}-*"); do
+  N="${tag##*-}"
+  [[ "${N}" =~ ^[0-9]+$ ]] || continue
+  (( N > MAX_N )) && MAX_N="${N}"
+done
+NEW_TAG="rel-${DATE}-$((MAX_N + 1))"
+
+echo "🏷️  Tagging Release: ${NEW_TAG}"
+git tag -a "${NEW_TAG}" -m "Release ${NEW_TAG}"
+
+# Require remote to exist and push to succeed
+git remote get-url origin >/dev/null 2>&1 || die "No 'origin' remote set. Set it before releasing."
+git push origin "${NEW_TAG}"
+
+echo "========================================"
+echo "🚀 RELEASE GUARD PASSED: ${NEW_TAG}"
+echo "========================================"

@@ -1,0 +1,202 @@
+✅ Loading V6 Model (Market Aware): models/trained/soccer_model_v6.pkl
+2026-01-28 14:21:06,061 [INFO] [DB] Connection Pool Initialized (1-20 conns)
+/Users/purdue2k5/Documents/Philly-P-Sniper/models/soccer.py:60: UserWarning: pandas only supports SQLAlchemy connectable (engine/connection) or database string URI or sqlite3 DBAPI2 connection. Other DBAPI2 objects are not tested. Please consider using SQLAlchemy.
+  df = pd.read_sql(query, conn)
+✓ V5 State built for 119 teams.
+✅ Loaded Model Registry: models/registry.json
+✅ Loaded NBA ML Model: models/nba_model_ml_v2.joblib
+✅ Loaded NBA Totals Model: models/nba_model_total_v2.joblib
+✅ Loaded Residuals Distribution for ['Low', 'Med', 'High', 'Global']
+2026-01-28 14:21:06,194 [INFO] [NHL_V2] ✅ Loaded XGBoost Model V2
+2026-01-28 14:21:07,496 [INFO] [NHL_V2] ✅ Loaded Goalie Features (137 goalies)
+2026-01-28 14:21:07,621 [INFO] [NHL_V2] ✅ Loaded Team Stats (33 teams)
+2026-01-28 14:21:07,630 [INFO] [NHL_TOTALS] ✅ Loaded V2 Model & artifacts (33 teams)
+2026-01-28 14:21:07,633 [INFO] [INIT] Starting PhillyEdge Pipeline (Run ID: ad17862b)...
+2026-01-28 14:21:07,633 [INFO] [INIT] 🎯 Targeted Run for: ['ChampionsLeague']
+2026-01-28 14:21:07,633 [INFO] [INIT] ⚠️ DRY RUN MODE: Telegram alerts suppressed.
+2026-01-28 14:21:07,633 [INFO] [PIPELINE] 🚀 Starting Run ad17862b
+2026-01-28 14:21:07,633 [INFO] [PIPELINE] ▶️  Stage: INIT
+2026-01-28 14:21:07,633 [INFO] [INIT] Checking Configuration...
+2026-01-28 14:21:07,633 [INFO] [INIT] Validating Action Network Auth...
+2026-01-28 14:21:07,834 [INFO] [INIT] Validating AI Models...
+2026-01-28 14:21:07,834 [INFO] [WARN] Missing Model: models/ncaab_model.pkl (Skipping validation for now)
+2026-01-28 14:21:07,835 [INFO] [INIT] Initializing Service...
+2026-01-28 14:21:07,835 [INFO] [DB] Initializing database schema...
+2026-01-28 14:21:07,863 [INFO] [INIT] ✅ System Initialized Successfully
+2026-01-28 14:21:07,863 [INFO] [PIPELINE] ▶️  Stage: FETCH
+2026-01-28 14:21:07,863 [INFO] [FETCH] Retrieving Sharp Money Splits...
+2026-01-28 14:21:07,863 [INFO] [SHARP] ✅ Using Cached Sharp Data
+2026-01-28 14:21:07,863 [INFO] [FETCH] ✅ Loaded 84 Sharp Records
+2026-01-28 14:21:07,863 [INFO] [FETCH] Loading Active Pending Bets...
+2026-01-28 14:21:07,865 [INFO] [FETCH] ✅ Loaded 423 Active Bets across 72 Matches
+2026-01-28 14:21:07,865 [INFO] [FETCH] Fetching Odds for ChampionsLeague (soccer_uefa_champs_league)...
+2026-01-28 14:21:08,025 [INFO] [FETCH] ✅ ChampionsLeague: 18 Games Found
+2026-01-28 14:21:08,025 [INFO] [FETCH]    🔍 Fetching Deep Details (alternate_totals) for 18 games...
+2026-01-28 14:21:11,019 [INFO] [FETCH]    ✅ Merged Alternates for 18 games.
+2026-01-28 14:21:11,021 [INFO] [PIPELINE] ▶️  Stage: ENRICH
+2026-01-28 14:21:11,021 [INFO] [ENRICH] Fetching Team Ratings...
+2026-01-28 14:21:11,023 [INFO] [RATINGS] ✅ Using Cached Ratings
+2026-01-28 14:21:11,023 [INFO] [ENRICH] ✅ Loaded Ratings for 426 teams
+2026-01-28 14:21:11,023 [INFO] [ENRICH] Fetching Referee Assignments...
+🕵️‍♂️ Fetching Referee Data from https://official.nba.com/referee-assignments/...
+✅ Found 0 assignments.
+2026-01-28 14:21:11,144 [INFO] [ENRICH] ✅ Mapped NBA Refs for 0 games
+🕵️‍♂️ Checking ScoutingTheRefs Homepage for assignments...
+   ✅ Found Target Post: ''
+   Fetching details from https://scoutingtherefs.com/2026/01/50954/todays-nhl-referees-and-linespersons-1-27-26/...
+   ✅ Match: Nashville Predators at Boston Bruins -> ['Jake Brenk', 'Ryan Daisy', 'Pierre Lambert', 'Andrew Smith']
+   ✅ Match: Buffalo Sabres at Toronto Maple Leafs -> ['Scott Cherrey', 'Chris Schlenker', 'David Brisebois', 'Kendrick Nicholson']
+   ✅ Match: Vegas Golden Knights at Montreal Canadiens -> ['Michael Sullivan', 'Michel Cormier', 'Jeremy Faucher', 'Jon Mclsaac']
+   ✅ Match: Los Angeles Kings at Detroit Red Wings -> ['Mark Shewchyk', 'Shawn Oliver', 'Justin Kea', 'Chris Rooney']
+   ✅ Match: Utah Mammoth at Florida Panthers -> ['James Tobias', 'Chris Lee', 'Jean Hebert', 'Jonathan Deschamps']
+   ✅ Match: Winnipeg Jets at New Jersey Devils -> ['Brad Kovachik', 'Julien Fournier', 'Brian Pochmara', 'Beau Halkidis']
+   ✅ Match: Dallas Stars at St. Louis Blues -> ['Kilian McNamara', 'Gord Dwyer', 'Libor Suchanek', 'Stephen Hiff']
+   ✅ Match: Chicago Blackhawks at Minnesota Wild -> ['Morgan MacPhee', 'Rourke', 'Dan Kelly', 'Jonny Murray']
+   ✅ Match: San Jose Sharks at Vancouver Canucks -> ['Graedy Hamilton', 'Kyle Rehman', 'CJ Murray', 'Matt MacPherson']
+   ✅ Match: Washington Capitals at Seattle Kraken -> ['Joe Mahon', 'Kiel Murchison', 'Jordan Samuels-Thomas', 'Tom Chmielewski']
+2026-01-28 14:21:11,270 [INFO] [ENRICH] ✅ Mapped NHL Refs for 10 games
+2026-01-28 14:21:11,270 [INFO] [PIPELINE] ▶️  Stage: PROCESS
+2026-01-28 14:21:11,270 [INFO] [PROCESS] Running Betting Models...
+2026-01-28 14:21:11,271 [INFO] [PROCESS] Analyzing ChampionsLeague (18 games)...
+   🐛 [DEBUG-MARKETS] AS Monaco vs Juventus | Selected Bookie: fanduel | Markets: ['h2h', 'alternate_totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for AS Monaco vs Juventus (Key: alternate_totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Ajax vs Olympiakos Piraeus | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Ajax vs Olympiakos Piraeus (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Arsenal vs FC Kairat | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Arsenal vs FC Kairat (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Union Saint-Gilloise vs Atalanta BC | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Union Saint-Gilloise vs Atalanta BC (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Athletic Bilbao vs Sporting Lisbon | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Athletic Bilbao vs Sporting Lisbon (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Atlético Madrid vs Bodø/Glimt | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Atlético Madrid vs Bodø/Glimt (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Barcelona vs FC Copenhagen | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Barcelona vs FC Copenhagen (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Bayer Leverkusen vs Villarreal | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Bayer Leverkusen vs Villarreal (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] PSV Eindhoven vs Bayern Munich | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for PSV Eindhoven vs Bayern Munich (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Benfica vs Real Madrid | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Benfica vs Real Madrid (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Borussia Dortmund vs Inter Milan | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Borussia Dortmund vs Inter Milan (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Napoli vs Chelsea | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Napoli vs Chelsea (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Club Brugge vs Marseille | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Club Brugge vs Marseille (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Eintracht Frankfurt vs Tottenham Hotspur | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Eintracht Frankfurt vs Tottenham Hotspur (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Manchester City vs Galatasaray | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Manchester City vs Galatasaray (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Liverpool vs Qarabağ FK | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Liverpool vs Qarabağ FK (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Paris Saint Germain vs Newcastle United | Selected Bookie: fanduel | Markets: ['h2h', 'alternate_totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Paris Saint Germain vs Newcastle United (Key: alternate_totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+   🐛 [DEBUG-MARKETS] Pafos FC vs Slavia Praha | Selected Bookie: betmgm | Markets: ['h2h', 'totals']
+   🔍 [VERIFY-ENTRY] Entered Totals Block for Pafos FC vs Slavia Praha (Key: totals)
+   🔍 [VERIFY-PRED] Keys: ['home_team', 'away_team', 'market', 'prob_over', 'fair_odds', 'exp_score', 'exp_total_xg', 'home_win', 'draw', 'away_win']
+2026-01-28 14:21:11,386 [INFO] [PROCESS] ✅ Identified 17 Opportunities (Ops)
+2026-01-28 14:21:11,386 [INFO] [PIPELINE] ▶️  Stage: PERSIST
+2026-01-28 14:21:11,386 [INFO] [PERSIST] Persisting 17 operations to Database...
+2026-01-28 14:21:11,408 [INFO] [PERSIST] ✅ Batch Committed: 17 Upserts, 0 Deletes
+2026-01-28 14:21:11,408 [INFO] [PIPELINE] ▶️  Stage: REPORT
+2026-01-28 14:21:11,408 [INFO] [PIPELINE] ▶️  Stage: NOTIFY
+2026-01-28 14:21:11,408 [INFO] [NOTIFY] Processing Alerts for 17 opportunities...
+2026-01-28 14:21:11,408 [INFO] [WARN] DB Check failed for 45699b778c04c6fe1d8f73c1d925e2acd7c47f4dee7667d87b0ba15beacd1bbb: relation "telegram_alerts" does not exist
+LINE 1: SELECT 1 FROM telegram_alerts WHERE bet_id = '45699b778c04c6...
+                      ^
+
+2026-01-28 14:21:11,409 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=45699b778c04c6fe1d8f73c1d925e2acd7c47f4dee7667d87b0ba15beacd1bbb payload=153 chars
+2026-01-28 14:21:11,409 [INFO] [WARN] DB Check failed for 27d53593cdc234562b8ce03bedd0cdc1376e330a6032d2f1aeea4503893c4b01: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,409 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=27d53593cdc234562b8ce03bedd0cdc1376e330a6032d2f1aeea4503893c4b01 payload=153 chars
+2026-01-28 14:21:11,409 [INFO] [WARN] DB Check failed for 09907df642348a1c48f535aabeadc357ff5eb70e5b14a874edfa7e701a0462b7: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,409 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=09907df642348a1c48f535aabeadc357ff5eb70e5b14a874edfa7e701a0462b7 payload=155 chars
+2026-01-28 14:21:11,409 [INFO] [WARN] DB Check failed for 29c57471cac3cfd92f887fe357d6de4b6f1a36d9ac4f181295698d4d4baad8da: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,409 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=29c57471cac3cfd92f887fe357d6de4b6f1a36d9ac4f181295698d4d4baad8da payload=178 chars
+2026-01-28 14:21:11,409 [INFO] [WARN] DB Check failed for 78604c8a4836e78a6e34c0cab884741f4d65468e239ce0a261d62106e2da8c36: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,409 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=78604c8a4836e78a6e34c0cab884741f4d65468e239ce0a261d62106e2da8c36 payload=172 chars
+2026-01-28 14:21:11,410 [INFO] [WARN] DB Check failed for d7eb28948782aa497bf65bc6c02ca86a118814ed8ec309dbd6664174fa6d1ea0: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,410 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=d7eb28948782aa497bf65bc6c02ca86a118814ed8ec309dbd6664174fa6d1ea0 payload=162 chars
+2026-01-28 14:21:11,410 [INFO] [WARN] DB Check failed for 7a55c7fc390d2041c375c55025c34df0bc1c0621a6a982f7290205daae7aed1d: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,410 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=7a55c7fc390d2041c375c55025c34df0bc1c0621a6a982f7290205daae7aed1d payload=164 chars
+2026-01-28 14:21:11,410 [INFO] [WARN] DB Check failed for c9673051c1010d950f800046a00c1cad76ba9d6a38eb8141985c5d28e1984c83: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,410 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=c9673051c1010d950f800046a00c1cad76ba9d6a38eb8141985c5d28e1984c83 payload=163 chars
+2026-01-28 14:21:11,410 [INFO] [WARN] DB Check failed for f03c1d1c0e59b9c9a2e830a9e2346fd99540a936b8118173124c1f33230dcbaf: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,410 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=f03c1d1c0e59b9c9a2e830a9e2346fd99540a936b8118173124c1f33230dcbaf payload=152 chars
+2026-01-28 14:21:11,410 [INFO] [WARN] DB Check failed for da634b4d2f390004a8ce8b6eb64a476202cc1ca3602742cb484f61c4394c1b4d: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,410 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=da634b4d2f390004a8ce8b6eb64a476202cc1ca3602742cb484f61c4394c1b4d payload=172 chars
+2026-01-28 14:21:11,410 [INFO] [WARN] DB Check failed for d821f508e4adab8225bb8aca77c1ca545459185a197a142ec36f4cc783b6f1e5: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,410 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=d821f508e4adab8225bb8aca77c1ca545459185a197a142ec36f4cc783b6f1e5 payload=147 chars
+2026-01-28 14:21:11,411 [INFO] [WARN] DB Check failed for 16e9aa03996730e2a18090ee5082e6ab38cc7c5cbff20fa18d300128abd78ced: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,411 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=16e9aa03996730e2a18090ee5082e6ab38cc7c5cbff20fa18d300128abd78ced payload=156 chars
+2026-01-28 14:21:11,411 [INFO] [WARN] DB Check failed for 0f3965548fee6833a8bf8aa811806bb91255b39c61b33b95d4b1baf5e9e6a28c: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,411 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=0f3965548fee6833a8bf8aa811806bb91255b39c61b33b95d4b1baf5e9e6a28c payload=184 chars
+2026-01-28 14:21:11,411 [INFO] [WARN] DB Check failed for 8010707d8313b199ec6e547d8ca8d6a398407fc9f2e9edc5e92df68c0668563a: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,411 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=8010707d8313b199ec6e547d8ca8d6a398407fc9f2e9edc5e92df68c0668563a payload=165 chars
+2026-01-28 14:21:11,411 [INFO] [WARN] DB Check failed for ec1a02ec08e2f883d200d859e61c1d13fd8a0c0ecb2514b71c75d1390a2ef017: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,411 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=ec1a02ec08e2f883d200d859e61c1d13fd8a0c0ecb2514b71c75d1390a2ef017 payload=159 chars
+2026-01-28 14:21:11,411 [INFO] [WARN] DB Check failed for f6e08016cd88f2062784a90f41674f080b37c3a3d2bbbb916b939f003045f905: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,411 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=f6e08016cd88f2062784a90f41674f080b37c3a3d2bbbb916b939f003045f905 payload=178 chars
+2026-01-28 14:21:11,412 [INFO] [WARN] DB Check failed for ae788856a74e5c6589386a66e18416bfc84300216a1b90b46c1dc005fbd709c4: current transaction is aborted, commands ignored until end of transaction block
+
+2026-01-28 14:21:11,412 [INFO] [NOTIFY] TELEGRAM_DRY_RUN: would_send=ae788856a74e5c6589386a66e18416bfc84300216a1b90b46c1dc005fbd709c4 payload=155 chars
+🚀 [NOTIFY] Sent 17 Telegram alerts.
+2026-01-28 14:21:11,412 [INFO] [PIPELINE] ✅ Run Complete in 3.78s. Errors: 0
+2026-01-28 14:21:11,412 [INFO] [DB] Safety Close Connection
+2026-01-28 14:21:11,412 [INFO] [MAIN] ✅ Pipeline Execution Successful.
+
+============================================================
+📊 RECOMMENDATIONS (17 Found)
+============================================================
+ Sport                                   Event               Selection  Dec_Odds  Edge_Val
+SOCCER Tottenham Hotspur @ Eintracht Frankfurt  Eintracht Frankfurt ML      4.60  0.281382
+SOCCER                     FC Kairat @ Arsenal            FC Kairat ML     36.00  0.221536
+SOCCER                  Qarabağ FK @ Liverpool           Qarabağ FK ML     15.00  0.183372
+SOCCER           Galatasaray @ Manchester City          Galatasaray ML      8.50  0.148856
+SOCCER               FC Copenhagen @ Barcelona        FC Copenhagen ML     14.00  0.146195
+SOCCER                        Chelsea @ Napoli               Napoli ML      3.40  0.112219
+SOCCER            Bodø/Glimt @ Atlético Madrid           Bodø/Glimt ML      7.25  0.095975
+SOCCER                    Juventus @ AS Monaco            AS Monaco ML      4.00  0.092562
+SOCCER           Villarreal @ Bayer Leverkusen           Villarreal ML      4.80  0.090160
+SOCCER       Sporting Lisbon @ Athletic Bilbao      Athletic Bilbao ML      2.80  0.084799
+SOCCER  Newcastle United @ Paris Saint Germain     Newcastle United ML      5.70  0.057364
+SOCCER                 Marseille @ Club Brugge            Marseille ML      2.50  0.055062
+SOCCER                 Slavia Praha @ Pafos FC             Pafos FC ML      3.10  0.048329
+SOCCER                   Real Madrid @ Benfica              Benfica ML      3.80  0.042112
+SOCCER               Olympiakos Piraeus @ Ajax                 Ajax ML      3.00  0.037576
+SOCCER         Inter Milan @ Borussia Dortmund    Borussia Dortmund ML      2.85  0.027797
+SOCCER      Atalanta BC @ Union Saint-Gilloise Union Saint-Gilloise ML      2.90  0.001148
+============================================================
+

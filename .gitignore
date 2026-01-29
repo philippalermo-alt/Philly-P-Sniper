@@ -20,3 +20,4 @@ venv/
 .agent/
 .claude/
 *.log
+data/raw/*.zip

@@ -1,0 +1,14 @@
+[Unit]
+Description=NHL Totals V2 - Daily Run (Strict Verification)
+After=docker.service network.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/Philly-P-Sniper
+ExecStart=/usr/bin/env bash -lc 'cd /home/ubuntu/Philly-P-Sniper && docker exec -i -e NHL_TOTALS_V2_ENABLED=true philly_p_api python3 main.py --sports NHL --report-csv true'
+StandardOutput=append:/home/ubuntu/Philly-P-Sniper/logs/systemd/nhl-totals-run.log
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target

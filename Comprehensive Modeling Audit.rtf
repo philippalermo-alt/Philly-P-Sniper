@@ -1,0 +1,851 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 .AppleSystemUIFontMonospaced-Regular;\f2\fnil\fcharset0 .AppleSystemUIFontMonospaced-RegularItalic;
+\f3\fnil\fcharset0 AppleSymbols;}
+{\colortbl;\red255\green255\blue255;\red16\green16\blue16;\red255\green255\blue255;\red118\green23\blue27;
+\red249\green248\blue242;\red42\green44\blue51;\red50\green94\blue238;\red167\green87\blue5;\red143\green144\blue150;
+\red46\green47\blue44;\red147\green0\blue147;\red66\green147\blue62;\red24\green23\blue22;}
+{\*\expandedcolortbl;;\cssrgb\c7843\c7843\c7451;\cssrgb\c100000\c100000\c100000;\cssrgb\c54118\c14118\c14118;
+\cssrgb\c98039\c97647\c96078\c50196;\cssrgb\c21961\c22745\c25882;\cssrgb\c25098\c47059\c94902;\cssrgb\c71765\c41961\c392;\cssrgb\c62745\c63137\c65490;
+\cssrgb\c23922\c23922\c22745;\cssrgb\c65098\c14902\c64314;\cssrgb\c31373\c63137\c30980;\cssrgb\c12157\c11765\c11373\c14902;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat0\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat0\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}}{\leveltext\leveltemplateid201\'01\'00;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid3}
+{\list\listtemplateid4\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}}{\leveltext\leveltemplateid301\'01\'00;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid4}
+{\list\listtemplateid5\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}}{\leveltext\leveltemplateid401\'01\'00;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid5}
+{\list\listtemplateid6\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}}{\leveltext\leveltemplateid501\'01\'00;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid6}
+{\list\listtemplateid7\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}}{\leveltext\leveltemplateid601\'01\'00;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid7}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}{\listoverride\listid4\listoverridecount0\ls4}{\listoverride\listid5\listoverridecount0\ls5}{\listoverride\listid6\listoverridecount0\ls6}{\listoverride\listid7\listoverridecount0\ls7}}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Mathematical Audit Report: Philly-P-Sniper Prediction Codebase\
+\pard\pardeftab720\partightenfactor0
+\cf2 Executive Summary\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 This audit examines the mathematical, statistical, and probabilistic foundations of the Philly-P-Sniper sports betting prediction system. The codebase demonstrates sophisticated modeling approaches across multiple sports (NBA, NHL, Soccer, NCAAB) with Kelly Criterion staking, Monte Carlo simulation, and calibration analysis. However, several mathematical weaknesses were identified that could introduce bias, mispricing, or instability.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issues Identified\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issue 1: Kelly Criterion Probability Reconstruction Error\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 Where it occurs:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 core/kelly.py:29
+\f0\fs28 \cf2 \cb3 \strokec2 \
+Mathematical weakness:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 p \cf7 \strokec7 =\cf6 \strokec6  edge \cf7 \strokec7 +\cf6 \strokec6  (\cf8 \strokec8 1.0\cf6 \strokec6  \cf7 \strokec7 /\cf6 \strokec6  decimal_odds)  
+\f2\i \cf9 \strokec9 # True probability
+\f1\i0 \cf6 \strokec6 \
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 The true probability is being reconstructed as\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 edge + implied_prob
+\f0\fs28 \cf2 \cb3 \strokec2 . However, edge is defined in\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 core/edge.py:20
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0as:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf11 \cb5 \strokec11 return\cf6 \strokec6  true_prob \cf7 \strokec7 -\cf6 \strokec6  implied_prob\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 This means\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 p = (true_prob - implied_prob) + implied_prob = true_prob
+\f0\fs28 \cf2 \cb3 \strokec2 , which is\'a0mathematically correct. However, the implementation passes\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 edge
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0as a parameter without enforcing that the caller's\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 edge
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0follows this definition. If a caller passes a different edge computation (e.g., EV-based or percentage difference), the probability reconstruction will be incorrect.\
+Risk introduced:\'a0Mispricing of Kelly stakes if\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 edge
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0is computed inconsistently across the codebase. Stakes could be systematically over/under-sized.\
+Recommendation:\'a0Enforce a consistent edge definition by passing\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 true_prob
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0directly to the Kelly function rather than reconstructing it from edge, or add validation that\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 edge
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0+\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 implied_prob
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0
+\f3 \uc0\u8712 
+\f0  [0, 1].\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issue 2: Independence Assumption Violation in Parlay EV Calculation\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 Where it occurs:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 processing/parlay.py:79-95
+\f0\fs28 \cf2 \cb3 \strokec2 \
+Mathematical weakness:\cb1 \uc0\u8232 \cb3 The parlay combined probability is calculated as:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 combined_prob \cf7 \strokec7 =\cf6 \strokec6  \cf8 \strokec8 1.0\cf6 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf11 \strokec11 for\cf6 \strokec6  leg \cf11 \strokec11 in\cf6 \strokec6  legs:\
+    combined_prob \cf7 \strokec7 *=\cf6 \strokec6  leg[\cf12 \strokec12 'True_Prob'\cf6 \strokec6 ]\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 This assumes\'a0complete statistical independence\'a0between legs. However, legs from the same day, same league, or correlated markets (e.g., totals and spreads affected by weather) violate this assumption. The code enforces "1 leg per game" (line 53), but does not account for:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls1\ilvl0\cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Cross-game correlations (back-to-backs, travel, weather)\cb1 \
+\ls1\ilvl0\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Cross-sport correlations (shared public betting patterns)\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 Risk introduced:\'a0Systematic overestimation of parlay probabilities, leading to inflated EV calculations and over-betting on parlays.\
+Recommendation:\'a0Apply a correlation penalty factor when combining probabilities (e.g., multiply by 0.95-0.98 for same-day/same-league combinations) or explicitly model covariance structure.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issue 3: Fallback Probability Estimation in Parlay Edge Conversion\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 Where it occurs:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 processing/parlay.py:88-91
+\f0\fs28 \cf2 \cb3 \strokec2 \
+Mathematical weakness:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\i\fs26 \cf9 \cb5 \strokec9 # Fallback estimation
+\f1\i0 \cf6 \strokec6 \
+imp \cf7 \strokec7 =\cf6 \strokec6  \cf8 \strokec8 1\cf6 \strokec6  \cf7 \strokec7 /\cf6 \strokec6  leg[\cf12 \strokec12 'Dec_Odds'\cf6 \strokec6 ]\
+true_p \cf7 \strokec7 =\cf6 \strokec6  imp \cf7 \strokec7 /\cf6 \strokec6  (\cf8 \strokec8 1\cf6 \strokec6  \cf7 \strokec7 -\cf6 \strokec6  leg[\cf12 \strokec12 'Edge_Val'\cf6 \strokec6 ])  
+\f2\i \cf9 \strokec9 # E = (P*O)-1 => P = (E+1)/O
+\f1\i0 \cf6 \strokec6 \
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 The comment states\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 E = (P*O)-1 => P = (E+1)/O
+\f0\fs28 \cf2 \cb3 \strokec2 , but the code computes\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 true_p = imp / (1 - edge)
+\f0\fs28 \cf2 \cb3 \strokec2 . These are not equivalent:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls2\ilvl0\cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 EV formula:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 EV = P \'d7 O - 1
+\f0\fs28 \cf2 \cb3 \strokec2 , so\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 P = (EV + 1) / O
+\f0\fs28 \cf2 \cb1 \strokec2 \
+\ls2\ilvl0\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 The code divides\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 imp
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0by\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 (1 - edge)
+\f0\fs28 \cf2 \cb3 \strokec2 , which is algebraically incorrect\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 If edge is defined as\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 true_prob - implied_prob
+\f0\fs28 \cf2 \cb3 \strokec2 , then\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 true_p = implied_prob + edge
+\f0\fs28 \cf2 \cb3 \strokec2 , not\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 implied_prob / (1 - edge)
+\f0\fs28 \cf2 \cb3 \strokec2 .\
+Risk introduced:\'a0Significant probability estimation errors in the parlay fallback path, leading to incorrect combined probabilities and mispriced parlay recommendations.\
+Recommendation:\'a0Fix the formula to\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 true_p = imp + edge
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0if edge follows the standard definition, or clearly document the mathematical derivation.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issue 4: Gaussian Assumption for Totals Probability Conversion\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 Where it occurs:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 scripts/train_nba_totals_regression.py:79-81
+\f0\fs28 \cf2 \cb3 \strokec2 \
+Mathematical weakness:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 z_scores \cf7 \strokec7 =\cf6 \strokec6  (preds \cf7 \strokec7 -\cf6 \strokec6  test[\cf12 \strokec12 'total_line'\cf6 \strokec6 ]) \cf7 \strokec7 /\cf6 \strokec6  sigma\
+probs_over \cf7 \strokec7 =\cf6 \strokec6  norm.cdf(z_scores)\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 This assumes residuals follow a Normal distribution. However:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls3\ilvl0\cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	1	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Sports scores are discrete counts, not continuous\cb1 \
+\ls3\ilvl0\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	2	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Score distributions are often skewed (positive skew in low-scoring games)\cb1 \
+\ls3\ilvl0\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	3	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Heavy tails exist due to blowouts and overtimes\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 The alternative approach in\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 models/nba.py:130-136
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0uses empirical CDF from residuals:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 idx \cf7 \strokec7 =\cf6 \strokec6  bisect.bisect_right(r_list, diff)\
+prob_over \cf7 \strokec7 =\cf6 \strokec6  (\cf12 \strokec12 len\cf6 \strokec6 (r_list) \cf7 \strokec7 -\cf6 \strokec6  idx) \cf7 \strokec7 /\cf6 \strokec6  \cf12 \strokec12 len\cf6 \strokec6 (r_list)\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 This is more robust but requires sufficient sample sizes per bucket.\
+Risk introduced:\'a0Probability calibration errors in the tails. Gaussian assumption underestimates extreme outcome probabilities.\
+Recommendation:\'a0Use the empirical CDF approach consistently, or fit a more appropriate distribution (e.g., Student's t with low degrees of freedom, or a discrete distribution like Poisson/Skellam for score differentials).\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issue 5: Duplicate Model Prediction Call\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 Where it occurs:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 models/soccer.py:181-182
+\f0\fs28 \cf2 \cb3 \strokec2 \
+Mathematical weakness:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 prob_over \cf7 \strokec7 =\cf6 \strokec6  self.model.predict_proba(feat_df)[\cf8 \strokec8 0\cf6 \strokec6 ][\cf8 \strokec8 1\cf6 \strokec6 ]\
+prob_over \cf7 \strokec7 =\cf6 \strokec6  self.model.predict_proba(feat_df)[\cf8 \strokec8 0\cf6 \strokec6 ][\cf8 \strokec8 1\cf6 \strokec6 ]  
+\f2\i \cf9 \strokec9 # Duplicate
+\f1\i0 \cf6 \strokec6 \
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 The same prediction is called twice. While not mathematically wrong (it's idempotent), this suggests potential code quality issues that could mask other bugs.\
+Risk introduced:\'a0Performance overhead (minor) and code maintenance risk.\
+Recommendation:\'a0Remove the duplicate line.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issue 6: Poisson Independence Assumption in Soccer Match Probabilities\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 Where it occurs:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 models/soccer.py:203-223
+\f0\fs28 \cf2 \cb3 \strokec2 \
+Mathematical weakness:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 p \cf7 \strokec7 =\cf6 \strokec6  p_home[h] \cf7 \strokec7 *\cf6 \strokec6  p_away[a]\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 The code assumes home and away goals are\'a0independent Poisson processes. This is a standard simplification, but research shows:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls4\ilvl0\cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	1	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Goals create momentum effects (correlation within matches)\cb1 \
+\ls4\ilvl0\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	2	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Red cards affect both teams' scoring rates\cb1 \
+\ls4\ilvl0\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	3	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Weather/pitch conditions create positive correlation\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 Risk introduced:\'a0Slight miscalibration of 1X2 match odds, typically underestimating draw probability.\
+Recommendation:\'a0Consider applying a bivariate Poisson or Dixon-Coles adjustment for zero inflation and goal correlation.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issue 7: EMA State Initialization Bias\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 Where it occurs:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 models/soccer.py:75-79
+\f0\fs28 \cf2 \cb3 \strokec2 \
+Mathematical weakness:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 self.team_stats[nt] \cf7 \strokec7 =\cf6 \strokec6  \{\
+    \cf12 \strokec12 'home_att'\cf6 \strokec6 : \cf8 \strokec8 1.35\cf6 \strokec6 , \cf12 \strokec12 'home_def'\cf6 \strokec6 : \cf8 \strokec8 1.35\cf6 \strokec6 ,\
+    \cf12 \strokec12 'away_att'\cf6 \strokec6 : \cf8 \strokec8 1.35\cf6 \strokec6 , \cf12 \strokec12 'away_def'\cf6 \strokec6 : \cf8 \strokec8 1.35\cf6 \strokec6 ,\
+    \cf12 \strokec12 'recent_att'\cf6 \strokec6 : \cf8 \strokec8 1.35\cf6 \strokec6 , \cf12 \strokec12 'recent_def'\cf6 \strokec6 : \cf8 \strokec8 1.35\cf6 \strokec6  \
+\}\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 All teams initialize at the same default (1.35 xG). For newly promoted teams or first-time encounters, this creates bias toward league average. With alpha values of 0.15 and 0.30, it takes 15-20 games for the exponential moving average to converge from the prior.\
+Risk introduced:\'a0Early-season predictions for new teams will regress too strongly to the mean, creating systematic errors.\
+Recommendation:\'a0Initialize priors based on available historical data (e.g., second-division xG statistics for promoted teams) or use a Bayesian approach with informative priors based on market expectations.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issue 8: Feature Leakage Risk in NCAAB H1 Model\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 Where it occurs:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 ncaab_h1_model/ncaab_h1_train.py:67-72
+\f0\fs28 \cf2 \cb3 \strokec2 \
+Mathematical weakness:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\i\fs26 \cf9 \cb5 \strokec9 # MODEL 3.0 TARGET: Train on residuals (Actual - Baseline)
+\f1\i0 \cf6 \strokec6 \
+
+\f2\i \cf9 \strokec9 # Baseline is pace_adjusted_total
+\f1\i0 \cf6 \strokec6 \
+baseline \cf7 \strokec7 =\cf6 \strokec6  features[\cf12 \strokec12 'pace_adjusted_total'\cf6 \strokec6 ]\
+actual \cf7 \strokec7 =\cf6 \strokec6  game[\cf12 \strokec12 'h1_total'\cf6 \strokec6 ]\
+residual \cf7 \strokec7 =\cf6 \strokec6  actual \cf7 \strokec7 -\cf6 \strokec6  baseline\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 The\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 pace_adjusted_total
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0is derived from features that include\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 tempo
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0from KenPom. If KenPom data is updated mid-season and the training uses the latest values rather than point-in-time values, there's temporal leakage.\
+Additionally, line 129 uses a hardcoded index for baseline extraction:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 BASELINE_IDX \cf7 \strokec7 =\cf6 \strokec6  \cf8 \strokec8 19\cf6 \strokec6  \
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 This is fragile\'97any feature order change will silently corrupt evaluation.\
+Risk introduced:\'a0Potential look-ahead bias if feature values reflect post-game information. Brittle code that could introduce silent errors.\
+Recommendation:\'a0Ensure all features are computed using only information available before game time. Replace magic indices with named column lookups.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issue 9: Sharp Score Weighted Components Don't Sum to 1.0\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 Where it occurs:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 processing/sharp_scoring.py:34
+\f0\fs28 \cf2 \cb3 \strokec2 \
+Mathematical weakness:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 weighted \cf7 \strokec7 =\cf6 \strokec6  \cf8 \strokec8 0.60\cf6 \strokec6  \cf7 \strokec7 *\cf6 \strokec6  gap_score \cf7 \strokec7 +\cf6 \strokec6  \cf8 \strokec8 0.30\cf6 \strokec6  \cf7 \strokec7 *\cf6 \strokec6  minority_score \cf7 \strokec7 +\cf6 \strokec6  \cf8 \strokec8 0.10\cf6 \strokec6  \cf7 \strokec7 *\cf6 \strokec6  money_majority_score\
+\pard\pardeftab720\partightenfactor0
+\cf11 \strokec11 return\cf6 \strokec6  \cf12 \strokec12 int\cf6 \strokec6 (\cf12 \strokec12 round\cf6 \strokec6 (\cf8 \strokec8 100\cf6 \strokec6  \cf7 \strokec7 *\cf6 \strokec6  weighted))\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 The weights (0.60 + 0.30 + 0.10 = 1.0) do sum correctly. However, each component score is clamped to [0, 1], so the maximum sharp score is 100 only if all three components are saturated simultaneously.\
+The gap score formula:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 gap_score \cf7 \strokec7 =\cf6 \strokec6  \cf12 \strokec12 max\cf6 \strokec6 (\cf8 \strokec8 0\cf6 \strokec6 , \cf12 \strokec12 min\cf6 \strokec6 (\cf8 \strokec8 1\cf6 \strokec6 , (gap \cf7 \strokec7 -\cf6 \strokec6  \cf8 \strokec8 0\cf6 \strokec6 ) \cf7 \strokec7 /\cf6 \strokec6  \cf8 \strokec8 15\cf6 \strokec6 ))\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 Saturates at gap \uc0\u8805  15. But money majority requires 70%+ money to saturate, which may be rare when gap is also high.\
+Risk introduced:\'a0The 100-point scale may be poorly calibrated. Most scores will cluster in the 30-70 range, reducing discriminatory power.\
+Recommendation:\'a0Validate the score distribution empirically and consider nonlinear transformations or recalibrating the component formulas.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issue 10: Calibration Slope Regression on Binned Points\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 Where it occurs:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 scripts/validate_nhl_calibration.py:91-94
+\f0\fs28 \cf2 \cb3 \strokec2 \
+Mathematical weakness:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 lr.fit(prob_pred[mask].reshape(\cf7 \strokec7 -\cf8 \strokec8 1\cf6 \strokec6 , \cf8 \strokec8 1\cf6 \strokec6 ), prob_true[mask])\
+slope \cf7 \strokec7 =\cf6 \strokec6  lr.coef_[\cf8 \strokec8 0\cf6 \strokec6 ]\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 The calibration slope is computed via unweighted linear regression on the 10 binned points. This gives equal weight to bins with 5 samples and bins with 500 samples. The weighted deviation is computed separately (line 84) but not used for the slope.\
+Risk introduced:\'a0Calibration slope estimate is noisy and potentially misleading if bin counts are highly unbalanced.\
+Recommendation:\'a0Use weighted least squares where weights are proportional to bin sample counts, or use proper isotonic regression for recalibration.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issue 11: Monte Carlo Negative Binomial Parameter Definition Uncertainty\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 Where it occurs:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 scripts/build_points_sim.py:39-50
+\f0\fs28 \cf2 \cb3 \strokec2 \
+Mathematical weakness:\cb1 \uc0\u8232 \cb3 The comments show confusion about the NB parameterization:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\i\fs26 \cf9 \cb5 \strokec9 # Definition check: Scipy/Numpy 'n' is number of successes, 'p' is probability of success.
+\f1\i0 \cf6 \strokec6 \
+
+\f2\i \cf9 \strokec9 # Result is number of failures? 
+\f1\i0 \cf6 \strokec6 \
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 The scipy\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 nbinom
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0uses the parameterization where the random variable represents the number of\'a0failures\'a0before\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 n
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0successes. The mean is\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 n(1-p)/p
+\f0\fs28 \cf2 \cb3 \strokec2 . The code derives\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 p = n/(n+\uc0\u956 )
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0which gives mean\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 \uc0\u956 
+\f0\fs28 \cf2 \cb3 \strokec2 , so this is correct.\
+However, the code uses:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 n_sog_param \cf7 \strokec7 =\cf6 \strokec6  \cf8 \strokec8 1.0\cf6 \strokec6  \cf7 \strokec7 /\cf6 \strokec6  ALPHA_SOG  
+\f2\i \cf9 \strokec9 # scalar
+\f1\i0 \cf6 \strokec6 \
+p_sog_param \cf7 \strokec7 =\cf6 \strokec6  n_sog_param \cf7 \strokec7 /\cf6 \strokec6  (n_sog_param \cf7 \strokec7 +\cf6 \strokec6  df[\cf12 \strokec12 'mu_sog'\cf6 \strokec6 ].values)  
+\f2\i \cf9 \strokec9 # array
+\f1\i0 \cf6 \strokec6 \
+sim_sog \cf7 \strokec7 =\cf6 \strokec6  stats.nbinom.rvs(n_sog_param, p_sog_param.reshape(\cf7 \strokec7 -\cf8 \strokec8 1\cf6 \strokec6 , \cf8 \strokec8 1\cf6 \strokec6 ), size\cf7 \strokec7 =\cf6 \strokec6 (n_rows, N_SIMS))\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 The scalar\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 n
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0is broadcast across all players. This means all players share the same dispersion parameter, which may not be true (star players may have more consistent output).\
+Risk introduced:\'a0Player-specific variance is not modeled, potentially underestimating uncertainty for volatile players.\
+Recommendation:\'a0Consider player-specific dispersion parameters or validate the constant-dispersion assumption empirically.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issue 12: Random Seed Not Set in Monte Carlo Simulation\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 Where it occurs:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 scripts/build_points_sim.py
+\f0\fs28 \cf2 \cb3 \strokec2 \
+Mathematical weakness:\cb1 \uc0\u8232 \cb3 The simulation does not set a random seed:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 sim_sog \cf7 \strokec7 =\cf6 \strokec6  stats.nbinom.rvs(...)\
+sim_goals \cf7 \strokec7 =\cf6 \strokec6  np.random.binomial(...)\
+sim_assists \cf7 \strokec7 =\cf6 \strokec6  stats.nbinom.rvs(...)\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 Risk introduced:\'a0Results are not reproducible. Validation metrics will vary between runs, making debugging and comparison difficult.\
+Recommendation:\'a0Add\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 np.random.seed(42)
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0or equivalent at the start of the simulation for reproducibility.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issue 13: Backtesting Sharpe Ratio Calculation May Be Incorrect\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 Where it occurs:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 processing/backtesting.py:142-145
+\f0\fs28 \cf2 \cb3 \strokec2 \
+Mathematical weakness:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 sharpe \cf7 \strokec7 =\cf6 \strokec6  (df[\cf12 \strokec12 'result'\cf6 \strokec6 ].mean() \cf7 \strokec7 /\cf6 \strokec6  df[\cf12 \strokec12 'result'\cf6 \strokec6 ].std()) \cf7 \strokec7 *\cf6 \strokec6  np.sqrt(\cf12 \strokec12 len\cf6 \strokec6 (df))\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 The standard Sharpe ratio is:\cb1 \uc0\u8232 
+\f1\fs26 \cf4 \cb5 \strokec4 Sharpe = (\uc0\u82 \u772  - Rf) / \u963  \'d7 \u8730 (periods_per_year)
+\f0\fs28 \cf2 \cb3 \strokec2 \
+The code:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls5\ilvl0\cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	1	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Doesn't subtract risk-free rate (minor, often omitted)\cb1 \
+\ls5\ilvl0\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	2	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Multiplies by\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 \uc0\u8730 (len(df))
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0instead of\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 \uc0\u8730 (252)
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0or\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 \uc0\u8730 (365)
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0for annualization\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 If\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 len(df)
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0varies (30 bets vs 1000 bets), the Sharpe ratios are not comparable across different backtest periods.\
+Risk introduced:\'a0Sharpe ratio is not properly annualized, making cross-period comparisons invalid.\
+Recommendation:\'a0Use a fixed annualization factor based on expected bets per year, or report the raw information ratio without scaling.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issue 14: Totals Push Handling Missing\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 Where it occurs:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 processing/grading.py:216-217
+\f0\fs28 \cf2 \cb3 \strokec2 \
+Mathematical weakness:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf11 \cb5 \strokec11 if\cf6 \strokec6  \cf12 \strokec12 "over"\cf6 \strokec6  \cf11 \strokec11 in\cf6 \strokec6  sel_lower: \cf11 \strokec11 return\cf6 \strokec6  \cf12 \strokec12 'WON'\cf6 \strokec6  \cf11 \strokec11 if\cf6 \strokec6  total \cf7 \strokec7 >\cf6 \strokec6  val \cf11 \strokec11 else\cf6 \strokec6  \cf12 \strokec12 'LOST'\cf6 \strokec6 \
+\cf11 \strokec11 if\cf6 \strokec6  \cf12 \strokec12 "under"\cf6 \strokec6  \cf11 \strokec11 in\cf6 \strokec6  sel_lower: \cf11 \strokec11 return\cf6 \strokec6  \cf12 \strokec12 'WON'\cf6 \strokec6  \cf11 \strokec11 if\cf6 \strokec6  total \cf7 \strokec7 <\cf6 \strokec6  val \cf11 \strokec11 else\cf6 \strokec6  \cf12 \strokec12 'LOST'\cf6 \strokec6 \
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 If\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 total == val
+\f0\fs28 \cf2 \cb3 \strokec2 \'a0(push scenario), both conditions fail and the function falls through to return 'PENDING' at line 221. This is subtly correct but could be clearer.\
+However, for soccer O/U 2.5 markets, pushes are impossible (goals are integers, line is 2.5). For full-number lines (O/U 2.0), a push is possible but the code treats it as neither won nor lost.\
+Risk introduced:\'a0Push scenarios on full-number lines may be incorrectly classified as PENDING rather than PUSH.\
+Recommendation:\'a0Add explicit push handling:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 if total == val: return 'PUSH'
+\f0\fs28 \cf2 \cb3 \strokec2 .\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Issue 15: Base Model Uses Random Split Instead of Temporal Split\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf2 Where it occurs:\'a0
+\f1\fs26 \cf4 \cb5 \strokec4 models/base_model.py:80
+\f0\fs28 \cf2 \cb3 \strokec2 \
+Mathematical weakness:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 X_train, X_test, y_train, y_test \cf7 \strokec7 =\cf6 \strokec6  train_test_split(X, y, test_size\cf7 \strokec7 =\cf8 \strokec8 0.2\cf6 \strokec6 , random_state\cf7 \strokec7 =\cf8 \strokec8 42\cf6 \strokec6 )\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 Sports betting data is inherently temporal. Using random splits creates look-ahead bias because:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls6\ilvl0\cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	1	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Future games inform model weights used to predict past games\cb1 \
+\ls6\ilvl0\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	2	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Seasonal patterns can leak across the split\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 The NHL model (
+\f1\fs26 \cf4 \cb5 \strokec4 scripts/validate_nhl_calibration.py:44-48
+\f0\fs28 \cf2 \cb3 \strokec2 ) correctly uses temporal splits:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs26 \cf6 \cb5 \strokec6 df_clean \cf7 \strokec7 =\cf6 \strokec6  df_clean.sort_values(\cf12 \strokec12 'gameDate_home'\cf6 \strokec6 )\
+split_idx \cf7 \strokec7 =\cf6 \strokec6  \cf12 \strokec12 int\cf6 \strokec6 (\cf12 \strokec12 len\cf6 \strokec6 (df_clean) \cf7 \strokec7 *\cf6 \strokec6  \cf8 \strokec8 0.8\cf6 \strokec6 )\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f0\fs28 \cf10 \cb1 \strokec10 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 Risk introduced:\'a0Overfitting and inflated test metrics due to temporal leakage. Model may appear well-calibrated in backtests but fail in live deployment.\
+Recommendation:\'a0Use temporal/walk-forward splits consistently across all models.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Components with No Material Mathematical Issues Detected\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls7\ilvl0
+\fs26 \cf4 \cb5 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	1	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec4 core/probability.py
+\fs28 \cf2 \cb3 \strokec2 \'a0- Logit scaling and normalization are mathematically sound.\cb1 \
+\ls7\ilvl0
+\fs26 \cf4 \cb5 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	2	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec4 core/edge.py
+\fs28 \cf2 \cb3 \strokec2 \'a0- EV and edge formulas are correct.\cb1 \
+\ls7\ilvl0
+\fs26 \cf4 \cb5 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	3	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec4 ncaab_h1_model/ncaab_h1_features.py
+\fs28 \cf2 \cb3 \strokec2 \'a0- Feature engineering uses appropriate aggregations; variance combination via \uc0\u8730 (\u963 \u8321 \'b2 + \u963 \u8322 \'b2) correctly assumes independence.\cb1 \
+\ls7\ilvl0
+\fs26 \cf4 \cb5 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	4	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec4 processing/grading.py
+\fs28 \cf2 \cb3 \strokec2 \'a0- Core grading logic for ML/spreads/totals is correct (aside from push issue noted above).\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf2 Summary Table\
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\fs21 \cf10 \strokec10 #\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Issue\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 File\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Risk Level\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Risk Type\cb1 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 1\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Kelly prob reconstruction\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 core/kelly.py\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Medium\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Mispricing\cb1 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 2\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Parlay independence assumption\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 processing/parlay.py\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 High\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Probability inflation\cb1 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 3\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Parlay edge-to-prob formula error\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 processing/parlay.py\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 High\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Mispricing\cb1 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 4\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Gaussian assumption for totals\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 train_nba_totals_regression.py\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Medium\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Calibration error\cb1 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 5\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Duplicate prediction call\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 models/soccer.py\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Low\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Code quality\cb1 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 6\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Poisson independence in soccer\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 models/soccer.py\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Medium\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Draw underestimation\cb1 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 7\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 EMA initialization bias\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 models/soccer.py\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Medium\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Early-season bias\cb1 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 8\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Feature leakage risk + hardcoded index\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 ncaab_h1_train.py\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Medium\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Look-ahead bias\cb1 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 9\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Sharp score distribution\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 processing/sharp_scoring.py\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Low\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Reduced discrimination\cb1 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 10\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Unweighted calibration slope\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 validate_nhl_calibration.py\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Medium\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Noisy estimates\cb1 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 11\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Constant NB dispersion\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 build_points_sim.py\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Low\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Variance underestimation\cb1 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 12\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 No random seed in MC\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 build_points_sim.py\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Low\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Reproducibility\cb1 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 13\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Sharpe ratio miscalculation\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 processing/backtesting.py\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Medium\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Invalid comparisons\cb1 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 14\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Missing push handling\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 processing/grading.py\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Low\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Classification error\cb1 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth5205\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth4203\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw20\brdrcf13 \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3523\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt120 \clpadl180 \clpadb120 \clpadr180 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 15\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Random vs temporal splits\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 models/base_model.py\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 High\cb1 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf10 \cb3 Temporal leakage\cb1 \cell \lastrow\row
+}

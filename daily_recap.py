@@ -167,13 +167,15 @@ def generate_daily_recap():
     send_telegram(full_msg)
     
     # Send Email (New)
-    from email_notifier import EmailNotifier
-    emailer = EmailNotifier()
-    emailer.send_email(
-        subject=f"Philly P Sniper Recap: {yesterday.strftime('%a %b %d')}",
-        body=full_html,
-        is_html=True
-    )
+    # 9. Send Email
+    try:
+        from notifications.email_notifier import EmailNotifier
+        emailer = EmailNotifier()
+        subject = f"Philly P Sniper Recap: {yesterday.strftime('%a %b %d')}"
+        emailer.send_email(subject, full_html, is_html=True)
+        log("RECAP", "✅ Email Sent Successfully")
+    except Exception as e:
+        log("RECAP", f"❌ Email Failed: {e}")
 
 if __name__ == "__main__":
     generate_daily_recap()

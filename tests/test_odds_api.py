@@ -1,4 +1,4 @@
-from api_clients import fetch_prop_odds
+from data.clients.odds_api import fetch_prop_odds
 import json
 
 def test():

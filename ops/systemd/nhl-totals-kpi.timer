@@ -1,0 +1,9 @@
+[Unit]
+Description=Timer for NHL KPI Report (Daily 04:00 UTC)
+
+[Timer]
+OnCalendar=*-*-* 04:00:00
+Unit=nhl-totals-kpi.service
+
+[Install]
+WantedBy=timers.target

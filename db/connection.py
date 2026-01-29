@@ -31,17 +31,29 @@ class PooledConnection:
     def __init__(self, pool, conn):
         self._pool = pool
         self._conn = conn
-        
+        self._closed = False # Track state
+
     def close(self):
         """
         Return the connection to the pool.
         """
-        if self._conn:
+        if self._conn and not self._closed:
             try:
                 self._pool.putconn(self._conn)
                 self._conn = None
+                self._closed = True
             except Exception as e:
                 log("WARN", f"Failed to return conn to pool: {e}")
+
+    def __del__(self):
+        """Safety Net: Return to pool on GC."""
+        self.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
 
     def __getattr__(self, name):
         """
@@ -227,6 +239,96 @@ def init_db():
 
         # Insert default bankroll if not exists
         cur.execute("INSERT INTO app_settings (key, value) VALUES ('starting_bankroll', '451.16') ON CONFLICT (key) DO NOTHING")
+
+        # Phase 8: NBA Learning Loop (Predictions)
+        cur.execute('''CREATE TABLE IF NOT EXISTS nba_predictions (
+            id SERIAL PRIMARY KEY,
+            run_id TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            game_id TEXT,
+            game_date_est DATE,
+            home_team TEXT,
+            away_team TEXT,
+            market TEXT, -- 'ML' or 'TOTAL'
+            book TEXT,
+            
+            -- ML Odds
+            odds_home REAL,
+            odds_away REAL,
+            
+            -- Totals Odds
+            total_line REAL,
+            odds_over REAL,
+            odds_under REAL,
+            
+            odds_as_of TIMESTAMP,
+            
+            -- Versioning
+            model_version TEXT,
+            model_sha TEXT,
+            feature_version TEXT,
+            
+            -- ML Outputs
+            prob_home REAL,
+            prob_away REAL,
+            
+            -- Totals Outputs
+            expected_total REAL,
+            prob_over REAL,
+            prob_under REAL,
+            sigma_bucket TEXT,
+            z_score REAL,
+            
+            -- Decision Logic
+            edge_pct REAL,
+            ev REAL,
+            bucket TEXT,
+            decision TEXT, -- 'ACCEPT' or 'REJECT'
+            reject_reason TEXT,
+            
+            -- Audit
+            features_snapshot JSONB
+        )''')
+        
+        # Phase 8: NBA Outcomes
+        cur.execute('''CREATE TABLE IF NOT EXISTS nba_outcomes (
+            game_id TEXT PRIMARY KEY,
+            game_date_est DATE,
+            home_team TEXT,
+            away_team TEXT,
+            home_score INTEGER,
+            away_score INTEGER,
+            total_points INTEGER,
+            home_win INTEGER, -- 0 or 1
+            settled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )''')
+        
+        # Phase 8: NBA Training Runs
+        cur.execute('''CREATE TABLE IF NOT EXISTS nba_training_runs (
+            train_run_id TEXT PRIMARY KEY,
+            started_at TIMESTAMP,
+            completed_at TIMESTAMP,
+            dataset_start DATE,
+            dataset_end DATE,
+            n_samples INTEGER,
+            
+            -- Metrics
+            logloss_ml REAL,
+            roi_ml REAL,
+            roi_coin REAL,
+            roi_dog REAL,
+            mae_total REAL,
+            roi_total_ev5 REAL,
+            roi_total_ev7 REAL,
+            
+            accepted BOOLEAN,
+            
+            -- Artifacts
+            model_path_ml TEXT,
+            model_path_total TEXT,
+            sigma_path_total TEXT,
+            git_sha TEXT
+        )''')
 
         conn.commit()
     except Exception as e:
@@ -456,8 +558,17 @@ def surgical_cleanup():
     if not conn: return
     try:
         cur = conn.cursor()
+        # 1. Clean Stale Past Bets (Older than 24h)
         cur.execute("DELETE FROM intelligence_log WHERE outcome='PENDING' AND kickoff < NOW() - INTERVAL '24 HOURS'")
+        count_past = cur.rowcount
+        
+        # 2. Clean Far Future Bets (Beyond 36h limit)
+        # This removes the "Ghost Bets" from before the rule change
+        cur.execute("DELETE FROM intelligence_log WHERE outcome='PENDING' AND kickoff > NOW() + INTERVAL '36 HOURS'")
+        count_future = cur.rowcount
+        
         conn.commit()
+        print(f"🧹 Cleanup: Removed {count_past} stale past bets and {count_future} far-future bets.")
     except Exception as e:
         print(f"Cleanup Error: {e}")
     finally:

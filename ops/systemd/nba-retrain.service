@@ -1,0 +1,15 @@
+[Unit]
+Description=NBA Model V2 - Weekly Retraining
+After=docker.service network.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/Philly-P-Sniper
+ExecStart=/usr/bin/env bash -lc 'cd /home/ubuntu/Philly-P-Sniper && docker exec -i philly_p_api python3 scripts/retrain_nba_weekly.py'
+StandardOutput=append:/home/ubuntu/Philly-P-Sniper/logs/systemd/nba-retrain.log
+StandardError=inherit
+TimeoutStartSec=3600
+
+[Install]
+WantedBy=multi-user.target

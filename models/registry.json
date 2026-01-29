@@ -1,0 +1,19 @@
+{
+    "nba_ml": {
+        "active_path": "models/nba_model_ml_v2.joblib",
+        "version": "v2.0.0",
+        "git_sha": "current",
+        "last_updated": "2026-01-26"
+    },
+    "nba_total": {
+        "active_path": "models/nba_model_total_v2.joblib",
+        "sigma_path": "models/nba_total_residuals.json",
+        "version": "v2.0.0",
+        "git_sha": "current",
+        "last_updated": "2026-01-26"
+    },
+    "features": {
+        "path": "models/nba_features_v2.json",
+        "version": "v2.0.0"
+    }
+}

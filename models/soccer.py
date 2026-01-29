@@ -67,22 +67,29 @@ class SoccerModelV2:
         self.team_stats = {}
         self.leagues = {}
         
+        from utils.team_names import normalize_team_name
+        
         def get_team_state(t):
-            if t not in self.team_stats:
-                self.team_stats[t] = {
+            nt = normalize_team_name(t)
+            if nt not in self.team_stats:
+                self.team_stats[nt] = {
                     'home_att': 1.35, 'home_def': 1.35,
                     'away_att': 1.35, 'away_def': 1.35,
-                    # We still track form internally even if V5 doesn't use it yet (future proof)
                     'recent_att': 1.35, 'recent_def': 1.35 
                 }
-            return self.team_stats[t]
+            return self.team_stats[nt]
 
         for _, row in df.iterrows():
             h, a = row['home_team'], row['away_team']
             lg = row['league']
             
-            get_team_state(h)
-            get_team_state(a)
+            # Ensure initialized
+            h_stat = get_team_state(h)
+            a_stat = get_team_state(a)
+            
+            nt_h = normalize_team_name(h)
+            nt_a = normalize_team_name(a)
+            
             if lg not in self.leagues: self.leagues[lg] = 2.70
             
             h_xg, a_xg = row['home_xg'], row['away_xg']
@@ -90,17 +97,17 @@ class SoccerModelV2:
             if pd.notna(h_xg) and pd.notna(a_xg):
                 total_xg = h_xg + a_xg
                 
-                # Update Home
-                self.team_stats[h]['home_att'] = (1 - self.alpha_long) * self.team_stats[h]['home_att'] + self.alpha_long * h_xg
-                self.team_stats[h]['home_def'] = (1 - self.alpha_long) * self.team_stats[h]['home_def'] + self.alpha_long * a_xg
-                self.team_stats[h]['recent_att'] = (1 - self.alpha_short) * self.team_stats[h]['recent_att'] + self.alpha_short * h_xg
-                self.team_stats[h]['recent_def'] = (1 - self.alpha_short) * self.team_stats[h]['recent_def'] + self.alpha_short * a_xg
+                # Update Home (Use Normalized Keys)
+                self.team_stats[nt_h]['home_att'] = (1 - self.alpha_long) * self.team_stats[nt_h]['home_att'] + self.alpha_long * h_xg
+                self.team_stats[nt_h]['home_def'] = (1 - self.alpha_long) * self.team_stats[nt_h]['home_def'] + self.alpha_long * a_xg
+                self.team_stats[nt_h]['recent_att'] = (1 - self.alpha_short) * self.team_stats[nt_h]['recent_att'] + self.alpha_short * h_xg
+                self.team_stats[nt_h]['recent_def'] = (1 - self.alpha_short) * self.team_stats[nt_h]['recent_def'] + self.alpha_short * a_xg
                 
                 # Update Away
-                self.team_stats[a]['away_att'] = (1 - self.alpha_long) * self.team_stats[a]['away_att'] + self.alpha_long * a_xg
-                self.team_stats[a]['away_def'] = (1 - self.alpha_long) * self.team_stats[a]['away_def'] + self.alpha_long * h_xg
-                self.team_stats[a]['recent_att'] = (1 - self.alpha_short) * self.team_stats[a]['recent_att'] + self.alpha_short * a_xg
-                self.team_stats[a]['recent_def'] = (1 - self.alpha_short) * self.team_stats[a]['recent_def'] + self.alpha_short * h_xg
+                self.team_stats[nt_a]['away_att'] = (1 - self.alpha_long) * self.team_stats[nt_a]['away_att'] + self.alpha_long * a_xg
+                self.team_stats[nt_a]['away_def'] = (1 - self.alpha_long) * self.team_stats[nt_a]['away_def'] + self.alpha_long * h_xg
+                self.team_stats[nt_a]['recent_att'] = (1 - self.alpha_short) * self.team_stats[nt_a]['recent_att'] + self.alpha_short * a_xg
+                self.team_stats[nt_a]['recent_def'] = (1 - self.alpha_short) * self.team_stats[nt_a]['recent_def'] + self.alpha_short * h_xg
                 
                 # Update League
                 self.leagues[lg] = 0.99 * self.leagues[lg] + 0.01 * total_xg
@@ -114,10 +121,14 @@ class SoccerModelV2:
         if not self.model or not self.team_stats:
             return None
             
-        h_state = self.team_stats.get(home_team, {
+        from utils.team_names import normalize_team_name
+        nt_h = normalize_team_name(home_team)
+        nt_a = normalize_team_name(away_team)
+            
+        h_state = self.team_stats.get(nt_h, {
             'home_att': 1.35, 'home_def': 1.35
         })
-        a_state = self.team_stats.get(away_team, {
+        a_state = self.team_stats.get(nt_a, {
             'away_att': 1.35, 'away_def': 1.35
         })
         lg_avg = self.leagues.get(league_name, 2.70)
@@ -168,7 +179,11 @@ class SoccerModelV2:
         feat_df = feat_df[self.features]
         
         prob_over = self.model.predict_proba(feat_df)[0][1]
+        prob_over = self.model.predict_proba(feat_df)[0][1]
         fair_odds = 1 / prob_over if prob_over > 0 else 99.0
+        
+        # Calculate Match Probs
+        prob_home, prob_draw, prob_away = self._calc_poisson_match_probs(exp_h, exp_a)
         
         return {
             'home_team': home_team,
@@ -177,8 +192,35 @@ class SoccerModelV2:
             'prob_over': prob_over,
             'fair_odds': fair_odds,
             'exp_score': f"{exp_h:.2f} - {exp_a:.2f}",
-            'exp_total_xg': exp_total
+            'exp_score': f"{exp_h:.2f} - {exp_a:.2f}",
+            'exp_total_xg': exp_total,
+            # Match Winner Probs (Poisson)
+            'home_win': prob_home,
+            'draw': prob_draw,
+            'away_win': prob_away
         }
+
+    def _calc_poisson_match_probs(self, exp_h, exp_a):
+        import scipy.stats as stats
+        # Max goals to simulate
+        limit = 10
+        p_home = [stats.poisson.pmf(i, exp_h) for i in range(limit)]
+        p_away = [stats.poisson.pmf(i, exp_a) for i in range(limit)]
+        
+        home_win = 0.0
+        draw = 0.0
+        away_win = 0.0
+        
+        for h in range(limit):
+            for a in range(limit):
+                p = p_home[h] * p_away[a]
+                if h > a: home_win += p
+                elif h == a: draw += p
+                else: away_win += p
+                
+        # Normalize (handling truncation)
+        total = home_win + draw + away_win
+        return home_win/total, draw/total, away_win/total
 
 if __name__ == "__main__":
     model = SoccerModelV2()

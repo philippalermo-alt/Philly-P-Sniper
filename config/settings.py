@@ -10,6 +10,12 @@ class Config:
     API Keys are loaded from environment variables without fallback defaults.
     """
 
+    # Feature Flags
+    ENABLE_SOCCER_V2 = True
+    ENABLE_NBA_V2 = True
+    # Phase 6 Deployment (Recs Only) - Allow Env Override, Default to TRUE for standardization
+    NHL_TOTALS_V2_ENABLED = os.getenv('NHL_TOTALS_V2_ENABLED', 'True').lower() == 'true'
+
     # API Keys (environment variables only)
     ODDS_API_KEY = os.getenv('ODDS_API_KEY')
     KENPOM_API_KEY = os.getenv('KENPOM_API_KEY')
@@ -17,13 +23,18 @@ class Config:
     ACTION_COOKIE = os.getenv('ACTION_COOKIE')
     # ACTION_COOKIE = os.getenv('ACTION_COOKIE') # Duplicate removed
     DATABASE_URL = os.getenv('DATABASE_URL')
+    
+    # Docker Override: If DB_HOST is set (e.g. valid hostname 'db'), use it.
+    _db_host = os.getenv('DB_HOST')
+    if _db_host:
+         _db_user = os.getenv('DB_USER', 'postgres')
+         _db_pass = os.getenv('DB_PASSWORD', 'postgres')
+         _db_name = os.getenv('DB_NAME', 'philly_p_sniper')
+         DATABASE_URL = f"postgresql://{_db_user}:{_db_pass}@{_db_host}:5432/{_db_name}"
+    
     if not DATABASE_URL:
-        # Fallback: Construct from Docker Env Vars
-        _db_host = os.getenv('DB_HOST', 'localhost')
-        _db_user = os.getenv('DB_USER', 'postgres')
-        _db_pass = os.getenv('DB_PASSWORD', 'postgres')
-        _db_name = os.getenv('DB_NAME', 'philly_p_sniper')
-        DATABASE_URL = f"postgresql://{_db_user}:{_db_pass}@{_db_host}:5432/{_db_name}"
+        # Fallback to localhost if neither are set
+        DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/philly_p_sniper"
     DASHBOARD_PASSWORD = os.getenv('DASHBOARD_PASSWORD', 'phillyedge')
     
     # Telegram Alerts
@@ -61,7 +72,7 @@ class Config:
 
     # Market Weighting
     MARKET_WEIGHT_US = 0.15
-    MARKET_WEIGHT_SOCCER = 0.80
+    MARKET_WEIGHT_SOCCER = 0.65 # RELAXED (Was 0.80)
 
     # Debug Mode
     DEBUG_MODE = True

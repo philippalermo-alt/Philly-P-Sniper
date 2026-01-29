@@ -1,0 +1,9 @@
+[Unit]
+Description=Timer for NHL Retraining (Mon 05:00 UTC)
+
+[Timer]
+OnCalendar=Mon *-*-* 05:00:00
+Unit=nhl-totals-retrain.service
+
+[Install]
+WantedBy=timers.target

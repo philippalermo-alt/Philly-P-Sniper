@@ -5,6 +5,7 @@ from utils.logging import log
 from data.clients.action_network import validate_action_network_auth
 import os
 import pickle
+import joblib
 # Dynamic imports to avoid crashing if files are missing during import time? 
 # Usually better to import at top, but if models.sport_models depends on things...
 # We'll import at top.
@@ -52,8 +53,7 @@ def validate_models():
             missing.append(path)
             continue
         try:
-            with open(path, 'rb') as f:
-                model = pickle.load(f)
+            model = joblib.load(path)
             # Basic sanity check
             if not hasattr(model, 'predict_proba') and not hasattr(model, 'predict'):
                  # different models have different APIs

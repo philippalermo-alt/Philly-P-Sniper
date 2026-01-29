@@ -23,6 +23,9 @@ class PipelineContext:
     sharp_data: Dict[str, Any] = field(default_factory=dict)
     pro_systems: Dict[str, Any] = field(default_factory=dict)
     
+    # Metadata (Added Phase 2 Fix)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    
     # State Tracking (Atomic Writes support)
     existing_bets: Dict[str, List[Any]] = field(default_factory=dict) # MatchID -> List[(EventID, Selection, Edge)]
     
@@ -32,6 +35,13 @@ class PipelineContext:
     # Error Tracking
     errors: List[str] = field(default_factory=list)
     partial_failures: Dict[str, str] = field(default_factory=dict) # Stage -> Error
+    
+    # Phase 8: Prediction Logging (Full Audit)
+    nba_predictions: List[Dict] = field(default_factory=list)
+    
+    # Deduplication (Stable Signatures)
+    # Stores identifiers like "{Away} @ {Home} [{Selection}]" to prevent dupes if MatchID changes
+    seen_bet_signatures: set = field(default_factory=set)
 
     def log_error(self, stage: str, error: str):
         self.errors.append(f"[{stage}] {error}")

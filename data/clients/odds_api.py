@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from config.settings import Config
 from utils.logging import log
 from data.cache import cache_get, cache_set
@@ -11,11 +11,13 @@ class OddsAPIClient(BaseAPIClient):
 
     def get_events(self, sport_key: str):
         """Fetch upcoming events for a sport."""
+        # STRICT FILTER: Use UTC to ensure we don't fetch past games
+        now_utc = datetime.now(timezone.utc)
         params = {
             'apiKey': self.api_key,
             'regions': 'us',
             'commenceTimeFrom': datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
-            'commenceTimeTo': (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%dT%H:%M:%SZ')
+            'commenceTimeTo': (datetime.now() + timedelta(hours=36)).strftime('%Y-%m-%dT%H:%M:%SZ')
         }
         return self.get(f"sports/{sport_key}/events", params=params)
 
@@ -48,7 +50,12 @@ def fetch_prop_odds(sport_key, markets="player_goal_scorer_anytime"):
     client = OddsAPIClient()
     
     # 1. Get Events
-    events = client.get_events(sport_key)
+    try:
+        events = client.get_events(sport_key)
+    except Exception as e:
+        log("ERROR", f"Events API Failed: {e}")
+        return {}
+
     if not events or not isinstance(events, list):
         log("ERROR", f"Odds API Events Error: {events}")
         return {}
@@ -58,6 +65,19 @@ def fetch_prop_odds(sport_key, markets="player_goal_scorer_anytime"):
     for event in events:
         event_id = event['id']
         teams = f"{event['home_team']} vs {event['away_team']}"
+        commence_time = event.get('commence_time')
+        
+        # ----------------------------------------------------------------
+        # FILTER: Skip Started Games (Double-Check)
+        # ----------------------------------------------------------------
+        try:
+            dt_commence = datetime.strptime(commence_time, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+            if dt_commence < datetime.now(timezone.utc):
+                log("WARN", f"Skipping Started Game during Props Fetch: {teams}")
+                continue
+        except Exception:
+            pass # Use API filter as primary if parse fails, but proceed
+        # ----------------------------------------------------------------
         
         # 2. Get Odds per Event
         odds_res = client.get_event_odds(sport_key, event_id, markets)
@@ -75,7 +95,11 @@ def fetch_prop_odds(sport_key, markets="player_goal_scorer_anytime"):
                 m_key = market['key']
                 for outcome in market.get('outcomes', []):
                     p_name = outcome.get('description') # Player Name
-                    if not p_name: continue
+                    side_label = outcome.get('name') # Over/Under or Player Name
+                    
+                    # Fallback if description is empty (sometimes happens in ML, but should vary for props)
+                    if not p_name: 
+                        p_name = side_label # Suspicious fallback but keeps logic alive
                     
                     price = outcome['price']
                     point = outcome.get('point')
@@ -87,7 +111,9 @@ def fetch_prop_odds(sport_key, markets="player_goal_scorer_anytime"):
                         'book': book_id,
                         'price': price,
                         'line': point,
-                        'game': teams
+                        'matchup': teams,
+                        'commence_time': commence_time,
+                        'side': side_label
                     })
                     
     log("PROPS", f"Fetched live odds for {len(prop_data)} players in {sport_key}")

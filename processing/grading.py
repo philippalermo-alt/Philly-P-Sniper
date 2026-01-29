@@ -82,12 +82,13 @@ def fuzzy_match(team1, team2):
 # ---------------------------
 # Grading Logic
 # ---------------------------
-def grade_bet(selection, home_team, away_team, home_score, away_score, sport=None):
-    """Grades a single leg wager."""
+def grade_bet(selection, home_team, away_team, home_score, away_score, sport=None, home_linescores=None, away_linescores=None):
+    """Grades a single leg wager with support for period scores (1H, etc)."""
     
     margin = home_score - away_score
     
     # Normalize for safety
+
     h_norm = normalize_name(home_team)
     a_norm = normalize_name(away_team)
     
@@ -150,14 +151,70 @@ def grade_bet(selection, home_team, away_team, home_score, away_score, sport=Non
             pass
 
     # 4. Over/Under
-    if "Over" in selection or "Under" in selection:
+    sel_lower = selection.lower()
+    if "over" in sel_lower or "under" in sel_lower:
         try:
+            # Deterministic Score Source
+            h_s = home_score
+            a_s = away_score
+            
+            # --- 1H / Partial Game Logic ---
+            is_partial = False
+            
+            if "1H" in selection or "1st Half" in selection:
+                # Need valid linescores
+                if home_linescores and away_linescores:
+                    # NBA/NCAAB/NFL: Periods. 1H = Q1 + Q2 (or Period 1)
+                    # Check sport or assume length?
+                    # NCAAB: 2 periods usually. NHL: 3 periods. NBA/NFL: 4 quarters.
+                    # Safety check:
+                    if len(home_linescores) >= 1 and len(away_linescores) >= 1:
+                        # If >= 2 periods (likely Quarters), sum first 2.
+                        # If exactly 2 periods (NCAAB Men's often), sum 1? Wait, NCAAB Men's is 2 Halves.
+                        # NHL is 3 Periods.
+                        # Let's try heuristic based on list length for simplicity or sport if passed
+                        
+                        # Simplified 1H Logic:
+                        # If sport is NBA/NFL (Quarters): Sum index 0 and 1.
+                        # If sport is NCAAB (Halves): Index 0.
+                        # If sport is NHL (Periods): Index 0? No, NHL usually 1P Over/Under.
+                        
+                        # If sport is explicit:
+                        sport_clean = (sport or "").lower()
+                        if 'ncaab' in sport_clean:
+                            # Men's College: 2 Halves. 1H = Index 0
+                            h_s = home_linescores[0]
+                            a_s = away_linescores[0]
+                        elif 'nhl' in sport_clean or 'hockey' in sport_clean:
+                            # NHL 1st Period
+                            h_s = home_linescores[0]
+                            a_s = away_linescores[0]
+                        else:
+                            # Assume Quarters (NBA, NFL) -> Sum first 2
+                            if len(home_linescores) >= 2:
+                                h_s = sum(home_linescores[:2])
+                                a_s = sum(away_linescores[:2])
+                            else:
+                                # Fallback if data missing (e.g. only Q1 done?)
+                                # Stick to PENDING if we can't be sure
+                                return 'PENDING'
+                else:
+                    return 'PENDING' # Missing partial data
+            
+            # --- End 1H Logic ---
+
             # Clean selection: remove "Goals", "Points", "Runs"
             clean_sel = selection.lower().replace(" goals", "").replace(" points", "").replace(" runs", "")
+            # Remove 1H prefix for float parse
+            clean_sel = clean_sel.replace("1h", "").replace("1st half", "").strip()
+            
+            # Parse line
+            # "Over 67.0" -> 67.0
             val = float(clean_sel.split()[-1])
-            total = home_score + away_score
-            if "Over" in selection: return 'WON' if total > val else 'LOST'
-            if "Under" in selection: return 'WON' if total < val else 'LOST'
+            total = h_s + a_s
+            
+            if "over" in sel_lower: return 'WON' if total > val else ('PUSH' if total == val else 'LOST')
+            if "under" in sel_lower: return 'WON' if total < val else ('PUSH' if total == val else 'LOST')
         except:
             pass
 
@@ -260,7 +317,9 @@ def settle_pending_bets():
             dates_to_fetch = [
                 now_et.strftime('%Y%m%d'), 
                 (now_et - timedelta(days=1)).strftime('%Y%m%d'),
-                (now_et - timedelta(days=2)).strftime('%Y%m%d')
+                (now_et - timedelta(days=2)).strftime('%Y%m%d'),
+                (now_et - timedelta(days=3)).strftime('%Y%m%d'),
+                (now_et - timedelta(days=4)).strftime('%Y%m%d')
             ]
             
             for d in dates_to_fetch:
@@ -280,13 +339,13 @@ def settle_pending_bets():
 
         graded_count = 0
         
-        # Re-query all pending bets
-        cur.execute("SELECT event_id, sport, selection, teams FROM intelligence_log WHERE outcome = 'PENDING' AND kickoff < NOW()")
+        # Re-query all pending bets with necessary fields for PnL
+        cur.execute("SELECT event_id, sport, selection, teams, odds, stake FROM intelligence_log WHERE outcome = 'PENDING' AND kickoff < NOW()")
         pending_detailed = cur.fetchall()
         
         log("GRADING", f"Checking {len(pending_detailed)} pending bets against {len(live_games)} games.")
 
-        for event_id, sport, selection, teams_str in pending_detailed:
+        for event_id, sport, selection, teams_str, odds, stake in pending_detailed:
              log("DEBUG", f"Pending: {selection} | Teams: {teams_str}")
              
              outcome = 'PENDING'
@@ -320,8 +379,13 @@ def settle_pending_bets():
                      # Check if complete
                      if matched_game.get('is_complete') or "Final" in matched_game['status']:
                          try:
-                             outcome = grade_bet(selection, matched_game['home'], matched_game['away'], 
-                                                 matched_game['home_score'], matched_game['away_score'], sport=sport)
+                             outcome = grade_bet(
+                                 selection, matched_game['home'], matched_game['away'], 
+                                 matched_game['home_score'], matched_game['away_score'], 
+                                 sport=sport,
+                                 home_linescores=matched_game.get('home_linescores'),
+                                 away_linescores=matched_game.get('away_linescores')
+                            )
                              if outcome == 'PENDING':
                                  log("DEBUG", f"Bet {event_id} ({selection}) Matched but Graded PENDING. (Game: {matched_game['home']} vs {matched_game['away']}, Score: {matched_game['home_score']}-{matched_game['away_score']})")
                          except Exception as e:
@@ -329,11 +393,40 @@ def settle_pending_bets():
                      else:
                         log("DEBUG", f"Matched game {matched_game['home']} vs {matched_game['away']} (ID: {matched_game['id']}) but status not Final. Status: {matched_game['status']}, Complete: {matched_game.get('is_complete')}")
 
+                 else:
+                     log("WARNING", f"⚠️ No matching game found for bet {event_id}: '{teams_str}' (Sport: {sport}). Checked against {len(live_games)} live games.")
+
              # UPDATE DB if Graded
              if outcome in ['WON', 'LOST', 'PUSH']:
-                 safe_execute(cur, "UPDATE intelligence_log SET outcome = %s WHERE event_id = %s", (outcome, event_id))
+                 # Calculate Net Units (Authoritative Settlement)
+                 stake_val = float(stake) if stake else 1.0 # Default 1u if null
+                 odds_val = float(odds) if odds else 2.0 # Default 2.0 if null (shouldn't happen per contract)
+                 
+                 net_units = 0.0
+                 if outcome == 'WON':
+                     net_units = stake_val * (odds_val - 1.0)
+                 elif outcome == 'LOST':
+                     net_units = -stake_val
+                 elif outcome == 'PUSH':
+                     net_units = 0.0
+                     
+                 # Contract Section 3: Assign result, net_units, settled_at
+                 safe_execute(
+                    cur, 
+                    """
+                    UPDATE intelligence_log 
+                    SET outcome = %s, 
+                        net_units = %s, 
+                        settled_at = NOW() 
+                    WHERE event_id = %s
+                    """, 
+                    (outcome, net_units, event_id)
+                 )
+                 
+                 # Also update Calibration Log for Truth Tab
+                 safe_execute(cur, "UPDATE calibration_log SET outcome = %s WHERE event_id = %s", (outcome, event_id))
                  graded_count += 1
-                 log("GRADING", f"✅ Graded {event_id} ({sport}): {outcome}")
+                 log("GRADING", f"✅ Graded {event_id} ({sport}): {outcome} ({net_units:+.2f}u)")
 
         conn.commit()
 
@@ -344,6 +437,42 @@ def settle_pending_bets():
 
     except Exception as e:
         log("ERROR", f"Grading run failed: {e}")
+    finally:
+        cur.close()
+        conn.close()
+
+def sync_calibration_log():
+    """
+    Self-Healing: Sync outcomes from intelligence_log to calibration_log
+    where calibration_log is still 'PENDING' but intelligence_log is settled.
+    """
+    log("GRADING", "♻️ syncing Calibration Log outcomes matching Intelligence Log...")
+    conn = get_db()
+    if not conn: return
+    
+    try:
+        cur = conn.cursor()
+        # Postgres specific UPDATE with JOIN-like syntax
+        # Select entries in calib that are PENDING
+        # Update them if intelligence_log has a diff status
+        cur.execute("""
+            UPDATE calibration_log c
+            SET outcome = i.outcome
+            FROM intelligence_log i
+            WHERE c.event_id = i.event_id
+            AND c.outcome = 'PENDING'
+            AND i.outcome IN ('WON', 'LOST')
+            AND i.kickoff >= NOW() - INTERVAL '24 HOURS'
+        """)
+        updated = cur.rowcount
+        conn.commit()
+        if updated > 0:
+            log("GRADING", f"✅ Backfilled {updated} calibration records.")
+        else:
+            log("GRADING", "Calibration Log is in sync.")
+            
+    except Exception as e:
+        log("ERROR", f"Calibration Sync Error: {e}")
     finally:
         cur.close()
         conn.close()

@@ -60,11 +60,34 @@ class H1_FeatureEngine:
         # Normalize team name to match dataset
         normalized_name = normalize_team_name(team_name)
 
-        # Default values if team not found
         if normalized_name not in self.profiles:
-            return self._get_default_features(is_home)
+            # ROBUST MATCHING STRATEGY (Centralized)
+            from utils.team_names import robust_match_team
+            
+            found_profile = None
+            
+            # Use high threshold (0.85) and token constraints
+            matched_name = robust_match_team(normalized_name, self.profiles.keys(), threshold=0.85)
+            
+            if matched_name:
+                print(f"   ✨ [ROBUST MATCH] '{normalized_name}' -> '{matched_name}'")
+                found_profile = self.profiles[matched_name]
+            else:
+                 # Fallback: Try raw name one last time?
+                 # Often normalization strips something vital?
+                 # Try matching raw team_name against profiles
+                 matched_name_raw = robust_match_team(team_name, self.profiles.keys(), threshold=0.85)
+                 if matched_name_raw:
+                      print(f"   ✨ [ROBUST MATCH RAW] '{team_name}' -> '{matched_name_raw}'")
+                      found_profile = self.profiles[matched_name_raw]
 
-        profile = self.profiles[normalized_name]
+            if found_profile:
+                profile = found_profile
+            else:
+                print(f"[MISSING PROFILE] raw='{team_name}' normalized='{normalized_name}'")
+                return self._get_default_features(is_home)
+        else:
+            profile = self.profiles[normalized_name]
 
         # Home court adjustment (teams typically score 2-3 more points at home in H1)
         home_boost = 2.5 if is_home else 0.0

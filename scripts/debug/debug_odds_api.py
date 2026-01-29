@@ -45,7 +45,8 @@ try:
         print(f"[{est_str} EST] {away} @ {home} ({status}, Diff: {time_diff:.1f}h)")
         
         # Check props for games starting SOON or recently started
-        if -5 < time_diff < 5:
+        # STRICT FILTER: Future Games Only (Prevent live/past leakage)
+        if 0.1 < time_diff < 5:
             prop_url = f"https://api.the-odds-api.com/v4/sports/icehockey_nhl/events/{game_id}/odds?apiKey={api_key}&regions=us,us2&markets=player_shots_on_goal"
             try:
                 p_res = requests.get(prop_url, timeout=10).json()

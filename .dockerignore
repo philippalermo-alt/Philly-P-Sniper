@@ -3,6 +3,8 @@ January 25 Disaster Recovery/
 deprecated/
 *.tar.gz
 *.csv
+!Hockey Data/*.csv
+!models/*.csv
 philly-p-client.tar.gz
 philly-sniper-backend.tar.gz
 infrastructure/

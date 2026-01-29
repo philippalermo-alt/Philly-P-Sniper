@@ -29,6 +29,7 @@ class BaseModel:
         SELECT 
             sport, odds, true_prob, ticket_pct, 
             EXTRACT(EPOCH FROM (kickoff - timestamp))/60 as minutes_to_kickoff,
+            kickoff,
             home_xg, away_xg, dvp_rank, 
             home_adj_em, away_adj_em,
             home_adj_o, away_adj_o,
@@ -77,7 +78,33 @@ class BaseModel:
         y = df['target']
         
         try:
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+            # --- TEMPORAL SPLIT (Audit Fix 1.1) ---
+            # Sort by kickoff date to ensure we train on past, predict on future
+            if 'kickoff' in df.columns:
+                df = df.sort_values('kickoff').reset_index(drop=True)
+                X = df[self.features]
+                y = df['target']
+                
+                # Manual 80/20 Split
+                split_idx = int(len(df) * 0.8)
+                X_train = X.iloc[:split_idx]
+                X_test = X.iloc[split_idx:]
+                y_train = y.iloc[:split_idx]
+                y_test = y.iloc[split_idx:]
+                
+                # Check timestamps for leakage
+                train_max = df.iloc[split_idx-1]['kickoff']
+                test_min = df.iloc[split_idx]['kickoff']
+                
+                if train_max > test_min:
+                     # This should not happen if sorted, but verifying logic
+                     print(f"⚠️ Warning: Timestamp Overlap. Train Max: {train_max}, Test Min: {test_min}")
+                else:
+                     print(f"✅ Temporal Split Verified: Train End {train_max} < Test Start {test_min}")
+            else:
+                print("⚠️ Kickoff column missing for Temporal Split. Falling back to Random (Risk of Leakage).")
+                from sklearn.model_selection import train_test_split
+                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
             
             self.model = LogisticRegression(class_weight='balanced')
             self.model.fit(X_train, y_train)

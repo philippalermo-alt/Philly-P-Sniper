@@ -1,0 +1,9 @@
+[Unit]
+Description=Timer for NHL Totals Run (Daily 03:00 UTC)
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Unit=nhl-totals-run.service
+
+[Install]
+WantedBy=timers.target

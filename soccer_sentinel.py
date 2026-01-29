@@ -28,7 +28,8 @@ def get_upcoming_soccer_games():
             'soccer_usa_mls',
             'soccer_germany_bundesliga',
             'soccer_italy_serie_a',
-            'soccer_france_ligue_one'
+            'soccer_france_ligue_one',
+            'soccer_efl_champ'
         ]
         
         games = []

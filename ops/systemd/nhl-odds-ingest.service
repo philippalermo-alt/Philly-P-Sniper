@@ -1,0 +1,14 @@
+[Unit]
+Description=NHL Totals V2 - Live Odds Ingest
+After=docker.service network.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/Philly-P-Sniper
+ExecStart=/usr/bin/env bash -lc 'cd /home/ubuntu/Philly-P-Sniper && docker exec -i philly_p_api python3 scripts/ops/ingest_nhl_live_odds.py'
+StandardOutput=append:/home/ubuntu/Philly-P-Sniper/logs/systemd/nhl-odds-ingest.log
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target

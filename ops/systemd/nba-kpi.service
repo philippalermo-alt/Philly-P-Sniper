@@ -1,0 +1,14 @@
+[Unit]
+Description=NBA Model V2 - KPI Generation
+After=docker.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/Philly-P-Sniper
+ExecStart=/usr/bin/env bash -lc 'cd /home/ubuntu/Philly-P-Sniper && docker exec -i -e ENABLE_NBA_V2=true philly_p_api python3 scripts/ops/generate_nba_kpi.py'
+StandardOutput=append:/home/ubuntu/Philly-P-Sniper/logs/systemd/nba-kpi.log
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target

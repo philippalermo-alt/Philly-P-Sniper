@@ -3,7 +3,7 @@ import difflib
 import time
 from datetime import datetime, timedelta
 import pytz
-from database import get_db, safe_execute
+from db.connection import get_db, safe_execute
 from utils import log
 
 # Configuration
@@ -184,6 +184,7 @@ def settle_props():
                 # Update DB
                 print(f"✅ Grading {sel}: Actual {actual_sog} -> {outcome}")
                 cur.execute("UPDATE intelligence_log SET outcome = %s WHERE event_id = %s", (outcome, eid))
+                cur.execute("UPDATE calibration_log SET outcome = %s WHERE event_id = %s", (outcome, eid))
                 
             except Exception as e:
                 print(f"Error grading {sel}: {e}")

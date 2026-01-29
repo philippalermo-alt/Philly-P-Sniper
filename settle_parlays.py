@@ -1,5 +1,5 @@
 import re
-from database import get_db
+from db.connection import get_db
 
 def settle_parlays():
     print("🧩 Starting Parlay Settlement...")
@@ -67,6 +67,7 @@ def settle_parlays():
             
             if final != "PENDING":
                 cur.execute("UPDATE intelligence_log SET outcome = %s WHERE event_id = %s", (final, pid))
+                cur.execute("UPDATE calibration_log SET outcome = %s WHERE event_id = %s", (final, pid))
                 conn.commit()
                 print("  ✅ Updated DB")
                 

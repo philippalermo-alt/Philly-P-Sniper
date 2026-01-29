@@ -6,7 +6,7 @@ from datetime import datetime
 # Add parent directory to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from ratings import get_current_seasons
+from data.clients.ratings import get_current_seasons
 
 class TestRatings(unittest.TestCase):
     

@@ -76,7 +76,7 @@ class NCAAB_H1_Scraper:
 
         return games
 
-    def fetch_game_details(self, game_id):
+    def fetch_game_details(self, game_id, game_date=None):
         """Fetch detailed stats including H1/H2 splits for a specific game."""
         url = f"{self.base_url}/summary?event={game_id}"
 
@@ -126,6 +126,7 @@ class NCAAB_H1_Scraper:
 
             return {
                 'game_id': game_id,
+                'date': game_date, # Persist the date
                 'home_team': home_team,
                 'away_team': away_team,
                 'home_h1': home_h1,
@@ -254,7 +255,8 @@ class NCAAB_H1_Scraper:
             if i % 100 == 0 or i == len(completed_games):
                 print(f"   Progress: {i}/{len(completed_games)} ({i/len(completed_games)*100:.1f}%)")
 
-            game_details = self.fetch_game_details(game['id'])
+            # Pass the date!
+            game_details = self.fetch_game_details(game['id'], game['date'])
             if game_details:
                 games_data.append(game_details)
 

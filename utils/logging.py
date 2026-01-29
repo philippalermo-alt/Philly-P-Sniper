@@ -7,7 +7,7 @@ logging.basicConfig(
     format='%(asctime)s [%(levelname)s] %(message)s',
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler("philly_sniper.log")
+        logging.FileHandler("logs/app.log")
     ]
 )
 

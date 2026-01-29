@@ -21,3 +21,6 @@
 ### NCAAB Modeling
 - **Data Rule**: **CURRENT SEASON ONLY**. Do not train on historical seasons (roster turnover invalidates past data).
 - **Training Frequency**: Retrain weekly to capture new team form.
+
+### Fix Logs
+- **2026-01-28**: Fixed Dashboard Display Bug. NHL Totals recommendations were missing line values. Modified `pipeline/stages/process.py` to append line info. Deployed to EC2 and forced DB update.

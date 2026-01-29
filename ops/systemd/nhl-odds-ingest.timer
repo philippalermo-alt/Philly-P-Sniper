@@ -1,0 +1,9 @@
+[Unit]
+Description=Timer for NHL Odds Ingest (Every 60m)
+
+[Timer]
+OnCalendar=*:00:00
+Unit=nhl-odds-ingest.service
+
+[Install]
+WantedBy=timers.target

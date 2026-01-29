@@ -1,0 +1,11 @@
+{
+  "date": "2026-01-27",
+  "timestamp": "2026-01-27T12:48:14.722790",
+  "scans_count": 0,
+  "eligible_count": 0,
+  "predictions_count": 0,
+  "recommendations_count": 0,
+  "avg_ev_recommended": 0.0,
+  "sigma_current": 2.242,
+  "status": "OK"
+}

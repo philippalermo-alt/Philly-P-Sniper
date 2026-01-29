@@ -3493,23 +3493,23 @@
                 "position": {
                   "abbreviation": "C"
                 },
-                "status": "Day-To-Day",
+                "status": "Out",
                 "injuries": {
-                  "status": "Day-To-Day",
-                  "date": "2026-01-24T03:43Z",
+                  "status": "Out",
+                  "date": "2026-01-25T18:49Z",
                   "type": {
-                    "id": "6",
-                    "name": "INJURY_STATUS_DAYTODAY",
-                    "description": "day-to-day",
-                    "abbreviation": "DD"
+                    "id": "4",
+                    "name": "INJURY_STATUS_OUT",
+                    "description": "out",
+                    "abbreviation": "O"
                   },
                   "details": {
                     "fantasyStatus": {
-                      "description": "Day-To-Day",
-                      "abbreviation": "Day-To-Day"
+                      "description": "OUT",
+                      "abbreviation": "OUT"
                     },
                     "type": "Upper Body",
-                    "returnDate": "2026-01-25"
+                    "returnDate": "2026-01-29"
                   }
                 }
               }
@@ -3592,23 +3592,23 @@
                 "position": {
                   "abbreviation": "C"
                 },
-                "status": "Day-To-Day",
+                "status": "Out",
                 "injuries": {
-                  "status": "Day-To-Day",
-                  "date": "2026-01-24T03:43Z",
+                  "status": "Out",
+                  "date": "2026-01-25T18:49Z",
                   "type": {
-                    "id": "6",
-                    "name": "INJURY_STATUS_DAYTODAY",
-                    "description": "day-to-day",
-                    "abbreviation": "DD"
+                    "id": "4",
+                    "name": "INJURY_STATUS_OUT",
+                    "description": "out",
+                    "abbreviation": "O"
                   },
                   "details": {
                     "fantasyStatus": {
-                      "description": "Day-To-Day",
-                      "abbreviation": "Day-To-Day"
+                      "description": "OUT",
+                      "abbreviation": "OUT"
                     },
                     "type": "Upper Body",
-                    "returnDate": "2026-01-25"
+                    "returnDate": "2026-01-29"
                   }
                 }
               }
@@ -4174,61 +4174,6 @@
         },
         {
           "status": "Injured Reserve",
-          "date": "2026-01-17T18:41Z",
-          "athlete": {
-            "id": "3852",
-            "uid": "s:70~l:90~a:3852",
-            "guid": "96dbee19-d313-4f86-8aa8-d78db7b5bda4",
-            "lastName": "Marchand",
-            "fullName": "Brad Marchand",
-            "displayName": "Brad Marchand",
-            "shortName": "B. Marchand",
-            "links": [
-              {
-                "rel": [
-                  "playercard",
-                  "desktop",
-                  "athlete"
-                ],
-                "href": "https://www.espn.com/nhl/player/_/id/3852",
-                "text": "Player Card"
-              }
-            ],
-            "headshot": {
-              "href": "https://a.espncdn.com/i/headshots/nhl/players/full/3852.png",
-              "alt": "Brad Marchand"
-            },
-            "jersey": "63",
-            "position": {
-              "name": "Left Wing",
-              "displayName": "Left Wing",
-              "abbreviation": "LW"
-            },
-            "status": {
-              "id": "1",
-              "name": "Active",
-              "type": "active",
-              "abbreviation": "Active"
-            }
-          },
-          "type": {
-            "id": "5",
-            "name": "INJURY_STATUS_IR",
-            "description": "Injured Reserve",
-            "abbreviation": "IR"
-          },
-          "details": {
-            "fantasyStatus": {
-              "description": "IR",
-              "abbreviation": "IR",
-              "displayDescription": "IR"
-            },
-            "type": "Undisclosed",
-            "returnDate": "2026-01-24"
-          }
-        },
-        {
-          "status": "Injured Reserve",
           "date": "2026-01-05T17:31Z",
           "athlete": {
             "id": "4233890",
@@ -4353,8 +4298,8 @@
       },
       "injuries": [
         {
-          "status": "Day-To-Day",
-          "date": "2026-01-24T03:43Z",
+          "status": "Out",
+          "date": "2026-01-25T18:49Z",
           "athlete": {
             "id": "2592095",
             "uid": "s:70~l:90~a:2592095",
@@ -4392,19 +4337,19 @@
             }
           },
           "type": {
-            "id": "6",
-            "name": "INJURY_STATUS_DAYTODAY",
-            "description": "day-to-day",
-            "abbreviation": "DD"
+            "id": "4",
+            "name": "INJURY_STATUS_OUT",
+            "description": "out",
+            "abbreviation": "O"
           },
           "details": {
             "fantasyStatus": {
-              "description": "Day-To-Day",
-              "abbreviation": "Day-To-Day",
-              "displayDescription": "Day-To-Day"
+              "description": "OUT",
+              "abbreviation": "OUT",
+              "displayDescription": "Out"
             },
             "type": "Upper Body",
-            "returnDate": "2026-01-25"
+            "returnDate": "2026-01-29"
           }
         },
         {
@@ -4661,1398 +4606,6 @@
       "records": []
     }
   ],
-  "news": {
-    "header": "NHL News",
-    "link": {
-      "language": "en",
-      "rel": [
-        "index",
-        "desktop",
-        "league"
-      ],
-      "href": "https://www.espn.com/nhl/",
-      "text": "All NHL News",
-      "shortText": "All News",
-      "isExternal": false,
-      "isPremium": false
-    },
-    "articles": [
-      {
-        "id": 47712098,
-        "nowId": "1-47712098",
-        "contentKey": "47712098-1-22-1",
-        "dataSourceIdentifier": "53f0028942c71",
-        "type": "Preview",
-        "headline": "Edmonton and Washington hit the ice in non-conference matchup",
-        "description": "Washington Capitals (25-21-6, in the Metropolitan Division) vs. Edmonton Oilers (25-19-8, in the Pacific Division)",
-        "lastModified": "2026-01-24T09:12:14Z",
-        "published": "2026-01-24T09:12:14Z",
-        "images": [
-          {
-            "type": "stitcher",
-            "name": "espn.applewatch.awayhome.1",
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.applewatch.awayhome.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.applewatch.homeaway.1",
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.applewatch.homeaway.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.16x9.1",
-            "ratio": "16x9",
-            "height": 173,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.awayhome.16x9.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.16x9.1",
-            "ratio": "16x9",
-            "height": 173,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.homeaway.16x9.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.1x1.1",
-            "ratio": "1x1",
-            "height": 308,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.awayhome.1x1.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.1x1.1",
-            "ratio": "1x1",
-            "height": 308,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.homeaway.1x1.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.5x2.1",
-            "ratio": "5x2",
-            "height": 124,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.awayhome.5x2.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.5x2.1",
-            "ratio": "5x2",
-            "height": 124,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.homeaway.5x2.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.16x9.2",
-            "ratio": "16x9",
-            "height": 353,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.awayhome.16x9.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.16x9.2",
-            "ratio": "16x9",
-            "height": 353,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.homeaway.16x9.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.5x2.2",
-            "ratio": "5x2",
-            "height": 251,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.awayhome.5x2.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.5x2.2",
-            "ratio": "5x2",
-            "height": 251,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.homeaway.5x2.2"
-          }
-        ],
-        "categories": [
-          {
-            "id": 9580,
-            "type": "league",
-            "uid": "s:70~l:90",
-            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666",
-            "description": "NHL",
-            "sportId": 90,
-            "leagueId": 90,
-            "league": {
-              "id": 90,
-              "description": "NHL",
-              "abbreviation": "NHL",
-              "links": {
-                "web": {
-                  "leagues": {
-                    "href": "https://www.espn.com/nhl/"
-                  }
-                },
-                "mobile": {
-                  "leagues": {
-                    "href": "https://www.espn.com/nhl/"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "id": 6525,
-            "type": "team",
-            "uid": "s:70~l:90~t:6",
-            "guid": "c78600f3-cea1-f6e0-11cf-dfeefe1897ff",
-            "description": "Edmonton Oilers",
-            "sportId": 90,
-            "teamId": 6,
-            "team": {
-              "id": 6,
-              "description": "Edmonton Oilers",
-              "links": {
-                "web": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/edm/edmonton-oilers"
-                  }
-                },
-                "mobile": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/edm/edmonton-oilers"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "id": 6161,
-            "type": "team",
-            "uid": "s:70~l:90~t:23",
-            "guid": "cbe677ee-361e-91b4-5cae-6c4c30044743",
-            "description": "Washington Capitals",
-            "sportId": 90,
-            "teamId": 23,
-            "team": {
-              "id": 23,
-              "description": "Washington Capitals",
-              "links": {
-                "web": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/wsh/washington-capitals"
-                  }
-                },
-                "mobile": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/wsh/washington-capitals"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "type": "event",
-            "uid": "s:70~l:90~e:401803169",
-            "guid": "83909ed3-8ec9-3cf2-a4ae-15be3af98d47",
-            "description": "Washington Capitals @ Edmonton Oilers",
-            "eventId": 401803169,
-            "event": {
-              "id": 401803169,
-              "sport": "hockey",
-              "league": "nhl",
-              "description": "Washington Capitals @ Edmonton Oilers"
-            }
-          },
-          {
-            "type": "guid",
-            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666"
-          },
-          {
-            "type": "guid",
-            "guid": "c78600f3-cea1-f6e0-11cf-dfeefe1897ff"
-          },
-          {
-            "type": "guid",
-            "guid": "cbe677ee-361e-91b4-5cae-6c4c30044743"
-          },
-          {
-            "type": "guid",
-            "guid": "83909ed3-8ec9-3cf2-a4ae-15be3af98d47"
-          }
-        ],
-        "premium": false,
-        "links": {
-          "web": {
-            "href": "http://www.espn.com/nhl/preview?gameId=401803169"
-          },
-          "mobile": {
-            "href": "http://m.espn.go.com/nhl/story?storyId=47712098"
-          },
-          "api": {
-            "self": {
-              "href": "https://content.core.api.espn.com/v1/sports/news/47712098"
-            }
-          },
-          "app": {
-            "sportscenter": {
-              "href": "sportscenter://x-callback-url/showStory?uid=47712098"
-            }
-          }
-        }
-      },
-      {
-        "id": 47712097,
-        "nowId": "1-47712097",
-        "contentKey": "47712097-1-22-1",
-        "dataSourceIdentifier": "19a9c98f5dbee",
-        "type": "Preview",
-        "headline": "Pittsburgh brings 3-game win streak into matchup against Vancouver",
-        "description": "Pittsburgh Penguins (25-14-11, in the Metropolitan Division) vs. Vancouver Canucks (17-29-5, in the Pacific Division)",
-        "lastModified": "2026-01-24T09:12:12Z",
-        "published": "2026-01-24T09:12:12Z",
-        "images": [
-          {
-            "type": "stitcher",
-            "name": "espn.applewatch.awayhome.1",
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803173.png?templateId=espn.applewatch.awayhome.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.applewatch.homeaway.1",
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803173.png?templateId=espn.applewatch.homeaway.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.16x9.1",
-            "ratio": "16x9",
-            "height": 173,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803173.png?templateId=espn.all.awayhome.16x9.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.16x9.1",
-            "ratio": "16x9",
-            "height": 173,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803173.png?templateId=espn.all.homeaway.16x9.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.1x1.1",
-            "ratio": "1x1",
-            "height": 308,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803173.png?templateId=espn.all.awayhome.1x1.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.1x1.1",
-            "ratio": "1x1",
-            "height": 308,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803173.png?templateId=espn.all.homeaway.1x1.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.5x2.1",
-            "ratio": "5x2",
-            "height": 124,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803173.png?templateId=espn.all.awayhome.5x2.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.5x2.1",
-            "ratio": "5x2",
-            "height": 124,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803173.png?templateId=espn.all.homeaway.5x2.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.16x9.2",
-            "ratio": "16x9",
-            "height": 353,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803173.png?templateId=espn.all.awayhome.16x9.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.16x9.2",
-            "ratio": "16x9",
-            "height": 353,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803173.png?templateId=espn.all.homeaway.16x9.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.5x2.2",
-            "ratio": "5x2",
-            "height": 251,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803173.png?templateId=espn.all.awayhome.5x2.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.5x2.2",
-            "ratio": "5x2",
-            "height": 251,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803173.png?templateId=espn.all.homeaway.5x2.2"
-          }
-        ],
-        "categories": [
-          {
-            "id": 9580,
-            "type": "league",
-            "uid": "s:70~l:90",
-            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666",
-            "description": "NHL",
-            "sportId": 90,
-            "leagueId": 90,
-            "league": {
-              "id": 90,
-              "description": "NHL",
-              "abbreviation": "NHL",
-              "links": {
-                "web": {
-                  "leagues": {
-                    "href": "https://www.espn.com/nhl/"
-                  }
-                },
-                "mobile": {
-                  "leagues": {
-                    "href": "https://www.espn.com/nhl/"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "id": 6578,
-            "type": "team",
-            "uid": "s:70~l:90~t:22",
-            "guid": "64856285-41c1-61e8-4b7f-72a347c8c018",
-            "description": "Vancouver Canucks",
-            "sportId": 90,
-            "teamId": 22,
-            "team": {
-              "id": 22,
-              "description": "Vancouver Canucks",
-              "links": {
-                "web": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/van/vancouver-canucks"
-                  }
-                },
-                "mobile": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/van/vancouver-canucks"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "id": 6083,
-            "type": "team",
-            "uid": "s:70~l:90~t:16",
-            "guid": "472f7324-d0ab-e645-bce6-a3cd3dcb110d",
-            "description": "Pittsburgh Penguins",
-            "sportId": 90,
-            "teamId": 16,
-            "team": {
-              "id": 16,
-              "description": "Pittsburgh Penguins",
-              "links": {
-                "web": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/pit/pittsburgh-penguins"
-                  }
-                },
-                "mobile": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/pit/pittsburgh-penguins"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "type": "event",
-            "uid": "s:70~l:90~e:401803173",
-            "guid": "92080015-ad5a-348c-a982-f0e4d6456981",
-            "description": "Pittsburgh Penguins @ Vancouver Canucks",
-            "eventId": 401803173,
-            "event": {
-              "id": 401803173,
-              "sport": "hockey",
-              "league": "nhl",
-              "description": "Pittsburgh Penguins @ Vancouver Canucks"
-            }
-          },
-          {
-            "type": "guid",
-            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666"
-          },
-          {
-            "type": "guid",
-            "guid": "64856285-41c1-61e8-4b7f-72a347c8c018"
-          },
-          {
-            "type": "guid",
-            "guid": "472f7324-d0ab-e645-bce6-a3cd3dcb110d"
-          },
-          {
-            "type": "guid",
-            "guid": "92080015-ad5a-348c-a982-f0e4d6456981"
-          }
-        ],
-        "premium": false,
-        "links": {
-          "web": {
-            "href": "http://www.espn.com/nhl/preview?gameId=401803173"
-          },
-          "mobile": {
-            "href": "http://m.espn.go.com/nhl/story?storyId=47712097"
-          },
-          "api": {
-            "self": {
-              "href": "https://content.core.api.espn.com/v1/sports/news/47712097"
-            }
-          },
-          "app": {
-            "sportscenter": {
-              "href": "sportscenter://x-callback-url/showStory?uid=47712097"
-            }
-          }
-        }
-      },
-      {
-        "id": 47712096,
-        "nowId": "1-47712096",
-        "contentKey": "47712096-1-22-1",
-        "dataSourceIdentifier": "781fb80bb8337",
-        "type": "Preview",
-        "headline": "Lightning take on the Blue Jackets on 3-game win streak",
-        "description": "Tampa Bay Lightning (32-13-4, in the Atlantic Division) vs. Columbus Blue Jackets (23-20-7, in the Metropolitan Division)",
-        "lastModified": "2026-01-24T09:12:09Z",
-        "published": "2026-01-24T09:12:09Z",
-        "images": [
-          {
-            "type": "stitcher",
-            "name": "espn.applewatch.awayhome.1",
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803165.png?templateId=espn.applewatch.awayhome.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.applewatch.homeaway.1",
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803165.png?templateId=espn.applewatch.homeaway.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.16x9.1",
-            "ratio": "16x9",
-            "height": 173,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803165.png?templateId=espn.all.awayhome.16x9.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.16x9.1",
-            "ratio": "16x9",
-            "height": 173,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803165.png?templateId=espn.all.homeaway.16x9.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.1x1.1",
-            "ratio": "1x1",
-            "height": 308,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803165.png?templateId=espn.all.awayhome.1x1.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.1x1.1",
-            "ratio": "1x1",
-            "height": 308,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803165.png?templateId=espn.all.homeaway.1x1.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.5x2.1",
-            "ratio": "5x2",
-            "height": 124,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803165.png?templateId=espn.all.awayhome.5x2.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.5x2.1",
-            "ratio": "5x2",
-            "height": 124,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803165.png?templateId=espn.all.homeaway.5x2.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.16x9.2",
-            "ratio": "16x9",
-            "height": 353,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803165.png?templateId=espn.all.awayhome.16x9.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.16x9.2",
-            "ratio": "16x9",
-            "height": 353,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803165.png?templateId=espn.all.homeaway.16x9.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.5x2.2",
-            "ratio": "5x2",
-            "height": 251,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803165.png?templateId=espn.all.awayhome.5x2.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.5x2.2",
-            "ratio": "5x2",
-            "height": 251,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803165.png?templateId=espn.all.homeaway.5x2.2"
-          }
-        ],
-        "categories": [
-          {
-            "id": 9580,
-            "type": "league",
-            "uid": "s:70~l:90",
-            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666",
-            "description": "NHL",
-            "sportId": 90,
-            "leagueId": 90,
-            "league": {
-              "id": 90,
-              "description": "NHL",
-              "abbreviation": "NHL",
-              "links": {
-                "web": {
-                  "leagues": {
-                    "href": "https://www.espn.com/nhl/"
-                  }
-                },
-                "mobile": {
-                  "leagues": {
-                    "href": "https://www.espn.com/nhl/"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "id": 6341,
-            "type": "team",
-            "uid": "s:70~l:90~t:29",
-            "guid": "724d5dd5-197c-6f1d-29ca-a0b4f25eb1b6",
-            "description": "Columbus Blue Jackets",
-            "sportId": 90,
-            "teamId": 29,
-            "team": {
-              "id": 29,
-              "description": "Columbus Blue Jackets",
-              "links": {
-                "web": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/cbj/columbus-blue-jackets"
-                  }
-                },
-                "mobile": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/cbj/columbus-blue-jackets"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "id": 6136,
-            "type": "team",
-            "uid": "s:70~l:90~t:20",
-            "guid": "49fa608f-040f-21c1-ebfb-99e8feb8b774",
-            "description": "Tampa Bay Lightning",
-            "sportId": 90,
-            "teamId": 20,
-            "team": {
-              "id": 20,
-              "description": "Tampa Bay Lightning",
-              "links": {
-                "web": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/tb/tampa-bay-lightning"
-                  }
-                },
-                "mobile": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/tb/tampa-bay-lightning"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "type": "event",
-            "uid": "s:70~l:90~e:401803165",
-            "guid": "06f1b2c6-f396-3580-93c7-0f73514b740e",
-            "description": "Tampa Bay Lightning @ Columbus Blue Jackets",
-            "eventId": 401803165,
-            "event": {
-              "id": 401803165,
-              "sport": "hockey",
-              "league": "nhl",
-              "description": "Tampa Bay Lightning @ Columbus Blue Jackets"
-            }
-          },
-          {
-            "type": "guid",
-            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666"
-          },
-          {
-            "type": "guid",
-            "guid": "724d5dd5-197c-6f1d-29ca-a0b4f25eb1b6"
-          },
-          {
-            "type": "guid",
-            "guid": "49fa608f-040f-21c1-ebfb-99e8feb8b774"
-          },
-          {
-            "type": "guid",
-            "guid": "06f1b2c6-f396-3580-93c7-0f73514b740e"
-          }
-        ],
-        "premium": false,
-        "links": {
-          "web": {
-            "href": "http://www.espn.com/nhl/preview?gameId=401803165"
-          },
-          "mobile": {
-            "href": "http://m.espn.go.com/nhl/story?storyId=47712096"
-          },
-          "api": {
-            "self": {
-              "href": "https://content.core.api.espn.com/v1/sports/news/47712096"
-            }
-          },
-          "app": {
-            "sportscenter": {
-              "href": "sportscenter://x-callback-url/showStory?uid=47712096"
-            }
-          }
-        }
-      },
-      {
-        "id": 47712095,
-        "nowId": "1-47712095",
-        "contentKey": "47712095-1-22-1",
-        "dataSourceIdentifier": "57ca2abadce3e",
-        "type": "Preview",
-        "headline": "New Jersey visits Seattle after Glass' 2-goal game",
-        "description": "New Jersey Devils (27-22-2, in the Metropolitan Division) vs. Seattle Kraken (22-19-9, in the Pacific Division)",
-        "lastModified": "2026-01-24T09:12:07Z",
-        "published": "2026-01-24T09:12:07Z",
-        "images": [
-          {
-            "type": "stitcher",
-            "name": "espn.applewatch.awayhome.1",
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803171.png?templateId=espn.applewatch.awayhome.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.applewatch.homeaway.1",
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803171.png?templateId=espn.applewatch.homeaway.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.16x9.1",
-            "ratio": "16x9",
-            "height": 173,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803171.png?templateId=espn.all.awayhome.16x9.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.16x9.1",
-            "ratio": "16x9",
-            "height": 173,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803171.png?templateId=espn.all.homeaway.16x9.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.1x1.1",
-            "ratio": "1x1",
-            "height": 308,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803171.png?templateId=espn.all.awayhome.1x1.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.1x1.1",
-            "ratio": "1x1",
-            "height": 308,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803171.png?templateId=espn.all.homeaway.1x1.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.5x2.1",
-            "ratio": "5x2",
-            "height": 124,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803171.png?templateId=espn.all.awayhome.5x2.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.5x2.1",
-            "ratio": "5x2",
-            "height": 124,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803171.png?templateId=espn.all.homeaway.5x2.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.16x9.2",
-            "ratio": "16x9",
-            "height": 353,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803171.png?templateId=espn.all.awayhome.16x9.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.16x9.2",
-            "ratio": "16x9",
-            "height": 353,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803171.png?templateId=espn.all.homeaway.16x9.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.5x2.2",
-            "ratio": "5x2",
-            "height": 251,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803171.png?templateId=espn.all.awayhome.5x2.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.5x2.2",
-            "ratio": "5x2",
-            "height": 251,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803171.png?templateId=espn.all.homeaway.5x2.2"
-          }
-        ],
-        "categories": [
-          {
-            "id": 9580,
-            "type": "league",
-            "uid": "s:70~l:90",
-            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666",
-            "description": "NHL",
-            "sportId": 90,
-            "leagueId": 90,
-            "league": {
-              "id": 90,
-              "description": "NHL",
-              "abbreviation": "NHL",
-              "links": {
-                "web": {
-                  "leagues": {
-                    "href": "https://www.espn.com/nhl/"
-                  }
-                },
-                "mobile": {
-                  "leagues": {
-                    "href": "https://www.espn.com/nhl/"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "id": 489829,
-            "type": "team",
-            "uid": "s:70~l:90~t:124292",
-            "guid": "ca912ee8-d2a3-3e84-831e-1a0ca38e7c3f",
-            "description": "Seattle Kraken",
-            "sportId": 90,
-            "teamId": 124292,
-            "team": {
-              "id": 124292,
-              "description": "Seattle Kraken",
-              "links": {
-                "web": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/sea/seattle-kraken"
-                  }
-                },
-                "mobile": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/sea/seattle-kraken"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "id": 5979,
-            "type": "team",
-            "uid": "s:70~l:90~t:11",
-            "guid": "beb0cb35-4d9f-a5e8-9e7b-d5ca97e51d93",
-            "description": "New Jersey Devils",
-            "sportId": 90,
-            "teamId": 11,
-            "team": {
-              "id": 11,
-              "description": "New Jersey Devils",
-              "links": {
-                "web": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/nj/new-jersey-devils"
-                  }
-                },
-                "mobile": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/nj/new-jersey-devils"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "type": "event",
-            "uid": "s:70~l:90~e:401803171",
-            "guid": "1696b11f-3b36-3db9-b409-60fa60747af9",
-            "description": "New Jersey Devils @ Seattle Kraken",
-            "eventId": 401803171,
-            "event": {
-              "id": 401803171,
-              "sport": "hockey",
-              "league": "nhl",
-              "description": "New Jersey Devils @ Seattle Kraken"
-            }
-          },
-          {
-            "type": "guid",
-            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666"
-          },
-          {
-            "type": "guid",
-            "guid": "ca912ee8-d2a3-3e84-831e-1a0ca38e7c3f"
-          },
-          {
-            "type": "guid",
-            "guid": "beb0cb35-4d9f-a5e8-9e7b-d5ca97e51d93"
-          },
-          {
-            "type": "guid",
-            "guid": "1696b11f-3b36-3db9-b409-60fa60747af9"
-          }
-        ],
-        "premium": false,
-        "links": {
-          "web": {
-            "href": "http://www.espn.com/nhl/preview?gameId=401803171"
-          },
-          "mobile": {
-            "href": "http://m.espn.go.com/nhl/story?storyId=47712095"
-          },
-          "api": {
-            "self": {
-              "href": "https://content.core.api.espn.com/v1/sports/news/47712095"
-            }
-          },
-          "app": {
-            "sportscenter": {
-              "href": "sportscenter://x-callback-url/showStory?uid=47712095"
-            }
-          }
-        }
-      },
-      {
-        "id": 47712094,
-        "nowId": "1-47712094",
-        "contentKey": "47712094-1-22-1",
-        "dataSourceIdentifier": "10afdb56c23c3",
-        "type": "Preview",
-        "headline": "Blues take on the Kings on losing streak",
-        "description": "Los Angeles Kings (20-16-13, in the Pacific Division) vs. St. Louis Blues (19-24-8, in the Central Division)",
-        "lastModified": "2026-01-24T09:12:05Z",
-        "published": "2026-01-24T09:12:05Z",
-        "images": [
-          {
-            "type": "stitcher",
-            "name": "espn.applewatch.awayhome.1",
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803167.png?templateId=espn.applewatch.awayhome.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.applewatch.homeaway.1",
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803167.png?templateId=espn.applewatch.homeaway.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.16x9.1",
-            "ratio": "16x9",
-            "height": 173,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803167.png?templateId=espn.all.awayhome.16x9.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.16x9.1",
-            "ratio": "16x9",
-            "height": 173,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803167.png?templateId=espn.all.homeaway.16x9.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.1x1.1",
-            "ratio": "1x1",
-            "height": 308,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803167.png?templateId=espn.all.awayhome.1x1.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.1x1.1",
-            "ratio": "1x1",
-            "height": 308,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803167.png?templateId=espn.all.homeaway.1x1.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.5x2.1",
-            "ratio": "5x2",
-            "height": 124,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803167.png?templateId=espn.all.awayhome.5x2.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.5x2.1",
-            "ratio": "5x2",
-            "height": 124,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803167.png?templateId=espn.all.homeaway.5x2.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.16x9.2",
-            "ratio": "16x9",
-            "height": 353,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803167.png?templateId=espn.all.awayhome.16x9.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.16x9.2",
-            "ratio": "16x9",
-            "height": 353,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803167.png?templateId=espn.all.homeaway.16x9.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.5x2.2",
-            "ratio": "5x2",
-            "height": 251,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803167.png?templateId=espn.all.awayhome.5x2.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.5x2.2",
-            "ratio": "5x2",
-            "height": 251,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803167.png?templateId=espn.all.homeaway.5x2.2"
-          }
-        ],
-        "categories": [
-          {
-            "id": 9580,
-            "type": "league",
-            "uid": "s:70~l:90",
-            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666",
-            "description": "NHL",
-            "sportId": 90,
-            "leagueId": 90,
-            "league": {
-              "id": 90,
-              "description": "NHL",
-              "abbreviation": "NHL",
-              "links": {
-                "web": {
-                  "leagues": {
-                    "href": "https://www.espn.com/nhl/"
-                  }
-                },
-                "mobile": {
-                  "leagues": {
-                    "href": "https://www.espn.com/nhl/"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "id": 6288,
-            "type": "team",
-            "uid": "s:70~l:90~t:19",
-            "guid": "9d2d39d0-ed26-32e1-dcdf-d48e2cef3c90",
-            "description": "St. Louis Blues",
-            "sportId": 90,
-            "teamId": 19,
-            "team": {
-              "id": 19,
-              "description": "St. Louis Blues",
-              "links": {
-                "web": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/stl/st-louis-blues"
-                  }
-                },
-                "mobile": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/stl/st-louis-blues"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "id": 6365,
-            "type": "team",
-            "uid": "s:70~l:90~t:8",
-            "guid": "47ce4014-1c1f-c67f-bfe6-ec95d5f57a87",
-            "description": "Los Angeles Kings",
-            "sportId": 90,
-            "teamId": 8,
-            "team": {
-              "id": 8,
-              "description": "Los Angeles Kings",
-              "links": {
-                "web": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/la/los-angeles-kings"
-                  }
-                },
-                "mobile": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/la/los-angeles-kings"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "type": "event",
-            "uid": "s:70~l:90~e:401803167",
-            "guid": "d3213a68-3144-3d78-bf1e-606ece8f2b6f",
-            "description": "Los Angeles Kings @ St. Louis Blues",
-            "eventId": 401803167,
-            "event": {
-              "id": 401803167,
-              "sport": "hockey",
-              "league": "nhl",
-              "description": "Los Angeles Kings @ St. Louis Blues"
-            }
-          },
-          {
-            "type": "guid",
-            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666"
-          },
-          {
-            "type": "guid",
-            "guid": "9d2d39d0-ed26-32e1-dcdf-d48e2cef3c90"
-          },
-          {
-            "type": "guid",
-            "guid": "47ce4014-1c1f-c67f-bfe6-ec95d5f57a87"
-          },
-          {
-            "type": "guid",
-            "guid": "d3213a68-3144-3d78-bf1e-606ece8f2b6f"
-          }
-        ],
-        "premium": false,
-        "links": {
-          "web": {
-            "href": "http://www.espn.com/nhl/preview?gameId=401803167"
-          },
-          "mobile": {
-            "href": "http://m.espn.go.com/nhl/story?storyId=47712094"
-          },
-          "api": {
-            "self": {
-              "href": "https://content.core.api.espn.com/v1/sports/news/47712094"
-            }
-          },
-          "app": {
-            "sportscenter": {
-              "href": "sportscenter://x-callback-url/showStory?uid=47712094"
-            }
-          }
-        }
-      },
-      {
-        "id": 47712093,
-        "nowId": "1-47712093",
-        "contentKey": "47712093-1-22-1",
-        "dataSourceIdentifier": "5d1cae565a33d",
-        "type": "Preview",
-        "headline": "Maple Leafs bring 3-game losing streak into matchup against the Avalanche",
-        "description": "Colorado Avalanche (34-6-9, in the Central Division) vs. Toronto Maple Leafs (24-18-9, in the Atlantic Division)",
-        "lastModified": "2026-01-24T09:12:02Z",
-        "published": "2026-01-24T09:12:02Z",
-        "images": [
-          {
-            "type": "stitcher",
-            "name": "espn.applewatch.awayhome.1",
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803170.png?templateId=espn.applewatch.awayhome.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.applewatch.homeaway.1",
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803170.png?templateId=espn.applewatch.homeaway.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.16x9.1",
-            "ratio": "16x9",
-            "height": 173,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803170.png?templateId=espn.all.awayhome.16x9.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.16x9.1",
-            "ratio": "16x9",
-            "height": 173,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803170.png?templateId=espn.all.homeaway.16x9.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.1x1.1",
-            "ratio": "1x1",
-            "height": 308,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803170.png?templateId=espn.all.awayhome.1x1.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.1x1.1",
-            "ratio": "1x1",
-            "height": 308,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803170.png?templateId=espn.all.homeaway.1x1.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.5x2.1",
-            "ratio": "5x2",
-            "height": 124,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803170.png?templateId=espn.all.awayhome.5x2.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.5x2.1",
-            "ratio": "5x2",
-            "height": 124,
-            "width": 308,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803170.png?templateId=espn.all.homeaway.5x2.1"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.16x9.2",
-            "ratio": "16x9",
-            "height": 353,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803170.png?templateId=espn.all.awayhome.16x9.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.16x9.2",
-            "ratio": "16x9",
-            "height": 353,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803170.png?templateId=espn.all.homeaway.16x9.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.awayhome.5x2.2",
-            "ratio": "5x2",
-            "height": 251,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803170.png?templateId=espn.all.awayhome.5x2.2"
-          },
-          {
-            "type": "stitcher",
-            "name": "espn.all.homeaway.5x2.2",
-            "ratio": "5x2",
-            "height": 251,
-            "width": 628,
-            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803170.png?templateId=espn.all.homeaway.5x2.2"
-          }
-        ],
-        "categories": [
-          {
-            "id": 9580,
-            "type": "league",
-            "uid": "s:70~l:90",
-            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666",
-            "description": "NHL",
-            "sportId": 90,
-            "leagueId": 90,
-            "league": {
-              "id": 90,
-              "description": "NHL",
-              "abbreviation": "NHL",
-              "links": {
-                "web": {
-                  "leagues": {
-                    "href": "https://www.espn.com/nhl/"
-                  }
-                },
-                "mobile": {
-                  "leagues": {
-                    "href": "https://www.espn.com/nhl/"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "id": 5955,
-            "type": "team",
-            "uid": "s:70~l:90~t:21",
-            "guid": "5aa11fc5-b122-f21a-1ddb-a63c5b3dddee",
-            "description": "Toronto Maple Leafs",
-            "sportId": 90,
-            "teamId": 21,
-            "team": {
-              "id": 21,
-              "description": "Toronto Maple Leafs",
-              "links": {
-                "web": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/tor/toronto-maple-leafs"
-                  }
-                },
-                "mobile": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/tor/toronto-maple-leafs"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "id": 6550,
-            "type": "team",
-            "uid": "s:70~l:90~t:17",
-            "guid": "65489e39-7ab7-70da-94bc-adcc6f0aa1c6",
-            "description": "Colorado Avalanche",
-            "sportId": 90,
-            "teamId": 17,
-            "team": {
-              "id": 17,
-              "description": "Colorado Avalanche",
-              "links": {
-                "web": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/col/colorado-avalanche"
-                  }
-                },
-                "mobile": {
-                  "teams": {
-                    "href": "https://www.espn.com/nhl/team/_/name/col/colorado-avalanche"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "type": "event",
-            "uid": "s:70~l:90~e:401803170",
-            "guid": "404c9d0f-a376-35ae-85b1-abec4792eeb5",
-            "description": "Colorado Avalanche @ Toronto Maple Leafs",
-            "eventId": 401803170,
-            "event": {
-              "id": 401803170,
-              "sport": "hockey",
-              "league": "nhl",
-              "description": "Colorado Avalanche @ Toronto Maple Leafs"
-            }
-          },
-          {
-            "type": "guid",
-            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666"
-          },
-          {
-            "type": "guid",
-            "guid": "5aa11fc5-b122-f21a-1ddb-a63c5b3dddee"
-          },
-          {
-            "type": "guid",
-            "guid": "65489e39-7ab7-70da-94bc-adcc6f0aa1c6"
-          },
-          {
-            "type": "guid",
-            "guid": "404c9d0f-a376-35ae-85b1-abec4792eeb5"
-          }
-        ],
-        "premium": false,
-        "links": {
-          "web": {
-            "href": "http://www.espn.com/nhl/preview?gameId=401803170"
-          },
-          "mobile": {
-            "href": "http://m.espn.go.com/nhl/story?storyId=47712093"
-          },
-          "api": {
-            "self": {
-              "href": "https://content.core.api.espn.com/v1/sports/news/47712093"
-            }
-          },
-          "app": {
-            "sportscenter": {
-              "href": "sportscenter://x-callback-url/showStory?uid=47712093"
-            }
-          }
-        }
-      }
-    ]
-  },
   "header": {
     "id": "401801798",
     "uid": "s:70~l:90~e:401801798",
@@ -7700,6 +6253,1410 @@
       }
     ]
   },
+  "news": {
+    "header": "NHL News",
+    "link": {
+      "language": "en",
+      "rel": [
+        "index",
+        "desktop",
+        "league"
+      ],
+      "href": "https://www.espn.com/nhl/",
+      "text": "All NHL News",
+      "shortText": "All News",
+      "isExternal": false,
+      "isPremium": false
+    },
+    "articles": [
+      {
+        "id": 47695777,
+        "nowId": "1-47695777",
+        "contentKey": "47695777-1-6-1",
+        "dataSourceIdentifier": "ecf0a7624a663",
+        "type": "Story",
+        "headline": "'Heated Rivalry' stars Connor Storrie, Hudson Williams serve as Milan Olympics torchbearers",
+        "description": "Hudson Williams and Connor Storrie, who play rival hockey players who develop a decade-long secret relationship, will be part of the torch relay.",
+        "lastModified": "2026-01-25T18:49:56Z",
+        "published": "2026-01-25T18:49:56Z",
+        "images": [
+          {
+            "dataSourceIdentifier": "c09308b6ceb3c",
+            "id": 47695766,
+            "type": "header",
+            "name": "Heated Rivalry [1296x729]",
+            "caption": "Connor Storrie and Hudson Williams will be torchbearers at the Milan Olympics in February.",
+            "credit": "Harold Feng/Getty Images",
+            "height": 729,
+            "width": 1296,
+            "url": "https://a.espncdn.com/photo/2026/0122/r1604243_1296x729_16-9.jpg"
+          }
+        ],
+        "categories": [
+          {
+            "id": 123671,
+            "type": "league",
+            "uid": "s:3700~l:3758",
+            "guid": "79c2a434-4b84-3ea5-93da-2864b0ad812b",
+            "description": "Olympics - Ice Hockey",
+            "sportId": 3758,
+            "leagueId": 3758,
+            "league": {
+              "id": 3758,
+              "description": "Olympics - Ice Hockey",
+              "links": {
+                "web": {},
+                "mobile": {}
+              }
+            }
+          },
+          {
+            "id": 47714,
+            "type": "league",
+            "guid": "324bfb0e-398c-4946-9a22-7c61691b51f5",
+            "description": "Olympics",
+            "sportId": 3700,
+            "leagueId": 3700,
+            "league": {
+              "id": 3700,
+              "description": "Olympics"
+            }
+          },
+          {
+            "id": 9580,
+            "type": "league",
+            "uid": "s:70~l:90",
+            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666",
+            "description": "NHL",
+            "sportId": 90,
+            "leagueId": 90,
+            "league": {
+              "id": 90,
+              "description": "NHL",
+              "abbreviation": "NHL",
+              "links": {
+                "web": {
+                  "leagues": {
+                    "href": "https://www.espn.com/nhl/"
+                  }
+                },
+                "mobile": {
+                  "leagues": {
+                    "href": "https://www.espn.com/nhl/"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "guid",
+            "guid": "79c2a434-4b84-3ea5-93da-2864b0ad812b"
+          },
+          {
+            "type": "guid",
+            "guid": "324bfb0e-398c-4946-9a22-7c61691b51f5"
+          },
+          {
+            "type": "guid",
+            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666"
+          }
+        ],
+        "premium": false,
+        "links": {
+          "web": {
+            "href": "https://www.espn.com/olympics/story/_/id/47695777/heated-rivalry-milan-olympics-connor-storrie-hudson-williams"
+          },
+          "mobile": {
+            "href": "http://m.espn.go.com/extra/olympics/story?storyId=47695777"
+          },
+          "api": {
+            "self": {
+              "href": "https://content.core.api.espn.com/v1/sports/news/47695777"
+            }
+          },
+          "app": {
+            "sportscenter": {
+              "href": "sportscenter://x-callback-url/showStory?uid=47695777"
+            }
+          }
+        },
+        "byline": "Associated Press"
+      },
+      {
+        "id": 47722354,
+        "nowId": "1-47722354",
+        "contentKey": "47722354-1-22-1",
+        "dataSourceIdentifier": "31354b73fdae9",
+        "type": "Preview",
+        "headline": "Rangers take on the Bruins on losing streak",
+        "description": "Boston Bruins (30-20-2, in the Atlantic Division) vs. New York Rangers (21-25-6, in the Metropolitan Division)",
+        "lastModified": "2026-01-25T09:12:06Z",
+        "published": "2026-01-25T09:12:06Z",
+        "images": [
+          {
+            "type": "stitcher",
+            "name": "espn.applewatch.awayhome.1",
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803177.png?templateId=espn.applewatch.awayhome.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.applewatch.homeaway.1",
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803177.png?templateId=espn.applewatch.homeaway.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.16x9.1",
+            "ratio": "16x9",
+            "height": 173,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803177.png?templateId=espn.all.awayhome.16x9.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.16x9.1",
+            "ratio": "16x9",
+            "height": 173,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803177.png?templateId=espn.all.homeaway.16x9.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.1x1.1",
+            "ratio": "1x1",
+            "height": 308,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803177.png?templateId=espn.all.awayhome.1x1.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.1x1.1",
+            "ratio": "1x1",
+            "height": 308,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803177.png?templateId=espn.all.homeaway.1x1.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.5x2.1",
+            "ratio": "5x2",
+            "height": 124,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803177.png?templateId=espn.all.awayhome.5x2.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.5x2.1",
+            "ratio": "5x2",
+            "height": 124,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803177.png?templateId=espn.all.homeaway.5x2.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.16x9.2",
+            "ratio": "16x9",
+            "height": 353,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803177.png?templateId=espn.all.awayhome.16x9.2"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.16x9.2",
+            "ratio": "16x9",
+            "height": 353,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803177.png?templateId=espn.all.homeaway.16x9.2"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.5x2.2",
+            "ratio": "5x2",
+            "height": 251,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803177.png?templateId=espn.all.awayhome.5x2.2"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.5x2.2",
+            "ratio": "5x2",
+            "height": 251,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803177.png?templateId=espn.all.homeaway.5x2.2"
+          }
+        ],
+        "categories": [
+          {
+            "id": 9580,
+            "type": "league",
+            "uid": "s:70~l:90",
+            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666",
+            "description": "NHL",
+            "sportId": 90,
+            "leagueId": 90,
+            "league": {
+              "id": 90,
+              "description": "NHL",
+              "abbreviation": "NHL",
+              "links": {
+                "web": {
+                  "leagues": {
+                    "href": "https://www.espn.com/nhl/"
+                  }
+                },
+                "mobile": {
+                  "leagues": {
+                    "href": "https://www.espn.com/nhl/"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": 6030,
+            "type": "team",
+            "uid": "s:70~l:90~t:13",
+            "guid": "4e807ac9-f3b7-8e3b-8549-441c1e604c17",
+            "description": "New York Rangers",
+            "sportId": 90,
+            "teamId": 13,
+            "team": {
+              "id": 13,
+              "description": "New York Rangers",
+              "links": {
+                "web": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/nyr/new-york-rangers"
+                  }
+                },
+                "mobile": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/nyr/new-york-rangers"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": 5855,
+            "type": "team",
+            "uid": "s:70~l:90~t:1",
+            "guid": "585503ab-1462-2afe-7a70-aafea4f6b1b6",
+            "description": "Boston Bruins",
+            "sportId": 90,
+            "teamId": 1,
+            "team": {
+              "id": 1,
+              "description": "Boston Bruins",
+              "links": {
+                "web": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/bos/boston-bruins"
+                  }
+                },
+                "mobile": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/bos/boston-bruins"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "event",
+            "uid": "s:70~l:90~e:401803177",
+            "guid": "c908eba6-349a-3072-bb41-85bcbc51acd6",
+            "description": "Boston Bruins @ New York Rangers",
+            "eventId": 401803177,
+            "event": {
+              "id": 401803177,
+              "sport": "hockey",
+              "league": "nhl",
+              "description": "Boston Bruins @ New York Rangers"
+            }
+          },
+          {
+            "type": "guid",
+            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666"
+          },
+          {
+            "type": "guid",
+            "guid": "4e807ac9-f3b7-8e3b-8549-441c1e604c17"
+          },
+          {
+            "type": "guid",
+            "guid": "585503ab-1462-2afe-7a70-aafea4f6b1b6"
+          },
+          {
+            "type": "guid",
+            "guid": "c908eba6-349a-3072-bb41-85bcbc51acd6"
+          }
+        ],
+        "premium": false,
+        "links": {
+          "web": {
+            "href": "http://www.espn.com/nhl/preview?gameId=401803177"
+          },
+          "mobile": {
+            "href": "http://m.espn.go.com/nhl/story?storyId=47722354"
+          },
+          "api": {
+            "self": {
+              "href": "https://content.core.api.espn.com/v1/sports/news/47722354"
+            }
+          },
+          "app": {
+            "sportscenter": {
+              "href": "sportscenter://x-callback-url/showStory?uid=47722354"
+            }
+          }
+        }
+      },
+      {
+        "id": 47722351,
+        "nowId": "1-47722351",
+        "contentKey": "47722351-1-22-1",
+        "dataSourceIdentifier": "accce12d50248",
+        "type": "Preview",
+        "headline": "Golden Knights take on the Senators following Stone's 2-goal game",
+        "description": "Vegas Golden Knights (25-13-12, in the Pacific Division) vs. Ottawa Senators (23-21-7, in the Atlantic Division)",
+        "lastModified": "2026-01-25T09:12:03Z",
+        "published": "2026-01-25T09:12:03Z",
+        "images": [
+          {
+            "type": "stitcher",
+            "name": "espn.applewatch.awayhome.1",
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803172.png?templateId=espn.applewatch.awayhome.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.applewatch.homeaway.1",
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803172.png?templateId=espn.applewatch.homeaway.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.16x9.1",
+            "ratio": "16x9",
+            "height": 173,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803172.png?templateId=espn.all.awayhome.16x9.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.16x9.1",
+            "ratio": "16x9",
+            "height": 173,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803172.png?templateId=espn.all.homeaway.16x9.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.1x1.1",
+            "ratio": "1x1",
+            "height": 308,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803172.png?templateId=espn.all.awayhome.1x1.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.1x1.1",
+            "ratio": "1x1",
+            "height": 308,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803172.png?templateId=espn.all.homeaway.1x1.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.5x2.1",
+            "ratio": "5x2",
+            "height": 124,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803172.png?templateId=espn.all.awayhome.5x2.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.5x2.1",
+            "ratio": "5x2",
+            "height": 124,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803172.png?templateId=espn.all.homeaway.5x2.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.16x9.2",
+            "ratio": "16x9",
+            "height": 353,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803172.png?templateId=espn.all.awayhome.16x9.2"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.16x9.2",
+            "ratio": "16x9",
+            "height": 353,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803172.png?templateId=espn.all.homeaway.16x9.2"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.5x2.2",
+            "ratio": "5x2",
+            "height": 251,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803172.png?templateId=espn.all.awayhome.5x2.2"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.5x2.2",
+            "ratio": "5x2",
+            "height": 251,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803172.png?templateId=espn.all.homeaway.5x2.2"
+          }
+        ],
+        "categories": [
+          {
+            "id": 9580,
+            "type": "league",
+            "uid": "s:70~l:90",
+            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666",
+            "description": "NHL",
+            "sportId": 90,
+            "leagueId": 90,
+            "league": {
+              "id": 90,
+              "description": "NHL",
+              "abbreviation": "NHL",
+              "links": {
+                "web": {
+                  "leagues": {
+                    "href": "https://www.espn.com/nhl/"
+                  }
+                },
+                "mobile": {
+                  "leagues": {
+                    "href": "https://www.espn.com/nhl/"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": 5930,
+            "type": "team",
+            "uid": "s:70~l:90~t:14",
+            "guid": "3edd2776-99a9-c0bb-6a73-863b428e25ef",
+            "description": "Ottawa Senators",
+            "sportId": 90,
+            "teamId": 14,
+            "team": {
+              "id": 14,
+              "description": "Ottawa Senators",
+              "links": {
+                "web": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/ott/ottawa-senators"
+                  }
+                },
+                "mobile": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/ott/ottawa-senators"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": 168810,
+            "type": "team",
+            "uid": "s:70~l:90~t:37",
+            "guid": "dd8e7d92-918d-4ec1-4e50-c328fc09467a",
+            "description": "Vegas Golden Knights",
+            "sportId": 90,
+            "teamId": 37,
+            "team": {
+              "id": 37,
+              "description": "Vegas Golden Knights",
+              "links": {
+                "web": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/vgk/vegas-golden-knights"
+                  }
+                },
+                "mobile": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/vgk/vegas-golden-knights"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "event",
+            "uid": "s:70~l:90~e:401803172",
+            "guid": "271241ce-5083-30ed-b933-c8a2af86951a",
+            "description": "Vegas Golden Knights @ Ottawa Senators",
+            "eventId": 401803172,
+            "event": {
+              "id": 401803172,
+              "sport": "hockey",
+              "league": "nhl",
+              "description": "Vegas Golden Knights @ Ottawa Senators"
+            }
+          },
+          {
+            "type": "guid",
+            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666"
+          },
+          {
+            "type": "guid",
+            "guid": "3edd2776-99a9-c0bb-6a73-863b428e25ef"
+          },
+          {
+            "type": "guid",
+            "guid": "dd8e7d92-918d-4ec1-4e50-c328fc09467a"
+          },
+          {
+            "type": "guid",
+            "guid": "271241ce-5083-30ed-b933-c8a2af86951a"
+          }
+        ],
+        "premium": false,
+        "links": {
+          "web": {
+            "href": "http://www.espn.com/nhl/preview?gameId=401803172"
+          },
+          "mobile": {
+            "href": "http://m.espn.go.com/nhl/story?storyId=47722351"
+          },
+          "api": {
+            "self": {
+              "href": "https://content.core.api.espn.com/v1/sports/news/47722351"
+            }
+          },
+          "app": {
+            "sportscenter": {
+              "href": "sportscenter://x-callback-url/showStory?uid=47722351"
+            }
+          }
+        }
+      },
+      {
+        "id": 47722350,
+        "nowId": "1-47722350",
+        "contentKey": "47722350-1-22-1",
+        "dataSourceIdentifier": "a715bcd9c5506",
+        "type": "Preview",
+        "headline": "Blue Jackets play the Kings after Marchment's hat trick",
+        "description": "Los Angeles Kings (21-16-13, in the Pacific Division) vs. Columbus Blue Jackets (24-20-7, in the Metropolitan Division)",
+        "lastModified": "2026-01-25T09:12:00Z",
+        "published": "2026-01-25T09:12:00Z",
+        "images": [
+          {
+            "type": "stitcher",
+            "name": "espn.applewatch.awayhome.1",
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803179.png?templateId=espn.applewatch.awayhome.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.applewatch.homeaway.1",
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803179.png?templateId=espn.applewatch.homeaway.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.16x9.1",
+            "ratio": "16x9",
+            "height": 173,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803179.png?templateId=espn.all.awayhome.16x9.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.16x9.1",
+            "ratio": "16x9",
+            "height": 173,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803179.png?templateId=espn.all.homeaway.16x9.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.1x1.1",
+            "ratio": "1x1",
+            "height": 308,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803179.png?templateId=espn.all.awayhome.1x1.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.1x1.1",
+            "ratio": "1x1",
+            "height": 308,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803179.png?templateId=espn.all.homeaway.1x1.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.5x2.1",
+            "ratio": "5x2",
+            "height": 124,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803179.png?templateId=espn.all.awayhome.5x2.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.5x2.1",
+            "ratio": "5x2",
+            "height": 124,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803179.png?templateId=espn.all.homeaway.5x2.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.16x9.2",
+            "ratio": "16x9",
+            "height": 353,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803179.png?templateId=espn.all.awayhome.16x9.2"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.16x9.2",
+            "ratio": "16x9",
+            "height": 353,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803179.png?templateId=espn.all.homeaway.16x9.2"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.5x2.2",
+            "ratio": "5x2",
+            "height": 251,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803179.png?templateId=espn.all.awayhome.5x2.2"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.5x2.2",
+            "ratio": "5x2",
+            "height": 251,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803179.png?templateId=espn.all.homeaway.5x2.2"
+          }
+        ],
+        "categories": [
+          {
+            "id": 9580,
+            "type": "league",
+            "uid": "s:70~l:90",
+            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666",
+            "description": "NHL",
+            "sportId": 90,
+            "leagueId": 90,
+            "league": {
+              "id": 90,
+              "description": "NHL",
+              "abbreviation": "NHL",
+              "links": {
+                "web": {
+                  "leagues": {
+                    "href": "https://www.espn.com/nhl/"
+                  }
+                },
+                "mobile": {
+                  "leagues": {
+                    "href": "https://www.espn.com/nhl/"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": 6341,
+            "type": "team",
+            "uid": "s:70~l:90~t:29",
+            "guid": "724d5dd5-197c-6f1d-29ca-a0b4f25eb1b6",
+            "description": "Columbus Blue Jackets",
+            "sportId": 90,
+            "teamId": 29,
+            "team": {
+              "id": 29,
+              "description": "Columbus Blue Jackets",
+              "links": {
+                "web": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/cbj/columbus-blue-jackets"
+                  }
+                },
+                "mobile": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/cbj/columbus-blue-jackets"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": 6365,
+            "type": "team",
+            "uid": "s:70~l:90~t:8",
+            "guid": "47ce4014-1c1f-c67f-bfe6-ec95d5f57a87",
+            "description": "Los Angeles Kings",
+            "sportId": 90,
+            "teamId": 8,
+            "team": {
+              "id": 8,
+              "description": "Los Angeles Kings",
+              "links": {
+                "web": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/la/los-angeles-kings"
+                  }
+                },
+                "mobile": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/la/los-angeles-kings"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "event",
+            "uid": "s:70~l:90~e:401803179",
+            "guid": "44ace6c9-b28b-30ce-909d-f88ab0c6e205",
+            "description": "Los Angeles Kings @ Columbus Blue Jackets",
+            "eventId": 401803179,
+            "event": {
+              "id": 401803179,
+              "sport": "hockey",
+              "league": "nhl",
+              "description": "Los Angeles Kings @ Columbus Blue Jackets"
+            }
+          },
+          {
+            "type": "guid",
+            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666"
+          },
+          {
+            "type": "guid",
+            "guid": "724d5dd5-197c-6f1d-29ca-a0b4f25eb1b6"
+          },
+          {
+            "type": "guid",
+            "guid": "47ce4014-1c1f-c67f-bfe6-ec95d5f57a87"
+          },
+          {
+            "type": "guid",
+            "guid": "44ace6c9-b28b-30ce-909d-f88ab0c6e205"
+          }
+        ],
+        "premium": false,
+        "links": {
+          "web": {
+            "href": "http://www.espn.com/nhl/preview?gameId=401803179"
+          },
+          "mobile": {
+            "href": "http://m.espn.go.com/nhl/story?storyId=47722350"
+          },
+          "api": {
+            "self": {
+              "href": "https://content.core.api.espn.com/v1/sports/news/47722350"
+            }
+          },
+          "app": {
+            "sportscenter": {
+              "href": "sportscenter://x-callback-url/showStory?uid=47722350"
+            }
+          }
+        }
+      },
+      {
+        "id": 47722349,
+        "nowId": "1-47722349",
+        "contentKey": "47722349-1-22-1",
+        "dataSourceIdentifier": "7411a84c11075",
+        "type": "Preview",
+        "headline": "Lightning host the Mammoth after Guentzel's 2-goal game",
+        "description": "Utah Mammoth (27-20-4, in the Central Division) vs. Tampa Bay Lightning (32-14-4, in the Atlantic Division)",
+        "lastModified": "2026-01-25T09:11:09Z",
+        "published": "2026-01-25T09:11:09Z",
+        "images": [
+          {
+            "type": "stitcher",
+            "name": "espn.applewatch.awayhome.1",
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803176.png?templateId=espn.applewatch.awayhome.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.applewatch.homeaway.1",
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803176.png?templateId=espn.applewatch.homeaway.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.16x9.1",
+            "ratio": "16x9",
+            "height": 173,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803176.png?templateId=espn.all.awayhome.16x9.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.16x9.1",
+            "ratio": "16x9",
+            "height": 173,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803176.png?templateId=espn.all.homeaway.16x9.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.1x1.1",
+            "ratio": "1x1",
+            "height": 308,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803176.png?templateId=espn.all.awayhome.1x1.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.1x1.1",
+            "ratio": "1x1",
+            "height": 308,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803176.png?templateId=espn.all.homeaway.1x1.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.5x2.1",
+            "ratio": "5x2",
+            "height": 124,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803176.png?templateId=espn.all.awayhome.5x2.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.5x2.1",
+            "ratio": "5x2",
+            "height": 124,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803176.png?templateId=espn.all.homeaway.5x2.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.16x9.2",
+            "ratio": "16x9",
+            "height": 353,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803176.png?templateId=espn.all.awayhome.16x9.2"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.16x9.2",
+            "ratio": "16x9",
+            "height": 353,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803176.png?templateId=espn.all.homeaway.16x9.2"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.5x2.2",
+            "ratio": "5x2",
+            "height": 251,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803176.png?templateId=espn.all.awayhome.5x2.2"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.5x2.2",
+            "ratio": "5x2",
+            "height": 251,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803176.png?templateId=espn.all.homeaway.5x2.2"
+          }
+        ],
+        "categories": [
+          {
+            "id": 9580,
+            "type": "league",
+            "uid": "s:70~l:90",
+            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666",
+            "description": "NHL",
+            "sportId": 90,
+            "leagueId": 90,
+            "league": {
+              "id": 90,
+              "description": "NHL",
+              "abbreviation": "NHL",
+              "links": {
+                "web": {
+                  "leagues": {
+                    "href": "https://www.espn.com/nhl/"
+                  }
+                },
+                "mobile": {
+                  "leagues": {
+                    "href": "https://www.espn.com/nhl/"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": 6136,
+            "type": "team",
+            "uid": "s:70~l:90~t:20",
+            "guid": "49fa608f-040f-21c1-ebfb-99e8feb8b774",
+            "description": "Tampa Bay Lightning",
+            "sportId": 90,
+            "teamId": 20,
+            "team": {
+              "id": 20,
+              "description": "Tampa Bay Lightning",
+              "links": {
+                "web": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/tb/tampa-bay-lightning"
+                  }
+                },
+                "mobile": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/tb/tampa-bay-lightning"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": 667298,
+            "type": "team",
+            "uid": "s:70~l:90~t:129764",
+            "guid": "f7e8115e-e00b-315d-8018-d2b38e4f420a",
+            "description": "Utah Mammoth",
+            "sportId": 90,
+            "teamId": 129764,
+            "team": {
+              "id": 129764,
+              "description": "Utah Mammoth",
+              "links": {
+                "web": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/utah/utah-mammoth"
+                  }
+                },
+                "mobile": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/utah/utah-mammoth"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "event",
+            "uid": "s:70~l:90~e:401803176",
+            "guid": "fa85bf5c-e5d3-32d8-8ef4-69d6805a7b28",
+            "description": "Utah Mammoth @ Tampa Bay Lightning",
+            "eventId": 401803176,
+            "event": {
+              "id": 401803176,
+              "sport": "hockey",
+              "league": "nhl",
+              "description": "Utah Mammoth @ Tampa Bay Lightning"
+            }
+          },
+          {
+            "type": "guid",
+            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666"
+          },
+          {
+            "type": "guid",
+            "guid": "49fa608f-040f-21c1-ebfb-99e8feb8b774"
+          },
+          {
+            "type": "guid",
+            "guid": "f7e8115e-e00b-315d-8018-d2b38e4f420a"
+          },
+          {
+            "type": "guid",
+            "guid": "fa85bf5c-e5d3-32d8-8ef4-69d6805a7b28"
+          }
+        ],
+        "premium": false,
+        "links": {
+          "web": {
+            "href": "http://www.espn.com/nhl/preview?gameId=401803176"
+          },
+          "mobile": {
+            "href": "http://m.espn.go.com/nhl/story?storyId=47722349"
+          },
+          "api": {
+            "self": {
+              "href": "https://content.core.api.espn.com/v1/sports/news/47722349"
+            }
+          },
+          "app": {
+            "sportscenter": {
+              "href": "sportscenter://x-callback-url/showStory?uid=47722349"
+            }
+          }
+        }
+      },
+      {
+        "id": 47721736,
+        "nowId": "1-47721736",
+        "contentKey": "47721736-1-21-1",
+        "dataSourceIdentifier": "5d0b47b83b45e",
+        "type": "Recap",
+        "headline": "McDavid scores in OT, Bouchard nets hat trick as Oilers edge Capitals 6-5",
+        "description": "Connor McDavid scored 46 seconds into overtime, Evan Bouchard had his first NHL hat trick and three assists, and the Edmonton Oilers held on for a 6-5 win over the Washington Capitals on Saturday night.",
+        "lastModified": "2026-01-25T06:36:01Z",
+        "published": "2026-01-25T06:36:01Z",
+        "images": [
+          {
+            "type": "stitcher",
+            "name": "espn.applewatch.awayhome.1",
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.applewatch.awayhome.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.applewatch.homeaway.1",
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.applewatch.homeaway.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.16x9.1",
+            "ratio": "16x9",
+            "height": 173,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.awayhome.16x9.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.16x9.1",
+            "ratio": "16x9",
+            "height": 173,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.homeaway.16x9.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.1x1.1",
+            "ratio": "1x1",
+            "height": 308,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.awayhome.1x1.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.1x1.1",
+            "ratio": "1x1",
+            "height": 308,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.homeaway.1x1.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.5x2.1",
+            "ratio": "5x2",
+            "height": 124,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.awayhome.5x2.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.5x2.1",
+            "ratio": "5x2",
+            "height": 124,
+            "width": 308,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.homeaway.5x2.1"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.16x9.2",
+            "ratio": "16x9",
+            "height": 353,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.awayhome.16x9.2"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.16x9.2",
+            "ratio": "16x9",
+            "height": 353,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.homeaway.16x9.2"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.awayhome.5x2.2",
+            "ratio": "5x2",
+            "height": 251,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.awayhome.5x2.2"
+          },
+          {
+            "type": "stitcher",
+            "name": "espn.all.homeaway.5x2.2",
+            "ratio": "5x2",
+            "height": 251,
+            "width": 628,
+            "url": "https://s.espncdn.com/stitcher/sports/hockey/nhl/events/401803169.png?templateId=espn.all.homeaway.5x2.2"
+          },
+          {
+            "type": "Media",
+            "name": "Hyman ties it late, McDavid wins it in wild Oilers OT victory",
+            "caption": "Zach Hyman ties it for the Oilers at the end of regulation before Connor McDavid nets the overtime winner.",
+            "height": 324,
+            "width": 576,
+            "url": "https://a.espncdn.com/media/motion/2026/0125/a05e7ab03eb74314b05a004dbadfbc2a70/a05e7ab03eb74314b05a004dbadfbc2a70.jpg"
+          }
+        ],
+        "categories": [
+          {
+            "id": 9580,
+            "type": "league",
+            "uid": "s:70~l:90",
+            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666",
+            "description": "NHL",
+            "sportId": 90,
+            "leagueId": 90,
+            "league": {
+              "id": 90,
+              "description": "NHL",
+              "abbreviation": "NHL",
+              "links": {
+                "web": {
+                  "leagues": {
+                    "href": "https://www.espn.com/nhl/"
+                  }
+                },
+                "mobile": {
+                  "leagues": {
+                    "href": "https://www.espn.com/nhl/"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": 6525,
+            "type": "team",
+            "uid": "s:70~l:90~t:6",
+            "guid": "c78600f3-cea1-f6e0-11cf-dfeefe1897ff",
+            "description": "Edmonton Oilers",
+            "sportId": 90,
+            "teamId": 6,
+            "team": {
+              "id": 6,
+              "description": "Edmonton Oilers",
+              "links": {
+                "web": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/edm/edmonton-oilers"
+                  }
+                },
+                "mobile": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/edm/edmonton-oilers"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": 6161,
+            "type": "team",
+            "uid": "s:70~l:90~t:23",
+            "guid": "cbe677ee-361e-91b4-5cae-6c4c30044743",
+            "description": "Washington Capitals",
+            "sportId": 90,
+            "teamId": 23,
+            "team": {
+              "id": 23,
+              "description": "Washington Capitals",
+              "links": {
+                "web": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/wsh/washington-capitals"
+                  }
+                },
+                "mobile": {
+                  "teams": {
+                    "href": "https://www.espn.com/nhl/team/_/name/wsh/washington-capitals"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "event",
+            "uid": "s:70~l:90~e:401803169",
+            "guid": "83909ed3-8ec9-3cf2-a4ae-15be3af98d47",
+            "description": "Washington Capitals @ Edmonton Oilers",
+            "eventId": 401803169,
+            "event": {
+              "id": 401803169,
+              "sport": "hockey",
+              "league": "nhl",
+              "description": "Washington Capitals @ Edmonton Oilers",
+              "links": {
+                "web": {
+                  "event": {
+                    "href": "https://www.espn.com/nhl/game/_/gameId/401803169"
+                  }
+                },
+                "mobile": {
+                  "event": {
+                    "href": "https://www.espn.com/nhl/game/_/gameId/401803169"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "guid",
+            "guid": "1a5f0227-a13e-396c-8cea-8961bc288666"
+          },
+          {
+            "type": "guid",
+            "guid": "c78600f3-cea1-f6e0-11cf-dfeefe1897ff"
+          },
+          {
+            "type": "guid",
+            "guid": "cbe677ee-361e-91b4-5cae-6c4c30044743"
+          },
+          {
+            "type": "guid",
+            "guid": "83909ed3-8ec9-3cf2-a4ae-15be3af98d47"
+          }
+        ],
+        "premium": false,
+        "links": {
+          "web": {
+            "href": "http://www.espn.com/nhl/recap?gameId=401803169"
+          },
+          "mobile": {
+            "href": "http://m.espn.go.com/nhl/story?storyId=47721736"
+          },
+          "api": {
+            "self": {
+              "href": "https://content.core.api.espn.com/v1/sports/news/47721736"
+            }
+          },
+          "app": {
+            "sportscenter": {
+              "href": "sportscenter://x-callback-url/showStory?uid=47721736"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "onIce": [
+    {
+      "entries": [
+        {
+          "whereabouts": {
+            "id": "1",
+            "description": "In Play",
+            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
+          },
+          "athleteid": "5571"
+        },
+        {
+          "whereabouts": {
+            "id": "1",
+            "description": "In Play",
+            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
+          },
+          "athleteid": "3114722"
+        },
+        {
+          "whereabouts": {
+            "id": "1",
+            "description": "In Play",
+            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
+          },
+          "athleteid": "3151784"
+        },
+        {
+          "whereabouts": {
+            "id": "1",
+            "description": "In Play",
+            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
+          },
+          "athleteid": "4697395"
+        },
+        {
+          "whereabouts": {
+            "id": "1",
+            "description": "In Play",
+            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
+          },
+          "athleteid": "4233877"
+        },
+        {
+          "whereabouts": {
+            "id": "1",
+            "description": "In Play",
+            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
+          },
+          "athleteid": "3114717"
+        }
+      ],
+      "teamId": "26"
+    },
+    {
+      "entries": [
+        {
+          "whereabouts": {
+            "id": "1",
+            "description": "In Play",
+            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
+          },
+          "athleteid": "3535"
+        },
+        {
+          "whereabouts": {
+            "id": "1",
+            "description": "In Play",
+            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
+          },
+          "athleteid": "2592095"
+        },
+        {
+          "whereabouts": {
+            "id": "1",
+            "description": "In Play",
+            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
+          },
+          "athleteid": "3042056"
+        },
+        {
+          "whereabouts": {
+            "id": "1",
+            "description": "In Play",
+            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
+          },
+          "athleteid": "5080157"
+        },
+        {
+          "whereabouts": {
+            "id": "1",
+            "description": "In Play",
+            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
+          },
+          "athleteid": "5080173"
+        },
+        {
+          "whereabouts": {
+            "id": "1",
+            "description": "In Play",
+            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
+          },
+          "athleteid": "5149125"
+        }
+      ],
+      "teamId": "4"
+    }
+  ],
   "article": {
     "id": 46525110,
     "nowId": "1-46525110",
@@ -9680,114 +9637,6 @@
         "trackingName": "NHL_One-Play (Teuvo Teravainen nets goal for Blackhawks) 2025/10/07 ESHEET",
         "trackingId": "dm_20251007_NHL_teuvo_teravainen_nets_goal_for_blackhawks"
       }
-    }
-  ],
-  "onIce": [
-    {
-      "entries": [
-        {
-          "whereabouts": {
-            "id": "1",
-            "description": "In Play",
-            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
-          },
-          "athleteid": "5571"
-        },
-        {
-          "whereabouts": {
-            "id": "1",
-            "description": "In Play",
-            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
-          },
-          "athleteid": "3114722"
-        },
-        {
-          "whereabouts": {
-            "id": "1",
-            "description": "In Play",
-            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
-          },
-          "athleteid": "3151784"
-        },
-        {
-          "whereabouts": {
-            "id": "1",
-            "description": "In Play",
-            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
-          },
-          "athleteid": "4697395"
-        },
-        {
-          "whereabouts": {
-            "id": "1",
-            "description": "In Play",
-            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
-          },
-          "athleteid": "4233877"
-        },
-        {
-          "whereabouts": {
-            "id": "1",
-            "description": "In Play",
-            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
-          },
-          "athleteid": "3114717"
-        }
-      ],
-      "teamId": "26"
-    },
-    {
-      "entries": [
-        {
-          "whereabouts": {
-            "id": "1",
-            "description": "In Play",
-            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
-          },
-          "athleteid": "3535"
-        },
-        {
-          "whereabouts": {
-            "id": "1",
-            "description": "In Play",
-            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
-          },
-          "athleteid": "2592095"
-        },
-        {
-          "whereabouts": {
-            "id": "1",
-            "description": "In Play",
-            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
-          },
-          "athleteid": "3042056"
-        },
-        {
-          "whereabouts": {
-            "id": "1",
-            "description": "In Play",
-            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
-          },
-          "athleteid": "5080157"
-        },
-        {
-          "whereabouts": {
-            "id": "1",
-            "description": "In Play",
-            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
-          },
-          "athleteid": "5080173"
-        },
-        {
-          "whereabouts": {
-            "id": "1",
-            "description": "In Play",
-            "name": "ROSTER_WHEREABOUTS_IN_PLAY"
-          },
-          "athleteid": "5149125"
-        }
-      ],
-      "teamId": "4"
     }
   ],
   "plays": [
@@ -29819,8 +29668,8 @@
                   "description": "Total Points",
                   "abbreviation": "PTS",
                   "type": "points",
-                  "value": 77.0,
-                  "displayValue": "77"
+                  "value": 79.0,
+                  "displayValue": "79"
                 },
                 {
                   "name": "wins",
@@ -29829,8 +29678,8 @@
                   "description": "Wins",
                   "abbreviation": "W",
                   "type": "wins",
-                  "value": 34.0,
-                  "displayValue": "34"
+                  "value": 35.0,
+                  "displayValue": "35"
                 }
               ],
               "logo": [
@@ -29847,6 +29696,79 @@
                 },
                 {
                   "href": "https://a.espncdn.com/i/teamlogos/nhl/500-dark/scoreboard/col.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": [
+                    "full",
+                    "scoreboard",
+                    "dark"
+                  ],
+                  "lastUpdated": "2024-07-02T15:46Z"
+                }
+              ]
+            },
+            {
+              "team": "Minnesota",
+              "link": "https://www.espn.com/nhl/team/_/name/min/minnesota-wild",
+              "id": "30",
+              "uid": "s:70~l:90~t:30",
+              "stats": [
+                {
+                  "name": "otLosses",
+                  "displayName": "Overtime Losses",
+                  "shortDisplayName": "OTL",
+                  "description": "Number of Overtime Losses",
+                  "abbreviation": "OTL",
+                  "type": "otlosses",
+                  "value": 10.0,
+                  "displayValue": "10"
+                },
+                {
+                  "name": "losses",
+                  "displayName": "Losses",
+                  "shortDisplayName": "L",
+                  "description": "Losses",
+                  "abbreviation": "L",
+                  "type": "losses",
+                  "value": 14.0,
+                  "displayValue": "14"
+                },
+                {
+                  "name": "points",
+                  "displayName": "Points",
+                  "shortDisplayName": "PTS",
+                  "description": "Total Points",
+                  "abbreviation": "PTS",
+                  "type": "points",
+                  "value": 68.0,
+                  "displayValue": "68"
+                },
+                {
+                  "name": "wins",
+                  "displayName": "Wins",
+                  "shortDisplayName": "W",
+                  "description": "Wins",
+                  "abbreviation": "W",
+                  "type": "wins",
+                  "value": 29.0,
+                  "displayValue": "29"
+                }
+              ],
+              "logo": [
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500/min.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": [
+                    "full",
+                    "default"
+                  ],
+                  "lastUpdated": "2024-07-02T15:51Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500-dark/scoreboard/min.png",
                   "width": 500,
                   "height": 500,
                   "alt": "",
@@ -29933,79 +29855,6 @@
               ]
             },
             {
-              "team": "Minnesota",
-              "link": "https://www.espn.com/nhl/team/_/name/min/minnesota-wild",
-              "id": "30",
-              "uid": "s:70~l:90~t:30",
-              "stats": [
-                {
-                  "name": "otLosses",
-                  "displayName": "Overtime Losses",
-                  "shortDisplayName": "OTL",
-                  "description": "Number of Overtime Losses",
-                  "abbreviation": "OTL",
-                  "type": "otlosses",
-                  "value": 9.0,
-                  "displayValue": "9"
-                },
-                {
-                  "name": "losses",
-                  "displayName": "Losses",
-                  "shortDisplayName": "L",
-                  "description": "Losses",
-                  "abbreviation": "L",
-                  "type": "losses",
-                  "value": 14.0,
-                  "displayValue": "14"
-                },
-                {
-                  "name": "points",
-                  "displayName": "Points",
-                  "shortDisplayName": "PTS",
-                  "description": "Total Points",
-                  "abbreviation": "PTS",
-                  "type": "points",
-                  "value": 67.0,
-                  "displayValue": "67"
-                },
-                {
-                  "name": "wins",
-                  "displayName": "Wins",
-                  "shortDisplayName": "W",
-                  "description": "Wins",
-                  "abbreviation": "W",
-                  "type": "wins",
-                  "value": 29.0,
-                  "displayValue": "29"
-                }
-              ],
-              "logo": [
-                {
-                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500/min.png",
-                  "width": 500,
-                  "height": 500,
-                  "alt": "",
-                  "rel": [
-                    "full",
-                    "default"
-                  ],
-                  "lastUpdated": "2024-07-02T15:51Z"
-                },
-                {
-                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500-dark/scoreboard/min.png",
-                  "width": 500,
-                  "height": 500,
-                  "alt": "",
-                  "rel": [
-                    "full",
-                    "scoreboard",
-                    "dark"
-                  ],
-                  "lastUpdated": "2024-07-02T15:46Z"
-                }
-              ]
-            },
-            {
               "team": "Utah",
               "link": "https://www.espn.com/nhl/team/_/name/utah/utah-mammoth",
               "id": "129764",
@@ -30038,8 +29887,8 @@
                   "description": "Total Points",
                   "abbreviation": "PTS",
                   "type": "points",
-                  "value": 56.0,
-                  "displayValue": "56"
+                  "value": 58.0,
+                  "displayValue": "58"
                 },
                 {
                   "name": "wins",
@@ -30048,8 +29897,8 @@
                   "description": "Wins",
                   "abbreviation": "W",
                   "type": "wins",
-                  "value": 26.0,
-                  "displayValue": "26"
+                  "value": 27.0,
+                  "displayValue": "27"
                 }
               ],
               "logo": [
@@ -30101,8 +29950,8 @@
                   "description": "Losses",
                   "abbreviation": "L",
                   "type": "losses",
-                  "value": 22.0,
-                  "displayValue": "22"
+                  "value": 23.0,
+                  "displayValue": "23"
                 },
                 {
                   "name": "points",
@@ -30247,8 +30096,8 @@
                   "description": "Losses",
                   "abbreviation": "L",
                   "type": "losses",
-                  "value": 23.0,
-                  "displayValue": "23"
+                  "value": 24.0,
+                  "displayValue": "24"
                 },
                 {
                   "name": "points",
@@ -30310,8 +30159,8 @@
                   "description": "Number of Overtime Losses",
                   "abbreviation": "OTL",
                   "type": "otlosses",
-                  "value": 8.0,
-                  "displayValue": "8"
+                  "value": 9.0,
+                  "displayValue": "9"
                 },
                 {
                   "name": "losses",
@@ -30330,8 +30179,8 @@
                   "description": "Total Points",
                   "abbreviation": "PTS",
                   "type": "points",
-                  "value": 46.0,
-                  "displayValue": "46"
+                  "value": 47.0,
+                  "displayValue": "47"
                 },
                 {
                   "name": "wins",
@@ -30379,6 +30228,79 @@
         "standings": {
           "entries": [
             {
+              "team": "Detroit",
+              "link": "https://www.espn.com/nhl/team/_/name/det/detroit-red-wings",
+              "id": "5",
+              "uid": "s:70~l:90~t:5",
+              "stats": [
+                {
+                  "name": "otLosses",
+                  "displayName": "Overtime Losses",
+                  "shortDisplayName": "OTL",
+                  "description": "Number of Overtime Losses",
+                  "abbreviation": "OTL",
+                  "type": "otlosses",
+                  "value": 5.0,
+                  "displayValue": "5"
+                },
+                {
+                  "name": "losses",
+                  "displayName": "Losses",
+                  "shortDisplayName": "L",
+                  "description": "Losses",
+                  "abbreviation": "L",
+                  "type": "losses",
+                  "value": 16.0,
+                  "displayValue": "16"
+                },
+                {
+                  "name": "points",
+                  "displayName": "Points",
+                  "shortDisplayName": "PTS",
+                  "description": "Total Points",
+                  "abbreviation": "PTS",
+                  "type": "points",
+                  "value": 69.0,
+                  "displayValue": "69"
+                },
+                {
+                  "name": "wins",
+                  "displayName": "Wins",
+                  "shortDisplayName": "W",
+                  "description": "Wins",
+                  "abbreviation": "W",
+                  "type": "wins",
+                  "value": 32.0,
+                  "displayValue": "32"
+                }
+              ],
+              "logo": [
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500/det.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": [
+                    "full",
+                    "default"
+                  ],
+                  "lastUpdated": "2024-07-02T15:51Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500-dark/scoreboard/det.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": [
+                    "full",
+                    "scoreboard",
+                    "dark"
+                  ],
+                  "lastUpdated": "2018-06-05T12:12Z"
+                }
+              ]
+            },
+            {
               "team": "Tampa Bay",
               "link": "https://www.espn.com/nhl/team/_/name/tb/tampa-bay-lightning",
               "id": "20",
@@ -30401,8 +30323,8 @@
                   "description": "Losses",
                   "abbreviation": "L",
                   "type": "losses",
-                  "value": 13.0,
-                  "displayValue": "13"
+                  "value": 14.0,
+                  "displayValue": "14"
                 },
                 {
                   "name": "points",
@@ -30452,10 +30374,10 @@
               ]
             },
             {
-              "team": "Detroit",
-              "link": "https://www.espn.com/nhl/team/_/name/det/detroit-red-wings",
-              "id": "5",
-              "uid": "s:70~l:90~t:5",
+              "team": "Buffalo",
+              "link": "https://www.espn.com/nhl/team/_/name/buf/buffalo-sabres",
+              "id": "2",
+              "uid": "s:70~l:90~t:2",
               "stats": [
                 {
                   "name": "otLosses",
@@ -30474,8 +30396,8 @@
                   "description": "Losses",
                   "abbreviation": "L",
                   "type": "losses",
-                  "value": 16.0,
-                  "displayValue": "16"
+                  "value": 17.0,
+                  "displayValue": "17"
                 },
                 {
                   "name": "points",
@@ -30484,8 +30406,8 @@
                   "description": "Total Points",
                   "abbreviation": "PTS",
                   "type": "points",
-                  "value": 67.0,
-                  "displayValue": "67"
+                  "value": 63.0,
+                  "displayValue": "63"
                 },
                 {
                   "name": "wins",
@@ -30494,13 +30416,13 @@
                   "description": "Wins",
                   "abbreviation": "W",
                   "type": "wins",
-                  "value": 31.0,
-                  "displayValue": "31"
+                  "value": 29.0,
+                  "displayValue": "29"
                 }
               ],
               "logo": [
                 {
-                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500/det.png",
+                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500/buf.png",
                   "width": 500,
                   "height": 500,
                   "alt": "",
@@ -30511,7 +30433,7 @@
                   "lastUpdated": "2024-07-02T15:51Z"
                 },
                 {
-                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500-dark/scoreboard/det.png",
+                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500-dark/scoreboard/buf.png",
                   "width": 500,
                   "height": 500,
                   "alt": "",
@@ -30520,7 +30442,7 @@
                     "scoreboard",
                     "dark"
                   ],
-                  "lastUpdated": "2018-06-05T12:12Z"
+                  "lastUpdated": "2024-07-02T15:46Z"
                 }
               ]
             },
@@ -30547,8 +30469,8 @@
                   "description": "Losses",
                   "abbreviation": "L",
                   "type": "losses",
-                  "value": 16.0,
-                  "displayValue": "16"
+                  "value": 17.0,
+                  "displayValue": "17"
                 },
                 {
                   "name": "points",
@@ -30598,79 +30520,6 @@
               ]
             },
             {
-              "team": "Buffalo",
-              "link": "https://www.espn.com/nhl/team/_/name/buf/buffalo-sabres",
-              "id": "2",
-              "uid": "s:70~l:90~t:2",
-              "stats": [
-                {
-                  "name": "otLosses",
-                  "displayName": "Overtime Losses",
-                  "shortDisplayName": "OTL",
-                  "description": "Number of Overtime Losses",
-                  "abbreviation": "OTL",
-                  "type": "otlosses",
-                  "value": 5.0,
-                  "displayValue": "5"
-                },
-                {
-                  "name": "losses",
-                  "displayName": "Losses",
-                  "shortDisplayName": "L",
-                  "description": "Losses",
-                  "abbreviation": "L",
-                  "type": "losses",
-                  "value": 17.0,
-                  "displayValue": "17"
-                },
-                {
-                  "name": "points",
-                  "displayName": "Points",
-                  "shortDisplayName": "PTS",
-                  "description": "Total Points",
-                  "abbreviation": "PTS",
-                  "type": "points",
-                  "value": 61.0,
-                  "displayValue": "61"
-                },
-                {
-                  "name": "wins",
-                  "displayName": "Wins",
-                  "shortDisplayName": "W",
-                  "description": "Wins",
-                  "abbreviation": "W",
-                  "type": "wins",
-                  "value": 28.0,
-                  "displayValue": "28"
-                }
-              ],
-              "logo": [
-                {
-                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500/buf.png",
-                  "width": 500,
-                  "height": 500,
-                  "alt": "",
-                  "rel": [
-                    "full",
-                    "default"
-                  ],
-                  "lastUpdated": "2024-07-02T15:51Z"
-                },
-                {
-                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500-dark/scoreboard/buf.png",
-                  "width": 500,
-                  "height": 500,
-                  "alt": "",
-                  "rel": [
-                    "full",
-                    "scoreboard",
-                    "dark"
-                  ],
-                  "lastUpdated": "2024-07-02T15:46Z"
-                }
-              ]
-            },
-            {
               "team": "Boston",
               "link": "https://www.espn.com/nhl/team/_/name/bos/boston-bruins",
               "id": "1",
@@ -30703,8 +30552,8 @@
                   "description": "Total Points",
                   "abbreviation": "PTS",
                   "type": "points",
-                  "value": 60.0,
-                  "displayValue": "60"
+                  "value": 62.0,
+                  "displayValue": "62"
                 },
                 {
                   "name": "wins",
@@ -30713,8 +30562,8 @@
                   "description": "Wins",
                   "abbreviation": "W",
                   "type": "wins",
-                  "value": 29.0,
-                  "displayValue": "29"
+                  "value": 30.0,
+                  "displayValue": "30"
                 }
               ],
               "logo": [
@@ -30740,6 +30589,79 @@
                     "dark"
                   ],
                   "lastUpdated": "2025-09-25T18:12Z"
+                }
+              ]
+            },
+            {
+              "team": "Florida",
+              "link": "https://www.espn.com/nhl/team/_/name/fla/florida-panthers",
+              "id": "26",
+              "uid": "s:70~l:90~t:26",
+              "stats": [
+                {
+                  "name": "otLosses",
+                  "displayName": "Overtime Losses",
+                  "shortDisplayName": "OTL",
+                  "description": "Number of Overtime Losses",
+                  "abbreviation": "OTL",
+                  "type": "otlosses",
+                  "value": 3.0,
+                  "displayValue": "3"
+                },
+                {
+                  "name": "losses",
+                  "displayName": "Losses",
+                  "shortDisplayName": "L",
+                  "description": "Losses",
+                  "abbreviation": "L",
+                  "type": "losses",
+                  "value": 20.0,
+                  "displayValue": "20"
+                },
+                {
+                  "name": "points",
+                  "displayName": "Points",
+                  "shortDisplayName": "PTS",
+                  "description": "Total Points",
+                  "abbreviation": "PTS",
+                  "type": "points",
+                  "value": 57.0,
+                  "displayValue": "57"
+                },
+                {
+                  "name": "wins",
+                  "displayName": "Wins",
+                  "shortDisplayName": "W",
+                  "description": "Wins",
+                  "abbreviation": "W",
+                  "type": "wins",
+                  "value": 27.0,
+                  "displayValue": "27"
+                }
+              ],
+              "logo": [
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500/fla.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": [
+                    "full",
+                    "default"
+                  ],
+                  "lastUpdated": "2024-07-02T15:51Z"
+                },
+                {
+                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500-dark/scoreboard/fla.png",
+                  "width": 500,
+                  "height": 500,
+                  "alt": "",
+                  "rel": [
+                    "full",
+                    "scoreboard",
+                    "dark"
+                  ],
+                  "lastUpdated": "2018-06-05T12:12Z"
                 }
               ]
             },
@@ -30817,79 +30739,6 @@
               ]
             },
             {
-              "team": "Florida",
-              "link": "https://www.espn.com/nhl/team/_/name/fla/florida-panthers",
-              "id": "26",
-              "uid": "s:70~l:90~t:26",
-              "stats": [
-                {
-                  "name": "otLosses",
-                  "displayName": "Overtime Losses",
-                  "shortDisplayName": "OTL",
-                  "description": "Number of Overtime Losses",
-                  "abbreviation": "OTL",
-                  "type": "otlosses",
-                  "value": 3.0,
-                  "displayValue": "3"
-                },
-                {
-                  "name": "losses",
-                  "displayName": "Losses",
-                  "shortDisplayName": "L",
-                  "description": "Losses",
-                  "abbreviation": "L",
-                  "type": "losses",
-                  "value": 20.0,
-                  "displayValue": "20"
-                },
-                {
-                  "name": "points",
-                  "displayName": "Points",
-                  "shortDisplayName": "PTS",
-                  "description": "Total Points",
-                  "abbreviation": "PTS",
-                  "type": "points",
-                  "value": 55.0,
-                  "displayValue": "55"
-                },
-                {
-                  "name": "wins",
-                  "displayName": "Wins",
-                  "shortDisplayName": "W",
-                  "description": "Wins",
-                  "abbreviation": "W",
-                  "type": "wins",
-                  "value": 26.0,
-                  "displayValue": "26"
-                }
-              ],
-              "logo": [
-                {
-                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500/fla.png",
-                  "width": 500,
-                  "height": 500,
-                  "alt": "",
-                  "rel": [
-                    "full",
-                    "default"
-                  ],
-                  "lastUpdated": "2024-07-02T15:51Z"
-                },
-                {
-                  "href": "https://a.espncdn.com/i/teamlogos/nhl/500-dark/scoreboard/fla.png",
-                  "width": 500,
-                  "height": 500,
-                  "alt": "",
-                  "rel": [
-                    "full",
-                    "scoreboard",
-                    "dark"
-                  ],
-                  "lastUpdated": "2018-06-05T12:12Z"
-                }
-              ]
-            },
-            {
               "team": "Ottawa",
               "link": "https://www.espn.com/nhl/team/_/name/ott/ottawa-senators",
               "id": "14",
@@ -30912,8 +30761,8 @@
                   "description": "Losses",
                   "abbreviation": "L",
                   "type": "losses",
-                  "value": 20.0,
-                  "displayValue": "20"
+                  "value": 21.0,
+                  "displayValue": "21"
                 },
                 {
                   "name": "points",

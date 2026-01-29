@@ -1,7 +1,10 @@
-FROM python:3.9-slim
+FROM python:3.12-slim
 
 # Set working directory
 WORKDIR /app
+
+# Ensure root directory is in PYTHONPATH for module imports
+ENV PYTHONPATH=/app
 
 # Install system dependencies
 # libpq-dev is for psycopg2 (Postgres)
@@ -29,8 +32,8 @@ COPY . .
 EXPOSE 8501
 
 # Copy startup script
-COPY start.sh .
-RUN chmod +x start.sh
+COPY start_dashboard.sh .
+RUN chmod +x start_dashboard.sh
 
-# Default command matches start.sh
-CMD ["./start.sh"]
+# Default command matches start_dashboard.sh
+CMD ["./start_dashboard.sh"]

@@ -1,6 +1,6 @@
 import logging
 from understat_client import UnderstatClient
-from database import get_db, safe_execute
+from db.connection import get_db, safe_execute
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("TestScrape")

@@ -1,7 +1,7 @@
 from config import Config
 from utils import log
-from database import get_db
-from api_clients import fetch_prop_odds
+from db.connection import get_db
+from data.clients.odds_api import fetch_prop_odds
 from player_props_model import PlayerPropsPredictor
 import pandas as pd
 from datetime import datetime
@@ -27,7 +27,9 @@ class PropSniper:
             ("La_liga", "soccer_spain_la_liga"),
             ("Bundesliga", "soccer_germany_bundesliga"),
             ("Serie_A", "soccer_italy_serie_a"),
-            ("Ligue_1", "soccer_france_ligue_one")
+            ("Ligue_1", "soccer_france_ligue_one"),
+            ("Champions_League", "soccer_uefa_champs_league"),
+            ("Europa_League", "soccer_uefa_europa_league")
         ]
         self.lineup_cache = {} # Cache match_id -> set(starters)
         
@@ -55,20 +57,25 @@ class PropSniper:
                 
                 # --- MARKET 1: ANYTIME GOAL SCORER ---
                 if 'player_goal_scorer_anytime' in markets:
-                    # New structure from api_clients.py stores sides. 'anytime' key for goal scorers.
-                    goal_market = markets['player_goal_scorer_anytime'].get('anytime')
-                    if goal_market:
-                        if self.process_market(predictor, player_name, goal_market, "Anytime Goal", league_name, sport_key):
-                            total_found += 1
+                    # New structure: List of offers
+                    goal_offers = markets['player_goal_scorer_anytime']
+                    if goal_offers and isinstance(goal_offers, list):
+                        # Iterate all offers (each book)
+                        for offer in goal_offers:
+                             if self.process_market(predictor, player_name, offer, "Anytime Goal", league_name, sport_key):
+                                total_found += 1
 
                 # --- MARKET 2: TOTAL SHOTS OVER ---
                 # Key changed from player_shots_total_over_under to player_shots
                 if 'player_shots' in markets:
-                    # Look for 'Over'
-                    shots_over = markets['player_shots'].get('Over')
-                    if shots_over:
-                        if self.process_market(predictor, player_name, shots_over, "Total Shots", league_name, sport_key):
-                            total_found += 1
+                    # List of offers (Over/Under mixed)
+                    shot_offers = markets['player_shots']
+                    if shot_offers and isinstance(shot_offers, list):
+                        for offer in shot_offers:
+                            # Filter for 'Over'
+                            if offer.get('side') == 'Over':
+                                if self.process_market(predictor, player_name, offer, "Total Shots", league_name, sport_key):
+                                    total_found += 1
 
         log("EDGE", f"🎯 Prop Edge Run Complete. Found {total_found} opportunities.")
 

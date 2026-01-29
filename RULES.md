@@ -11,6 +11,18 @@
 - **Why**: Guarantees reproducibility, speeds up future debugging, and prevents repeat failures after server restarts.
 - **Enforcement**: The assistant will automatically create or update the guide after each successful run.
 
+## Rule: Database Integrity & Connections (STRICT)
+- **Host**: `localhost` (Internal Cluster/Docker: `db`)
+- **Port**: `5432`
+- **User**: `user`
+- **Password**: `password`
+- **DB Name**: `philly_sniper` (NOT `philly_p_sniper`)
+- **Action**: If `Connection refused`, prompt user to start DB; do not assume wrong creds first.
+
 # 🚫 NEGATIVE CONSTRAINTS
 - **NO "SNIPER" BRANDING:** The brand is **PhillyEdge** or **PhillyEdge.AI**. Never use the word "Sniper" in user-facing text, alerts, emails, or dashboards.
 - AESTHETICS: Use "Emerald Green" and "Gold/Amber" accents.
+
+## Rule: Dashboard Time Invariants (Strict)
+- **Always** filter out selections that are past their start time (`kickoff < now`). No exceptions.
+- **Never** display opportunities more than 36 hours in the future (`kickoff > now + 36h`).

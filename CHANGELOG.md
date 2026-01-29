@@ -1,6 +1,17 @@
 # 📜 Change Log
 All notable changes to the PhillyEdge.AI platform will be documented in this file.
 
+## [2.1.3] - 2026-01-26 - Stability & Model Recovery
+### 🧠 AI Model Restoration (NCAAB)
+*   **Resolved Missing Model**: Diagnosed that the NCAAB AI model was not training due to a "Cold Start" requirement (>20 settled bets). 
+*   **Training Fix**: Patched `pipeline/stages/init.py` to fix a compatibility issue between `joblib` (training) and `pickle` (validation), restoring the model to active duty.
+*   **Filter Calibration**: Lowered the **NCAAB Edge Threshold** from 6% to **4%** to allow volume to flow through despite market efficiency.
+
+### 🛡️ Database Stability (Critical Fix)
+*   **Pool Exhaustion Fixed**: Diagnosed a recurring crash where the Dashboard consumed all DB connections.
+*   **RAII Implementation**: Hardened `db/connection.py` by adding a destructor (`__del__`) and Context Manager support to the `PooledConnection` class. This ensures "forgotten" connections are automatically returned to the pool.
+*   **Leak Plugged**: Updated `web/dashboard.py` to explicitly close connections in `finally` blocks for all user actions (Track/Cancel Bet).
+
 ## [2.1.0] - 2026-01-24
 ### Added (Model Optimizations)
 - **NCAAB Calibration**: Implemented "Reality Cap" (Max Prob 65%) and "Noise Floor" (Min Edge 6%) to purge bad volume.
@@ -99,3 +110,14 @@ All notable changes to the PhillyEdge.AI platform will be documented in this fil
     *   **Fix**: Implemented an **"Edge Barrier"** in `probability_models.py`. The system now retrieves the *existing* bet's edge from the DB and only allows a replacement if the **New Edge > Old Edge + 0.5%**.
     *   **Context**: This prevents "lateral moves" where the model churns DB writes for negligible gain. Stability is now prioritized over micro-optimizations.
 
+
+## [2.1.2] - 2026-01-25 - Coherence & UI Refactor
+### 📐 Mathematical Coherence (Critical Fix)
+*   **Normalization Enforced**: Implemented `core.probability.normalize_probabilities` to strictly enforce that outcomes (e.g., Home/Draw/Away) sum to **1.0**.
+*   **Prevented Dual-Sided Value**: By normalizing markets *before* edge calculation, it is now impossible for the model to find value on both sides of a market (unless the bookie line itself is an arb).
+*   **Refactored Processing**: Updated `processing/markets.py` to use the new normalization logic for Soccer H2H and Totals.
+
+### 🎨 Dashboard UI Refactor
+*   **Hidden Stakes**: Removed the dollar amount stake recommendation from the primary card view to reduce **Anchoring Bias**. Stakes are now only visible inside the "Track" popover.
+*   **Integrated Badges**: Removed the floating "Sharp Badge" and integrated the signal directly into the Edge Label (e.g., `EDGE 5.2% 🔥 SHARP`) for better context.
+*   **Performance**: Implemented **Caching** (`@st.cache_data`) for the main data fetch to prevent dashboard crashes when interacting with filters.

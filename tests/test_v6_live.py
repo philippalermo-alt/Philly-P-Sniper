@@ -1,4 +1,4 @@
-from soccer_model_v2 import SoccerModelV2
+from models.soccer import SoccerModelV2
 
 def test_live():
     model = SoccerModelV2()

@@ -5,7 +5,7 @@ import pandas as pd
 import difflib
 import re
 from datetime import datetime, timedelta
-from database import get_db
+from db.connection import get_db
 from config import Config
 from utils import log
 
@@ -295,6 +295,8 @@ def settle_soccer_props():
                 SET outcome = %s, logic = %s 
                 WHERE event_id = %s
             """, (outcome, logic, event_id))
+            
+            cursor.execute("UPDATE calibration_log SET outcome = %s WHERE event_id = %s", (outcome, event_id))
             
             conn.commit()
             log(CONTEXT, f"[INFO] Settled Bet {event_id}: {selection} -> {outcome} ({logic})")

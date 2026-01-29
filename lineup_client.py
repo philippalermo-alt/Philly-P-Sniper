@@ -76,8 +76,10 @@ def get_confirmed_lineup(league_key, home_team, away_team):
         items = data.get('response', [])
         print(f"DEBUG_LC: Found {len(items)} fixtures for date {date_str} league {lid}", flush=True)
         
+        fixture_id = None
         for f in items:
             teams = f['teams']
+            # print(f"   🐛 [DEBUG-LC] Found Fixture: {teams['home']['name']} vs {teams['away']['name']}", flush=True)
             h_name = teams['home']['name']
             a_name = teams['away']['name']
             

@@ -8,7 +8,7 @@ which is a key metric for measuring betting skill over time.
 import requests
 from datetime import datetime, timezone, timedelta
 from config import Config
-from database import get_db, safe_execute
+from db.connection import get_db, safe_execute
 from utils import log
 
 def fetch_closing_odds():

@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from database import get_db
+from db.connection import get_db
 from utils import log
 
 class PlayerPropsPredictor:
@@ -14,7 +14,40 @@ class PlayerPropsPredictor:
         self.season = season
         self.data = self._load_data()
         
+    def get_player_stats_any_league(self, player_name):
+        """
+        Cross-Reference Lookup: Find player stats in ANY league (for UCL).
+        """
+        conn = get_db()
+        if not conn: return None
+        
+        # Search all leagues for this player (most recent season)
+        query = """
+            SELECT player_id, player_name, team_name, team_id, position, minutes, 
+                   shots, goals, assists, xg, xa, xg_chain, xg_buildup, match_id, league, season
+            FROM player_stats
+            WHERE player_name = %s
+            ORDER BY season DESC, match_id DESC
+            LIMIT 50 
+        """
+        try:
+             df = pd.read_sql(query, conn, params=(player_name,))
+             if not df.empty:
+                # Prioritize Big 5 Leagues if multiple found
+                # Filter for season 2025 preferrably
+                df_2025 = df[df['season'] == '2025']
+                if not df_2025.empty:
+                    df = df_2025
+                return df
+             return None
+        except Exception as e:
+            log("ERROR", f"Cross-Ref Lookup Error: {e}")
+            return None
+        finally:
+            conn.close()
+
     def _load_data(self):
+
         """Fetch all player stats for the season from DB."""
         conn = get_db()
         if not conn:
@@ -111,7 +144,13 @@ class PlayerPropsPredictor:
         """
         Calculate stats and apply MATCHUP ADJUSTMENT if opponent is provided.
         """
-        player_df = self.data[self.data['player_name'] == player_name].copy()
+        # --- CROSS-REFERENCE CHECK (UCL) ---
+        if self.league == "Champions_League":
+             # Special Mode: Lookup Player in ANY DB (Domestic League Data)
+             player_df = self.get_player_stats_any_league(player_name)
+             if player_df is None or player_df.empty: return None
+        else:
+             player_df = self.data[self.data['player_name'] == player_name].copy()
         
         if player_df.empty: return None
         
